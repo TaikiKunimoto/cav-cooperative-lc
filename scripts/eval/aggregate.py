@@ -54,6 +54,23 @@ def _to_float(v: str | None) -> float | None:
         return None
 
 
+def _resolve_csv(job: dict) -> Path | None:
+    """job の CSV パスを解決する。manifest の絶対パスが無ければ out/raw/<name>.csv へフォールバック。
+
+    リモート（sgnlab 等）で実行した manifest は output_csv がリモートの絶対パスのため、
+    回収後のローカルでは raw/ 直下の決定的名で探し直す。
+    """
+    csv_path = job.get("output_csv")
+    if csv_path and Path(csv_path).exists():
+        return Path(csv_path)
+    name = job.get("name")
+    if name:
+        cand = OUT_DIR / "raw" / f"{name}.csv"
+        if cand.exists():
+            return cand
+    return None
+
+
 def load_long() -> pd.DataFrame:
     manifest = json.loads(MANIFEST.read_text())
     rows: list[dict] = []
@@ -62,8 +79,8 @@ def load_long() -> pd.DataFrame:
         if job.get("status") not in ("ok", "skipped"):
             skipped.append(f"{job.get('name')} [{job.get('status')}]")
             continue
-        csv_path = job.get("output_csv")
-        if not csv_path or not Path(csv_path).exists():
+        csv_path = _resolve_csv(job)
+        if csv_path is None:
             skipped.append(f"{job.get('name')} [no-csv]")
             continue
         with open(csv_path) as fh:
@@ -77,7 +94,11 @@ def load_long() -> pd.DataFrame:
             row[dst] = _to_float(r.get(src))
         rows.append(row)
     if skipped:
-        print(f"[aggregate] 集計から除外 {len(skipped)} 件: " + ", ".join(skipped[:12]) + (" ..." if len(skipped) > 12 else ""))
+        print(
+            f"[aggregate] 集計から除外 {len(skipped)} 件: "
+            + ", ".join(skipped[:12])
+            + (" ..." if len(skipped) > 12 else "")
+        )
     df = pd.DataFrame(rows)
     return df
 

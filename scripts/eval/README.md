@@ -12,28 +12,34 @@
 
 | スクリプト | 役割 |
 |---|---|
-| `run_sweep.py` | 実行マトリクス（method×env×Q×f×seed）を並列実行。CSV を `out/raw/` に決定的名で集約し `out/manifest.json` を記録 |
-| `aggregate.py` | manifest と各 CSV を集計 → `out/summary_long.csv` / `summary_scenario.{csv,md}` / `summary_robustness.csv` |
+| `run_all.py` | **1コマンド一気通貫**（実行→集計→作図→Excel）。まずこれを使う |
+| `run_sweep.py` | 実行マトリクス（method×env×Q×f×seed）を並列実行。CSV を `out/raw/` に決定的名で集約し `out/manifest.json` を記録（gitコミット・SUMOバージョン等の来歴つき） |
+| `aggregate.py` | manifest と各 CSV を集計 → `out/summary_long.csv` / `summary_scenario.{csv,md}` / `summary_robustness.csv` / `summary_mlc.{csv,md}` |
 | `make_figures.py` | `summary_long.csv` から図を生成 → `out/figures/*.png` |
+| `export_excel.py` | 集計結果＋来歴を1つの Excel ブックへ → `out/excel/評価サマリ_<git>_<日時>.xlsx`（毎回新規＝上書きなし） |
+| `check_determinism.py` | 同一条件・同一seed を複数回実行し結果一致を検証（実装変更後の再現性ガード） |
+
+sgnlab（リモート）で回す場合は `scripts/remote/README.md`、運用ルールは `docs/評価運用SOP.md` を参照。
 
 ## 使い方（リポジトリ直下から）
 
 ```bash
-# 0) 動作確認（小グリッド）
-uv run python scripts/eval/run_sweep.py --suite proposed --quick
+# 0) 動作確認（小グリッド・一気通貫。1 run ≈ 100秒 × 20 jobs / 並列）
+uv run python scripts/eval/run_all.py --suite proposed --quick
 
-# 1) 提案手法フルスイープ（4必須LC環境 + straight障害物）
-uv run python scripts/eval/run_sweep.py --suite proposed --workers 20
+# 1) 提案手法フルスイープ（4必須LC環境 + straight障害物。385 jobs ≈ ローカル80分）
+uv run python scripts/eval/run_all.py --suite proposed --workers 20
 
 # 2) 分流ベースライン（v2 / default / custom を分流で交通効率比較）
-uv run python scripts/eval/run_sweep.py --suite baseline --workers 8
+uv run python scripts/eval/run_all.py --suite baseline --workers 8
 
-# 3) 集計 → 作図
-uv run python scripts/eval/aggregate.py
-uv run python scripts/eval/make_figures.py
+# 3) 既存の out/ から集計以降だけ再実行（図の体裁を変えた時など）
+uv run python scripts/eval/run_all.py --skip-sweep
 ```
 
-成果物はすべて `scripts/eval/out/` 配下（`raw/` 生CSV・`logs/` 実行ログ・`figures/` 図・各 summary）。
+個別ステップ（`run_sweep.py` → `aggregate.py` → `make_figures.py` → `export_excel.py`）を
+単独で叩くこともできる。成果物はすべて `scripts/eval/out/` 配下
+（`raw/` 生CSV・`logs/` 実行ログ・`figures/` 図・`excel/` Excel・各 summary）。
 
 ## 評価グリッド（既定 = しっかり）
 

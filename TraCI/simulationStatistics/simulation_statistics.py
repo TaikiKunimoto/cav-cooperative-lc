@@ -144,7 +144,14 @@ class SimulationStatistics:
             # 決定的な一意名（タイムスタンプなし）。run_sweep がパラメータを符号化して渡し、出力を確実に解決する。
             return f"{self.output_dir}/{override}.csv"
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        return f"{self.output_dir}/{filename}_{timestamp}.csv"
+        path = f"{self.output_dir}/{filename}_{timestamp}.csv"
+        # タイムスタンプは分単位のため、同一条件を同じ分内に再実行すると同名になり
+        # 既存結果を無警告で上書きしてしまう。衝突時のみ連番を付けて回避する（非衝突時は従来と同名）。
+        suffix = 2
+        while os.path.exists(path):
+            path = f"{self.output_dir}/{filename}_{timestamp}-{suffix}.csv"
+            suffix += 1
+        return path
 
     def _create_csv_with_headers(self) -> None:
         headers = [

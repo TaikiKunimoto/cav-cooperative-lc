@@ -25,9 +25,11 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
+from datetime import datetime
 import json
 import os
 from pathlib import Path
+import platform
 import subprocess
 import time
 
@@ -94,14 +96,63 @@ class Job:
 
     def command(self) -> list[str]:
         if self.method == "v2":
-            cmd = ["uv", "run", "python", "-m", "v2", str(self.seed), str(self.q), str(self.f), "--env", self.env, "--nogui"]
+            cmd = [
+                "uv",
+                "run",
+                "python",
+                "-m",
+                "v2",
+                str(self.seed),
+                str(self.q),
+                str(self.f),
+                "--env",
+                self.env,
+                "--nogui",
+            ]
             if self.obstacle is not None:
                 cmd += ["--obstacle", self.obstacle]
             return cmd
         # v1 系: 位置引数 (seed, inflow_pass, inflow_exit)
         inflow_exit = round(self.q * self.f)
         inflow_pass = round(self.q * (1.0 - self.f))
-        return ["uv", "run", "python", "-m", f"v1.{self.method}", str(self.seed), str(inflow_pass), str(inflow_exit), "--nogui"]
+        return [
+            "uv",
+            "run",
+            "python",
+            "-m",
+            f"v1.{self.method}",
+            str(self.seed),
+            str(inflow_pass),
+            str(inflow_exit),
+            "--nogui",
+        ]
+
+
+def collect_metadata() -> dict[str, object]:
+    """再現性のための実行来歴（gitコミット・SUMOバージョン・ホスト・開始時刻）を集める。"""
+
+    def _git(*args: str) -> str:
+        try:
+            r = subprocess.run(["git", *args], capture_output=True, text=True, cwd=REPO_ROOT, timeout=10)
+            return r.stdout.strip()
+        except OSError:
+            return ""
+
+    sumo_version = ""
+    try:
+        r = subprocess.run(["sumo", "--version"], capture_output=True, text=True, timeout=10)
+        sumo_version = r.stdout.splitlines()[0] if r.stdout else ""
+    except (OSError, IndexError):
+        pass
+
+    return {
+        "git_commit": _git("rev-parse", "--short", "HEAD") or "unknown",
+        "git_branch": _git("rev-parse", "--abbrev-ref", "HEAD") or "unknown",
+        "git_dirty": bool(_git("status", "--porcelain")),
+        "sumo_version": sumo_version or "unknown",
+        "hostname": platform.node(),
+        "started_at": datetime.now().isoformat(timespec="seconds"),
+    }
 
 
 def build_jobs(suite: str, quick: bool) -> list[Job]:
@@ -120,21 +171,35 @@ def build_jobs(suite: str, quick: bool) -> list[Job]:
         # straight は単一グループのため流入時刻のユニーク抽出上限（≈3600 veh/h）に当たる。Q は 3500 までに制限。
         for q in [q for q in qs if q <= 3500]:
             for s in seeds:
-                jobs.append(Job(method="v2", scenario="straight_obs", env="straight", q=q, f=0.0, seed=s, obstacle=STRAIGHT_OBSTACLE))
+                jobs.append(
+                    Job(
+                        method="v2",
+                        scenario="straight_obs",
+                        env="straight",
+                        q=q,
+                        f=0.0,
+                        seed=s,
+                        obstacle=STRAIGHT_OBSTACLE,
+                    )
+                )
 
     if suite in ("baseline", "all"):
         # v2 / default（高速）は全 Q × 全 seed
         for method in BASELINE_FAST_METHODS:
             for q in qs:
                 for s in seeds:
-                    jobs.append(Job(method=method, scenario="diverge_baseline", env="diverge", q=q, f=BASELINE_F, seed=s))
+                    jobs.append(
+                        Job(method=method, scenario="diverge_baseline", env="diverge", q=q, f=BASELINE_F, seed=s)
+                    )
         # custom（卒論・高コスト）は少数グリッド（quick 指定時はさらに縮小）
         slow_qs = Q_QUICK if quick else BASELINE_SLOW_Q
         slow_seeds = SEEDS_QUICK if quick else BASELINE_SLOW_SEEDS
         for method in BASELINE_SLOW_METHODS:
             for q in slow_qs:
                 for s in slow_seeds:
-                    jobs.append(Job(method=method, scenario="diverge_baseline", env="diverge", q=q, f=BASELINE_F, seed=s))
+                    jobs.append(
+                        Job(method=method, scenario="diverge_baseline", env="diverge", q=q, f=BASELINE_F, seed=s)
+                    )
 
     return jobs
 
@@ -241,8 +306,10 @@ def main() -> None:
         "total_jobs": len(jobs),
         "elapsed_s": elapsed,
         "raw_dir": str(RAW_DIR),
+        "metadata": collect_metadata(),
         "jobs": [asdict(j) for j in results],
     }
+
     # 既存 manifest があればマージ（別 suite を続けて回した場合に両方残す）。
     # キーは obstacle 込みの正規名で統一する（旧実装は新=name/旧=fallback でキーが食い違い、
     # obstacle 付き straight が二重登録されて n が倍になっていた）。
@@ -257,6 +324,12 @@ def main() -> None:
             old = json.loads(MANIFEST.read_text())
             for j in old.get("jobs", []):
                 existing[_job_key(j)] = j
+            # 過去 sweep の来歴も残す（どのコミット・環境で採ったかの追跡用）
+            history = old.get("metadata_history", [])
+            if old.get("metadata"):
+                history.append(old["metadata"])
+            if history:
+                manifest["metadata_history"] = history
         except (OSError, json.JSONDecodeError):
             pass
     for j in results:
