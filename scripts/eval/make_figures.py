@@ -49,8 +49,15 @@ def fig1_scenario_deadline(df: pd.DataFrame) -> None:
 
     fig, ax = plt.subplots(figsize=(7, 4.2))
     x = range(len(order))
-    ax.bar(x, means.values * 100, yerr=stds.values * 100, capsize=5,
-           color=COLORS[: len(order)], edgecolor="black", linewidth=0.6)
+    ax.bar(
+        x,
+        means.values * 100,
+        yerr=stds.values * 100,
+        capsize=5,
+        color=COLORS[: len(order)],
+        edgecolor="black",
+        linewidth=0.6,
+    )
     ax.set_xticks(list(x))
     ax.set_xticklabels([ENV_LABEL.get(e, e) for e in order])
     ax.set_ylabel("Mandatory-LC deadline completion rate [%]")
@@ -59,7 +66,16 @@ def fig1_scenario_deadline(df: pd.DataFrame) -> None:
     ax.set_title("Single controller across multiple mandatory-LC scenarios")
     for xi, m, n in zip(x, means.values, ns.values, strict=True):
         ax.text(xi, m * 100 + 1.5, f"{m * 100:.1f}%\n(n={int(n)})", ha="center", va="bottom", fontsize=9)
-    fig.tight_layout()
+    fig.text(
+        0.99,
+        0.005,
+        "Error bars: ±1 SD pooled over all runs (Q × f × seeds)",
+        ha="right",
+        va="bottom",
+        fontsize=7,
+        color="dimgray",
+    )
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
     p = FIG_DIR / "fig1_scenario_deadline.png"
     fig.savefig(p, dpi=160)
     plt.close(fig)
@@ -81,8 +97,15 @@ def fig2_robustness_deadline(df: pd.DataFrame) -> None:
         for j, fval in enumerate(sorted(de["f"].unique())):
             sub = de[de["f"] == fval]
             g = sub.groupby("q")["deadline_rate"].agg(["mean", "std"]).reset_index().sort_values("q")
-            ax.errorbar(g["q"], g["mean"] * 100, yerr=(g["std"] * 100).fillna(0), marker="o",
-                        capsize=3, color=COLORS[j % len(COLORS)], label=f"f={fval}")
+            ax.errorbar(
+                g["q"],
+                g["mean"] * 100,
+                yerr=(g["std"] * 100).fillna(0),
+                marker="o",
+                capsize=3,
+                color=COLORS[j % len(COLORS)],
+                label=f"f={fval}",
+            )
         ax.set_title(ENV_LABEL.get(env, env))
         ax.set_ylim(0, 105)
         ax.axhline(100, color="gray", lw=0.7, ls="--")
@@ -95,7 +118,16 @@ def fig2_robustness_deadline(df: pd.DataFrame) -> None:
         axes[k].set_visible(False)
     axes[0].legend(title="MLC ratio", fontsize=9, loc="lower left")
     fig.suptitle("Robustness to inflow Q and mandatory-LC ratio f", y=0.99)
-    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.text(
+        0.99,
+        0.005,
+        "Error bars: ±1 SD across seeds (per Q, f cell)",
+        ha="right",
+        va="bottom",
+        fontsize=7,
+        color="dimgray",
+    )
+    fig.tight_layout(rect=(0, 0.02, 1, 0.97))
     p = FIG_DIR / "fig2_robustness_deadline.png"
     fig.savefig(p, dpi=160)
     plt.close(fig)
@@ -131,7 +163,11 @@ def fig_safety(df: pd.DataFrame) -> None:
     a2.set_title("Collision-free run share vs load")
     a2.grid(True, alpha=0.3)
     a2.legend(fontsize=8)
-    fig.suptitle("Safety envelope: high deadline completion holds, but safety margin shrinks under heavy load", y=0.99, fontsize=11)
+    fig.suptitle(
+        "Safety envelope: high deadline completion holds, but safety margin shrinks under heavy load",
+        y=0.99,
+        fontsize=11,
+    )
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     p = FIG_DIR / "fig_safety.png"
     fig.savefig(p, dpi=160)
@@ -183,10 +219,15 @@ def fig3_baseline_diverge(df: pd.DataFrame) -> None:
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.2))
     for j, m in enumerate(methods):
         dm = d[d["method"] == m]
-        g = dm.groupby("q").agg(spd=("avg_speed", "mean"), spd_s=("avg_speed", "std"),
-                                thr=("throughput", "mean")).reset_index().sort_values("q")
-        a1.errorbar(g["q"], g["spd"], yerr=g["spd_s"].fillna(0), marker="o", capsize=3,
-                    color=COLORS[j % len(COLORS)], label=m)
+        g = (
+            dm.groupby("q")
+            .agg(spd=("avg_speed", "mean"), spd_s=("avg_speed", "std"), thr=("throughput", "mean"))
+            .reset_index()
+            .sort_values("q")
+        )
+        a1.errorbar(
+            g["q"], g["spd"], yerr=g["spd_s"].fillna(0), marker="o", capsize=3, color=COLORS[j % len(COLORS)], label=m
+        )
         a2.plot(g["q"], g["thr"], marker="s", color=COLORS[j % len(COLORS)], label=m)
     a1.set_xlabel("Inflow Q [veh/h]")
     a1.set_ylabel("Average speed [m/s]")
@@ -201,10 +242,15 @@ def fig3_baseline_diverge(df: pd.DataFrame) -> None:
     a2.legend()
     fig.suptitle("Diverge efficiency: proposed (v2) vs baseline (v1)", y=0.995)
     fig.text(
-        0.5, 0.005,
+        0.5,
+        0.005,
         "Caveat: geometry differs (v1 net 2496 m free-flow, no tight deadline; v2 diverge 1000 m with hard LC deadline). "
         "Throughput is comparable up to ~3500 veh/h; absolute speed is NOT a clean head-to-head.",
-        ha="center", va="bottom", fontsize=8, color="#555555", wrap=True,
+        ha="center",
+        va="bottom",
+        fontsize=8,
+        color="#555555",
+        wrap=True,
     )
     fig.tight_layout(rect=(0, 0.06, 1, 0.95))
     p = FIG_DIR / "fig3_baseline_diverge.png"

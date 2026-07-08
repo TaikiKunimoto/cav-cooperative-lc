@@ -54,6 +54,9 @@ uv run python scripts/eval/run_all.py --skip-sweep
 - `deadline_achievement_rate` … **締切達成率＝必須LC完了/要求**（中核指標。straight障害物は母数0で空）
 - `total_collisions` / `min_TTC` / `TET` … 安全性
 - `traffic volume`（スループット）/ `canceled_vehicles` … 容量
+  - 注意: `traffic volume` は **departed（入口通過）基準**＝ほぼ供給側。封鎖・渋滞下で
+    「捌けているか」を見るときは集計が計算する **`exit_throughput`（exited 基準）** を使う
+- `summary_excluded.csv` … 集計から除外された run（クラッシュ・timeout 等）。**空であることを毎回確認**
 - `average_speed` / `average_travel_time` … 効率
 
 ## 実装フック（評価専用・環境変数。未設定なら従来動作＝golden 不変）

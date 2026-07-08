@@ -17,6 +17,9 @@ scripts/eval/out/logs/
 scripts/eval/out/manifest.json
 scripts/eval/out/manifest.sgnlab.json
 scripts/eval/out/manifest.backup.*.json
+scripts/eval/out/manifest.corrupt.*.json
+scripts/eval/out/raw.backup.*/
+.sync_metadata.json
 scripts/eval/out/deliverable/
 scripts/eval/out/figures_*/
 scripts/eval/out/*.zip

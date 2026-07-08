@@ -25,6 +25,7 @@ MANIFEST = OUT_DIR / "manifest.json"
 
 # CSV から拾う主要指標（ヘッダ名 → 出力名）。"traffic volume" は空白入りなので注意。
 METRIC_COLS = {
+    "simulation_time": "sim_time",
     "deadline_achievement_rate": "deadline_rate",
     "mandatory_lc_total": "mlc_total",
     "mandatory_lc_completed": "mlc_completed",
@@ -71,44 +72,54 @@ def _resolve_csv(job: dict) -> Path | None:
     return None
 
 
-def load_long() -> pd.DataFrame:
+def load_long() -> tuple[pd.DataFrame, list[dict]]:
+    """manifest から (集計対象の long DataFrame, 除外された run 一覧) を返す。"""
     manifest = json.loads(MANIFEST.read_text())
     rows: list[dict] = []
-    skipped: list[str] = []
+    excluded: list[dict] = []
     for job in manifest.get("jobs", []):
         if job.get("status") not in ("ok", "skipped"):
-            skipped.append(f"{job.get('name')} [{job.get('status')}]")
+            excluded.append({"name": job.get("name"), "reason": job.get("status"), "log": job.get("log")})
             continue
         csv_path = _resolve_csv(job)
         if csv_path is None:
-            skipped.append(f"{job.get('name')} [no-csv]")
+            excluded.append({"name": job.get("name"), "reason": "no-csv", "log": job.get("log")})
             continue
         with open(csv_path) as fh:
             data = list(csv.DictReader(fh))
         if not data:
-            skipped.append(f"{job.get('name')} [empty-csv]")
+            excluded.append({"name": job.get("name"), "reason": "empty-csv", "log": job.get("log")})
             continue
         r = data[-1]  # 1 run = 末尾 1 行
         row: dict = {k: job.get(k) for k in META_KEYS}
         for src, dst in METRIC_COLS.items():
             row[dst] = _to_float(r.get(src))
         rows.append(row)
-    if skipped:
-        print(
-            f"[aggregate] 集計から除外 {len(skipped)} 件: "
-            + ", ".join(skipped[:12])
-            + (" ..." if len(skipped) > 12 else "")
-        )
     df = pd.DataFrame(rows)
-    return df
+    return df, excluded
 
 
 def main() -> None:
     if not MANIFEST.exists():
         raise SystemExit(f"manifest が見つかりません: {MANIFEST}（先に run_sweep.py を実行）")
-    df = load_long()
+    df, excluded = load_long()
+
+    # 除外 run は「無言で消す」と生存バイアスになる（例: 衝突でクラッシュした run が安全性集計から
+    # 消える）ため、必ずファイルに残して件数を目立たせる。
+    excl_path = OUT_DIR / "summary_excluded.csv"
+    pd.DataFrame(excluded, columns=["name", "reason", "log"]).to_csv(excl_path, index=False)
+    if excluded:
+        print(f"[aggregate] ⚠ 集計から除外された run が {len(excluded)} 件あります → {excl_path}")
+        print(
+            "[aggregate] ⚠ 論文・スライドに数値を使う前に、除外理由（クラッシュ等）が結果を歪めないか必ず確認すること。"
+        )
+
     if df.empty:
         raise SystemExit("集計対象の run がありません。")
+
+    # 出口ベースのスループット [veh/h]（'traffic volume'＝departed 基準は入口通過＝供給側の指標。
+    # 封鎖・渋滞で「捌けているか」を見るときはこちらを使う）
+    df["exit_throughput"] = df["exited"] * 3600.0 / df["sim_time"]
 
     df = df.sort_values(["method", "scenario", "q", "f", "seed"]).reset_index(drop=True)
     long_path = OUT_DIR / "summary_long.csv"
@@ -117,7 +128,9 @@ def main() -> None:
 
     # --- (method, scenario) 別の集計（seed/Q/f 跨ぎ）---
     # min_TTC は車両オーバーラップ時に異常値（巨大負値）が出るため安全性は衝突件数・衝突0率で見る。
-    df["_collision_free"] = (df["collisions"] == 0).astype(float)
+    # collisions 未計測（列が無い CSV → NaN）の run は「衝突あり」に数えず、分母から外す
+    # （全 run 欠損なら NaN のまま '-' 表示。0 と表示すると「毎回衝突」という虚偽になる）。
+    df["_collision_free"] = df["collisions"].eq(0).astype(float).where(df["collisions"].notna())
     agg = (
         df.groupby(["method", "scenario"])
         .agg(
@@ -128,6 +141,7 @@ def main() -> None:
             collision_free_pct=("_collision_free", "mean"),
             avg_speed_mean=("avg_speed", "mean"),
             throughput_mean=("throughput", "mean"),
+            exit_throughput_mean=("exit_throughput", "mean"),
             canceled_mean=("canceled", "mean"),
         )
         .reset_index()
@@ -163,9 +177,11 @@ def main() -> None:
             n=("seed", "size"),
             deadline_rate_mean=("deadline_rate", "mean"),
             deadline_rate_std=("deadline_rate", "std"),
-            collisions_sum=("collisions", "sum"),
+            # min_count=1: 全 run が未計測（NaN）のセルを 0 件と偽らず NaN のままにする
+            collisions_sum=("collisions", lambda s: s.sum(min_count=1)),
             avg_speed_mean=("avg_speed", "mean"),
             throughput_mean=("throughput", "mean"),
+            exit_throughput_mean=("exit_throughput", "mean"),
             canceled_mean=("canceled", "mean"),
         )
         .reset_index()

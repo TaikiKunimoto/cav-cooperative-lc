@@ -17,6 +17,10 @@ scripts/remote/sgnlab_fetch.sh                      # 4) 回収（ローカル�
 uv run python scripts/eval/run_all.py --skip-sweep  # 5) ローカルで集計→図→Excel
 ```
 
+リモートで `--force` 再採取した結果を採用するときだけ `sgnlab_fetch.sh --take-remote`
+（ローカル raw/ を raw.backup.<日時>/ へ退避してからリモートで上書き）。fetch が
+「内容が異なるCSVが N 件」と警告したら、この分岐が必要なサイン。ユーザーに確認してから使う。
+
 ## 安全ルール（厳守）
 
 - **フルスイープ（数百 jobs）の起動は必ずユーザーに事前確認**。--yes を独断で付けない。

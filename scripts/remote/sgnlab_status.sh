@@ -6,7 +6,9 @@
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 echo "=== 実行中プロセス ==="
-remote_exec "pgrep -af 'run_sweep|python -m v2|python -m v1' || echo '(実行中の run はありません)'"
+# 文字クラス [r] 等でパターン文字列自身へのマッチを防ぐ（ssh のラッパーシェルが
+# パターンを含むため、素のパターンだと常に自己マッチして「実行中」と誤表示する）。
+remote_exec "pgrep -af '[r]un_sweep|python -m [v]2|python -m [v]1' || echo '(実行中の run はありません)'"
 
 echo ""
 echo "=== 生成済み run CSV ==="

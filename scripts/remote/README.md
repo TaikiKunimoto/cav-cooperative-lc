@@ -13,6 +13,7 @@
 
 ```bash
 # 1) コードを同期（結果は消さない・.gitignore 対象は送らない）
+#    スイープ実行中は拒否される（コード差し替えで新旧結果が混在するため）
 scripts/remote/sgnlab_push.sh
 
 # 2) スイープを起動（ジョブ数を表示して確認プロンプト。--yes でスキップ）
@@ -22,18 +23,32 @@ scripts/remote/sgnlab_run.sh --suite proposed --workers 20
 # 3) 進捗確認（読み取りのみ）
 scripts/remote/sgnlab_status.sh
 
-# 4) 結果回収（ローカル既存ファイルは上書きしない）＋ manifest マージ
+# 4) 結果回収（ローカルに無い CSV だけ取り込む）＋ manifest マージ
 scripts/remote/sgnlab_fetch.sh
 
 # 5) ローカルで集計 → 図 → Excel
 uv run python scripts/eval/run_all.py --skip-sweep
 ```
 
+### リモートで `--force` 再採取したときの回収
+
+既定の fetch はローカル優先（同名 CSV は取り込まない）なので、リモートで採り直した結果を
+採用するときは明示的に指定する:
+
+```bash
+scripts/remote/sgnlab_fetch.sh --take-remote   # ローカル raw/ を raw.backup.<日時>/ へ退避してから上書き
+```
+
+既定の fetch が「リモートと内容が異なるローカル既存CSVが N 件」と警告したら、この分岐が必要なサイン。
+
 ## 安全設計
 
 - `push` / `fetch` は **`--delete` を使わない**。リモートの結果・ローカルの結果とも消えない。
-- `fetch` の raw CSV は `--ignore-existing`（同名はローカル優先）。
-- manifest はキー単位マージで、マージ前に `manifest.backup.<日時>.json` を自動保存。
+- `push` はスイープ実行中を検知して拒否（`.sync_metadata.json` で git 来歴もリモートへ伝える）。
+- 既定 `fetch` はローカルに無い CSV だけ取り込む（ヘッダのみ＝失敗残骸の CSV は先に除去）。
+  `--take-remote` はローカル raw/ 全体を退避してから上書き。
+- manifest はキー単位マージ（既定はローカル優先、`--take-remote` 時はリモート優先。
+  成功エントリが失敗エントリに負けることはない）。マージ前に `manifest.backup.<日時>.json` を自動保存。
 - `run` は投入ジョブ数を表示して確認を取る（大量ジョブの誤投入防止）。
 
 ## 設定の上書き

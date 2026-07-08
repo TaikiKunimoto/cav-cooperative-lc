@@ -29,6 +29,9 @@
    `check_determinism.py` を1回回す（不一致なら図表がすべて信用できなくなる）。
 3. **スイープ途中でコードを変えない**: run_sweep は冪等（済みの run をスキップ）なので、
    途中でコードを変えて再開すると新旧コミットの結果が混ざる。変えたら `--force` で全再実行。
+   `--force` 時は旧 CSV が `<run名>.csv.prev` に退避される（再実行が失敗しても旧結果は残る）。
+   **リモート（sgnlab）で `--force` 再採取した場合**、回収は `sgnlab_fetch.sh --take-remote`
+   を使う（既定の fetch はローカル優先のため新しい結果を取り込まない。fetch が警告を出す）。
 4. **1条件だけ手で回したいとき**も、素の `python -m v2` ではなく quick スイープか
    EVAL_OUTPUT_NAME を使う（`statistics/v2/` への手動実行ファイル散乱を増やさない）。
 
@@ -44,6 +47,8 @@
 ## 4. 実行後サニティチェック（毎回）
 
 - [ ] run_sweep 末尾の `bad=0` か（失敗があれば `out/logs/<run名>.log` を見る）
+- [ ] `out/summary_excluded.csv` が空か（除外 run は生存バイアスの元。例: 衝突でクラッシュした
+      run が消えると安全性が過大評価される。除外がある場合は理由を確認してから数値を使う）
 - [ ] `summary_scenario.csv` の n ＝ 期待 run 数（例: フル proposed は env×6Q×3f×5seed=90/env）
 - [ ] `deadline_rate` は 0〜1 / `collisions` は過去実績レンジ（0〜数件/run、高負荷でのみ増える）か
 - [ ] `throughput` が供給 Q に対して極端に低くないか（低い＝流入詰まり・設定ミスの疑い）

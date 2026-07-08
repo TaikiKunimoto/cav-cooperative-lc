@@ -101,15 +101,21 @@ def build_workbook(out_path: Path) -> None:
     ]
     meta_df = pd.DataFrame(meta_rows, columns=["項目", "値"])
 
+    # 集計から除外された run の一覧（あれば）。見落とすと生存バイアスになるため専用シートにする。
+    sources = dict(SHEET_SOURCES)
+    excluded_csv = OUT_DIR / "summary_excluded.csv"
+    if excluded_csv.exists():
+        sources["excluded"] = excluded_csv
+
     with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
         meta_df.to_excel(writer, sheet_name="meta", index=False)
-        for sheet, csv_path in SHEET_SOURCES.items():
+        for sheet, csv_path in sources.items():
             df = pd.read_csv(csv_path)
             df.to_excel(writer, sheet_name=sheet, index=False)
             ws = writer.sheets[sheet]
             ws.freeze_panes = "A2"  # ヘッダ行を固定
         # 列幅をヘッダ長+αに揃える（毎回同じ見た目になるよう決定的に計算）
-        for sheet in ("meta", *SHEET_SOURCES.keys()):
+        for sheet in ("meta", *sources.keys()):
             ws = writer.sheets[sheet]
             for col_cells in ws.columns:
                 header = str(col_cells[0].value or "")
@@ -118,7 +124,7 @@ def build_workbook(out_path: Path) -> None:
                 ws.column_dimensions[letter].width = min(max(len(header), body_max) + 3, 40)
 
     print(f"[export_excel] 出力: {out_path}")
-    for sheet, csv_path in SHEET_SOURCES.items():
+    for sheet, csv_path in sources.items():
         n = sum(1 for _ in open(csv_path)) - 1
         print(f"  - {sheet:11s} {n:5d} 行  ({csv_path.name})")
 

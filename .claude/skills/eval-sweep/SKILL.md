@@ -28,7 +28,10 @@ uv run python scripts/eval/run_all.py --skip-sweep               # 既存結果�
 ## 実行後サニティチェック
 
 - run_sweep 末尾の `bad=` が 0 か。失敗 run があれば `out/logs/<name>.log` を確認して報告する。
-- `summary_scenario.csv` の n が期待値（env×Q×f×seed の積）と一致するか。
+- `out/summary_excluded.csv` が空か。除外 run があれば理由（クラッシュ等）を確認し、
+  結果を歪めないか（例: 衝突した run だけ消えて安全性が過大評価）をユーザーへ報告する。
+- `summary_scenario.csv` の n が期待値（**scenario 行ごとに Q×f×seed の積**。
+  フル proposed は 6×3×5=90/env、straight_obs は 5×5=25）と一致するか。
 - `deadline_rate` が 0..1 の範囲か。`collisions` が異常に大きくないか（過去実績: 高負荷で 0〜数件/run）。
 - 異常があれば図・Excel を作る前にユーザーへ報告する。
 

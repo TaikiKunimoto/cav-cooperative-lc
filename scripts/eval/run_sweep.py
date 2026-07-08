@@ -145,7 +145,7 @@ def collect_metadata() -> dict[str, object]:
     except (OSError, IndexError):
         pass
 
-    return {
+    meta: dict[str, object] = {
         "git_commit": _git("rev-parse", "--short", "HEAD") or "unknown",
         "git_branch": _git("rev-parse", "--abbrev-ref", "HEAD") or "unknown",
         "git_dirty": bool(_git("status", "--porcelain")),
@@ -153,6 +153,21 @@ def collect_metadata() -> dict[str, object]:
         "hostname": platform.node(),
         "started_at": datetime.now().isoformat(timespec="seconds"),
     }
+    # リモート実行（rsync 同期で .git が無い）では push 時に生成された来歴ファイルへフォールバック
+    if meta["git_commit"] == "unknown":
+        sync_meta_path = REPO_ROOT / ".sync_metadata.json"
+        if sync_meta_path.exists():
+            try:
+                sync_meta = json.loads(sync_meta_path.read_text())
+                for k in ("git_commit", "git_branch", "git_dirty"):
+                    if k in sync_meta:
+                        meta[k] = sync_meta[k]
+                meta["git_provenance"] = (
+                    f"push元 {sync_meta.get('pushed_from', '?')} ({sync_meta.get('pushed_at', '?')})"
+                )
+            except (OSError, json.JSONDecodeError):
+                pass
+    return meta
 
 
 def build_jobs(suite: str, quick: bool) -> list[Job]:
@@ -209,6 +224,11 @@ def run_job(job: Job, force: bool) -> Job:
     log_path = LOG_DIR / f"{job.name}.log"
     job.output_csv = str(expected)
     job.log = str(log_path)
+
+    # --force 再実行では旧 CSV を .prev へ退避する（シミュレーションは run 開始時点で
+    # 出力 CSV を 'w' で開くため、退避しないと再実行が失敗した場合に旧結果まで失われる）
+    if force and expected.exists():
+        expected.replace(expected.with_suffix(".csv.prev"))
 
     # 冪等: 既存 CSV にデータ行があればスキップ（--force で無視）
     if not force and expected.exists():
@@ -330,8 +350,12 @@ def main() -> None:
                 history.append(old["metadata"])
             if history:
                 manifest["metadata_history"] = history
-        except (OSError, json.JSONDecodeError):
-            pass
+        except (OSError, json.JSONDecodeError) as e:
+            # 破損 manifest を黙って捨てない: 退避してから新規作成する（過去 run の来歴は
+            # 退避側に残る。CSV 自体は raw/ にあるので --force なし再実行で再登録可能）
+            corrupt = MANIFEST.with_name(f"manifest.corrupt.{datetime.now().strftime('%Y%m%d-%H%M%S')}.json")
+            MANIFEST.rename(corrupt)
+            print(f"[run_sweep] ⚠ 既存 manifest が読めません（{e}）。{corrupt} へ退避して作り直します。")
     for j in results:
         d = asdict(j)
         d["name"] = j.name

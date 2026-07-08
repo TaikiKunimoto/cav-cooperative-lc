@@ -8,6 +8,7 @@
 # 安全設計:
 #   - 実行前に --dry-run でジョブ数を表示し、確認プロンプトを出す（--yes でスキップ）。
 #   - 既存CSVがある run は run_sweep 側の冪等スキップが効く（--force を渡さない限り再実行しない）。
+#   - --force で再採取した場合、回収には sgnlab_fetch.sh --take-remote が必要（README 参照）。
 
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
@@ -34,6 +35,9 @@ fi
 
 STAMP=$(date +%Y%m%d-%H%M%S)
 LOG="scripts/eval/out/sweep_${STAMP}.log"
-remote_exec "mkdir -p scripts/eval/out && nohup uv run python scripts/eval/run_sweep.py ${ARGS[*]} > ${LOG} 2>&1 & echo \"[run] 起動 PID=\$!\""
+# 注意: mkdir の後は「;」で区切る（「&&」だと & が (cd && mkdir && nohup...) 全体を
+# バックグラウンド化し、ssh の stdout を握ったサブシェルが残ってスイープ完了までハングする）。
+# nohup 側は stdin/stdout/stderr を全て切り離し、ssh が即座に戻れるようにする。
+remote_exec "mkdir -p scripts/eval/out; nohup uv run python scripts/eval/run_sweep.py ${ARGS[*]} > ${LOG} 2>&1 < /dev/null & echo \"[run] 起動 PID=\$!\""
 echo "[run] リモートログ: ~/${SGNLAB_DIR}/${LOG}"
 echo "[run] 進捗確認: scripts/remote/sgnlab_status.sh / 回収: scripts/remote/sgnlab_fetch.sh"
