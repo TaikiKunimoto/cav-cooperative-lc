@@ -1,7 +1,7 @@
 {
   "folders": [
     {
-      "name": "high-way-branch-v2",
+      "name": "cav-cooperative-lc",
       "path": "."
     },
     {
@@ -29,7 +29,7 @@
       }
     },
     "ruff.enable": true,
-    "mypy-type-checker.args": ["--config-file=${workspaceFolder:high-way-branch-v2}/pyproject.toml"],
+    "mypy-type-checker.args": ["--config-file=${workspaceFolder:cav-cooperative-lc}/pyproject.toml"],
     "cSpell.words": [
       "sqlalchemy"
     ]
