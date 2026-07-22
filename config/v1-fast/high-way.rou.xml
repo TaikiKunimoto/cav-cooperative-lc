@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-11-04 11:20:16 by Eclipse SUMO netedit Version 1.21.0
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="CAV" accel="2.6" decel="5.0" minGap="2.8" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
+
+    <!-- Routes -->
+    <route id="r_pass" edges="MainLane1 MainLane2"/>
+    <route id="r_exit" edges="MainLane1 ExitLane"/>
+</routes>

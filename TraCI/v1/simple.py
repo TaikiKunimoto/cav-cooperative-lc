@@ -204,8 +204,9 @@ def run(inflow_pass: int, inflow_exit: int) -> None:
         for time_step, tail_pos in tail_position_list:
             writer.writerow([time_step, tail_pos])
 
-    # タイムスペース図をプロット
-    _plot_time_space_diagram()
+    # タイムスペース図をプロット（EVAL_NO_PLOT=1 の評価スイープでは抑止して高速化）
+    if not os.environ.get("EVAL_NO_PLOT"):
+        _plot_time_space_diagram()
 
     # シミュレーション結果をcsvファイルに保存
     results = {
@@ -231,7 +232,9 @@ def run(inflow_pass: int, inflow_exit: int) -> None:
 
 # シミュレーションを開始する
 def _startSim() -> None:
-    traci.start([sumoBinary, "-c", "../config/v1/high-way.sumocfg"])
+    # EVAL_SUMOCFG（評価スイープ）で設定ファイルを差し替え可能（既定はオリジナルの high-way）。
+    cfg = os.environ.get("EVAL_SUMOCFG", "../config/v1/high-way.sumocfg")
+    traci.start([sumoBinary, "-c", cfg])
     print("Simulation started")
 
 
