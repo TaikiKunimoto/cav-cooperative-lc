@@ -105,6 +105,21 @@ uv run python -m v2 1 3400 0.5 --env diverge --obstacle 1,1500,80 --nogui   # �
 
 ---
 
+## 評価実験（スイープ・集計・図表・Excel）
+
+評価実験は1条件ずつの手実行ではなく、`scripts/eval/` のパイプラインで回す。
+
+```bash
+uv run python scripts/eval/run_all.py --suite proposed --quick   # 動作確認（約5分）
+uv run python scripts/eval/run_all.py --suite proposed           # フルスイープ→集計→図→Excel
+```
+
+- 使い方の詳細：`scripts/eval/README.md`
+- sgnlab（リモート）実行：`scripts/remote/README.md`
+- 運用ルール・再現性・QAチェックリスト：`docs/評価運用SOP.md`
+
+---
+
 ## 開発
 
 - lint / format：`uv run ruff check TraCI` ／ `uv run ruff format TraCI`

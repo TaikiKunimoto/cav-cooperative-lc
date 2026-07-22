@@ -232,7 +232,9 @@ def run(inflow_pass: int, inflow_exit: int) -> None:
 
 # シミュレーションを開始する
 def _startSim() -> None:
-    traci.start([sumoBinary, "-c", "../config/v1/high-way.sumocfg"])
+    # EVAL_SUMOCFG（評価スイープ）で設定ファイルを差し替え可能（既定はオリジナルの high-way）。
+    cfg = os.environ.get("EVAL_SUMOCFG", "../config/v1/high-way.sumocfg")
+    traci.start([sumoBinary, "-c", cfg])
     print("Simulation started")
 
 

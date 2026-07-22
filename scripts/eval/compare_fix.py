@@ -25,6 +25,10 @@ NAME_RE = re.compile(r"^v2__(?P<scen>[a-z0-9_]+?)__Q(?P<q>\d+)__f(?P<f>[\d.]+)__
 
 
 def load(d: Path) -> pd.DataFrame:
+    if not d.is_dir():
+        raise SystemExit(
+            f"比較元ディレクトリがありません: {d}（--force 前の raw を raw_before_fix 等へ退避しておくこと）"
+        )
     rows = []
     for p in sorted(d.glob("v2__*.csv")):
         m = NAME_RE.match(p.name)
@@ -74,8 +78,13 @@ def summarize(df: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     before_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else OUT / "raw_before_fix"
     after_dir = Path(sys.argv[2]) if len(sys.argv) > 2 else OUT / "raw"
-    b = summarize(load(before_dir))
-    a = summarize(load(after_dir))
+    b_df, a_df = load(before_dir), load(after_dir)
+    if b_df.empty or a_df.empty:
+        raise SystemExit(
+            f"比較対象の run CSV が見つかりません: before={before_dir} ({len(b_df)}件) after={after_dir} ({len(a_df)}件)"
+        )
+    b = summarize(b_df)
+    a = summarize(a_df)
 
     def fmt(x, nd=2):
         return "-" if x is None or pd.isna(x) else f"{x:.{nd}f}"
@@ -94,8 +103,8 @@ def main() -> None:
         print(
             f"| {s} | {int(ra['n'])} | {fmt(rb['coll_per_run'])} → **{fmt(ra['coll_per_run'])}** | "
             f"{int(rb['collisions_total'])} → **{int(ra['collisions_total'])}** | "
-            f"{fmt(rb['cfree_pct'],0)} → **{fmt(ra['cfree_pct'],0)}** | "
-            f"{fmt(rb['deadline_mean'],3)} → **{fmt(ra['deadline_mean'],3)}** |"
+            f"{fmt(rb['cfree_pct'], 0)} → **{fmt(ra['cfree_pct'], 0)}** | "
+            f"{fmt(rb['deadline_mean'], 3)} → **{fmt(ra['deadline_mean'], 3)}** |"
         )
     # 全体（MLC4環境）
     bm = load(before_dir)
@@ -104,7 +113,7 @@ def main() -> None:
     am = am[am.scenario != "straight_obs"]
     print(
         f"\nMLC4環境合計 衝突件数: {int(bm['collisions'].sum())} → {int(am['collisions'].sum())}"
-        f"  / 衝突0率: {(bm['collisions']==0).mean()*100:.0f}% → {(am['collisions']==0).mean()*100:.0f}%"
+        f"  / 衝突0率: {(bm['collisions'] == 0).mean() * 100:.0f}% → {(am['collisions'] == 0).mean() * 100:.0f}%"
         f"  / 締切達成率(平均): {bm['deadline'].mean():.3f} → {am['deadline'].mean():.3f}"
     )
 
