@@ -9,3 +9,12 @@ __pycache__/
 
 statistics
 paperEvaluation
+
+# 評価スイープの生データ・ログ・バックアップ・配布zip（再生成可能。結果の図/表/所見のみ追跡）
+scripts/eval/out/raw/
+scripts/eval/out/raw_*/
+scripts/eval/out/logs/
+scripts/eval/out/manifest.json
+scripts/eval/out/deliverable/
+scripts/eval/out/figures_*/
+scripts/eval/out/*.zip

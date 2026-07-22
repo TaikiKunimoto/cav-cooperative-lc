@@ -187,7 +187,9 @@ def run(
         for time_step, tail_pos in tail_position_list:
             writer.writerow([time_step, tail_pos])
 
-    _plot_time_space_diagram(state, inflow_pass, inflow_exit)
+    # EVAL_NO_PLOT=1（評価スイープ）では time-space 図出力を抑止して高速化する。
+    if not os.environ.get("EVAL_NO_PLOT"):
+        _plot_time_space_diagram(state, inflow_pass, inflow_exit)
 
     results = {
         "total_generated_vehicle": state.veh_id,
@@ -210,7 +212,9 @@ def run(
 
 
 def _start_sim(sumoBinary: str) -> None:
-    traci.start([sumoBinary, "-c", "../config/v1/high-way.sumocfg"])
+    # EVAL_SUMOCFG（評価スイープ）で設定ファイルを差し替え可能（既定はオリジナルの high-way）。
+    cfg = os.environ.get("EVAL_SUMOCFG", "../config/v1/high-way.sumocfg")
+    traci.start([sumoBinary, "-c", cfg])
     print("Simulation started")
 
 

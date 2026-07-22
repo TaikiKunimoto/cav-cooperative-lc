@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-11-04 11:20:16 by Eclipse SUMO sumo Version 1.21.0
+-->
+
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="high-way.net.xml"/>
+        <route-files value="high-way.rou.xml"/>
+        <gui-settings-file value="high-way.view.xml"/>
+    </input>
+
+    <time>
+        <step-length value="0.1"/>
+        <begin value="0.0"/>
+        <end value="6000.0"/>
+    </time>
+
+</sumoConfiguration>

@@ -33,9 +33,12 @@ class SimulationStatistics:
         # track_deadline_achievement: 締切達成率（必須LC完了率）の列をCSVに出すか。提案(v2)のみ True。
         # v1(default/simple/custom)は False のままで列を出さず、既存CSVスキーマ（golden基準）をバイト不変に保つ。
         self.data = SimulationStatsData()
-        self.output_dir = output_dir
+        # 評価スイープ用フック（環境変数）。未設定なら従来動作と完全一致（golden 不変）。
+        # EVAL_OUTPUT_DIR: 出力先を一括で別ディレクトリへ集約。EVAL_OUTPUT_NAME: ファイル名を決定的に固定
+        # （タイムスタンプを付けず一意名で上書き＝冪等・再開可能・並列でも衝突なし。run_sweep が解決に使う）。
+        self.output_dir = os.environ.get("EVAL_OUTPUT_DIR") or output_dir
         self.track_deadline_achievement = track_deadline_achievement
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
         self.filename = self._create_filename(filename)
         self._create_csv_with_headers()
 
@@ -136,6 +139,10 @@ class SimulationStatistics:
         return self.data.mandatory_lc_total, self.data.mandatory_lc_completed, self._deadline_achievement_rate()
 
     def _create_filename(self, filename: str) -> str:
+        override = os.environ.get("EVAL_OUTPUT_NAME")
+        if override:
+            # 決定的な一意名（タイムスタンプなし）。run_sweep がパラメータを符号化して渡し、出力を確実に解決する。
+            return f"{self.output_dir}/{override}.csv"
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
         return f"{self.output_dir}/{filename}_{timestamp}.csv"
 
