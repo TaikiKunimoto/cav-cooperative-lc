@@ -1,4 +1,4 @@
-# high-way-branch-v2
+# cav-cooperative-lc
 
 高速道路における CAV（Connected and Automated Vehicle）の**協調車線変更制御**を SUMO / TraCI で評価するシミュレータ。
 修士研究「通信遅延を考慮したCAVのための協調車線変更制御手法」の実装・評価環境。
