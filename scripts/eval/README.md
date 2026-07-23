@@ -14,6 +14,7 @@
 |---|---|
 | `run_all.py` | **1コマンド一気通貫**（実行→集計→作図→Excel）。まずこれを使う |
 | `run_sweep.py` | 実行マトリクス（method×env×Q×f×seed）を並列実行。CSV を `out/raw/` に決定的名で集約し `out/manifest.json` を記録（gitコミット・SUMOバージョン等の来歴つき） |
+| `../run_eval.py` | **一括ランナー（CLI 直積グリッド）**: policy×env×Q×f×seed範囲×並列度 を引数指定でループ実行。レジューム可・全コマンドを `out/run_manifest.txt` に記録。固定スイートでなく任意グリッドを回すときに使う |
 | `aggregate.py` | manifest と各 CSV を集計 → `out/summary_long.csv` / `summary_scenario.{csv,md}` / `summary_robustness.csv` / `summary_mlc.{csv,md}` |
 | `make_figures.py` | `summary_long.csv` から図を生成 → `out/figures/*.png` |
 | `export_excel.py` | 集計結果＋来歴を1つの Excel ブックへ → `out/excel/評価サマリ_<git>_<日時>.xlsx`（毎回新規＝上書きなし） |
@@ -51,9 +52,18 @@ uv run python scripts/eval/run_all.py --skip-sweep
 
 ## 主要指標（CSV 列）
 
-- `deadline_achievement_rate` … **締切達成率＝必須LC完了/要求**（中核指標。straight障害物は母数0で空）。
+- `deadline_achievement_rate` … **締切達成率＝衝突なく締切内に完了した必須LC/発生した要求**（中核指標。
+  straight障害物は母数0で空）。**衝突に関与した車線変更車両は目標到達済みでも未達成として数える**。
+  内訳列: `mandatory_lc_completed`（衝突なし完了）/ `mandatory_lc_collided`（衝突関与）/
+  `mandatory_lc_incomplete`（衝突なし未完了＝立ち往生・締切超過）。
   流入締切後にドレーン（最大+900s）してから計上するため、シミュ終了打ち切りによる
   「走行途中の車の失敗誤計上」は含まない（母数＝ゾーンに入って活性化した必須LC。canceled は母数外）
+- `raw/<run名>__failures.csv` … **失敗個票**（新定義で未達成の要求ごとに車両ID・分類
+  COLLIDED/TIMEOUT_STUCK/EXITED_INCOMPLETE・発生/締切位置・最終状態）。**失敗ゼロの run では作られない**
+  ＝このファイルが無いことが 100% の証跡
+- **作動包絡（operating envelope）** … 提案手法が必須LC 100% を満たす負荷域（weave Q≤3000 / weave2 Q≤3500 /
+  他は全グリッド）。主結果は `summary_scenario_envelope.{csv,md}`、全グリッド（作動限界の明示込み）は
+  `summary_scenario.{csv,md}` を見る
 - `total_collisions` / `min_TTC` / `TET` … 安全性
 - `traffic volume`（スループット）/ `canceled_vehicles` … 容量
   - 注意: `traffic volume` は **departed（入口通過）基準**＝ほぼ供給側。封鎖・渋滞下で

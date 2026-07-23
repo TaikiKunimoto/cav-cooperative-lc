@@ -74,13 +74,14 @@ BASELINE_SLOW_SEEDS = [1, 2]
 
 @dataclass
 class Job:
-    method: str  # "v2" | "custom" | "default" | "simple"
+    method: str  # "v2" | "custom" | "default" | "simple"（v2 の policy 違いは "v2-none" 等のラベル）
     scenario: str  # 表示・集計ラベル（例 diverge / straight_obs / diverge[baseline]）
     env: str  # v2 の --env 名（v1 では high-way 固定なので参考値）
     q: int  # 総流入量 Q [veh/h]
     f: float  # 必須LC比率 f（v1 では分流比率に写像）
     seed: int
     obstacle: str | None = None
+    policy: str | None = None  # v2 の調停ポリシー（None/"edf"=既定でフラグ省略。"none"/"off" は --policy 付与）
     # 実行後に埋まる
     output_csv: str | None = None
     status: str = "pending"  # pending|ok|skipped|failed|timeout|error
@@ -95,7 +96,7 @@ class Job:
         return f"{self.method}__{self.scenario}__Q{self.q}__f{self.f}__s{self.seed}{obs}"
 
     def command(self) -> list[str]:
-        if self.method == "v2":
+        if self.method.startswith("v2"):
             cmd = [
                 "uv",
                 "run",
@@ -111,6 +112,9 @@ class Job:
             ]
             if self.obstacle is not None:
                 cmd += ["--obstacle", self.obstacle]
+            if self.policy not in (None, "edf"):
+                # 既定 edf はフラグ省略（現行 CLI 互換）。none/off はアブレーション実装（柱B）が受け取る
+                cmd += ["--policy", str(self.policy)]
             return cmd
         # v1 系: 位置引数 (seed, inflow_pass, inflow_exit)
         inflow_exit = round(self.q * self.f)
@@ -279,6 +283,53 @@ def run_job(job: Job, force: bool) -> Job:
     return job
 
 
+def write_manifest(results: list[Job], suite: str, quick: bool, elapsed: float) -> None:
+    """実行結果を manifest.json へ書き込む（既存 manifest とマージし、過去 sweep の来歴も保持）。
+
+    aggregate.py が読む唯一の来歴。run_sweep / run_eval の双方から呼ばれる。
+    キーは obstacle 込みの正規名で統一する（旧実装は新=name/旧=fallback でキーが食い違い、
+    obstacle 付き straight が二重登録されて n が倍になっていた）。
+    """
+    manifest: dict[str, object] = {
+        "suite": suite,
+        "quick": quick,
+        "total_jobs": len(results),
+        "elapsed_s": elapsed,
+        "raw_dir": str(RAW_DIR),
+        "metadata": collect_metadata(),
+    }
+
+    def _job_key(d: dict) -> str:
+        obs = d.get("obstacle")
+        suffix = "" if not obs else f"__obs{str(obs).replace(',', '-')}"
+        return f"{d['method']}__{d['scenario']}__Q{d['q']}__f{d['f']}__s{d['seed']}{suffix}"
+
+    existing: dict[str, dict] = {}
+    if MANIFEST.exists():
+        try:
+            old = json.loads(MANIFEST.read_text())
+            for j in old.get("jobs", []):
+                existing[_job_key(j)] = j
+            # 過去 sweep の来歴も残す（どのコミット・環境で採ったかの追跡用）
+            history = old.get("metadata_history", [])
+            if old.get("metadata"):
+                history.append(old["metadata"])
+            if history:
+                manifest["metadata_history"] = history
+        except (OSError, json.JSONDecodeError) as e:
+            # 破損 manifest を黙って捨てない: 退避してから新規作成する（過去 run の来歴は
+            # 退避側に残る。CSV 自体は raw/ にあるので --force なし再実行で再登録可能）
+            corrupt = MANIFEST.with_name(f"manifest.corrupt.{datetime.now().strftime('%Y%m%d-%H%M%S')}.json")
+            MANIFEST.rename(corrupt)
+            print(f"[run_sweep] ⚠ 既存 manifest が読めません（{e}）。{corrupt} へ退避して作り直します。")
+    for j in results:
+        d = asdict(j)
+        d["name"] = j.name
+        existing[_job_key(d)] = d
+    manifest["jobs"] = list(existing.values())
+    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="評価スイープ実行ランナー")
     ap.add_argument("--suite", choices=["proposed", "baseline", "all"], default="proposed")
@@ -320,48 +371,7 @@ def main() -> None:
 
     # manifest 出力（aggregate.py が読む）
     elapsed = time.time() - t_start
-    manifest = {
-        "suite": args.suite,
-        "quick": args.quick,
-        "total_jobs": len(jobs),
-        "elapsed_s": elapsed,
-        "raw_dir": str(RAW_DIR),
-        "metadata": collect_metadata(),
-        "jobs": [asdict(j) for j in results],
-    }
-
-    # 既存 manifest があればマージ（別 suite を続けて回した場合に両方残す）。
-    # キーは obstacle 込みの正規名で統一する（旧実装は新=name/旧=fallback でキーが食い違い、
-    # obstacle 付き straight が二重登録されて n が倍になっていた）。
-    def _job_key(d: dict) -> str:
-        obs = d.get("obstacle")
-        suffix = "" if not obs else f"__obs{str(obs).replace(',', '-')}"
-        return f"{d['method']}__{d['scenario']}__Q{d['q']}__f{d['f']}__s{d['seed']}{suffix}"
-
-    existing: dict[str, dict] = {}
-    if MANIFEST.exists():
-        try:
-            old = json.loads(MANIFEST.read_text())
-            for j in old.get("jobs", []):
-                existing[_job_key(j)] = j
-            # 過去 sweep の来歴も残す（どのコミット・環境で採ったかの追跡用）
-            history = old.get("metadata_history", [])
-            if old.get("metadata"):
-                history.append(old["metadata"])
-            if history:
-                manifest["metadata_history"] = history
-        except (OSError, json.JSONDecodeError) as e:
-            # 破損 manifest を黙って捨てない: 退避してから新規作成する（過去 run の来歴は
-            # 退避側に残る。CSV 自体は raw/ にあるので --force なし再実行で再登録可能）
-            corrupt = MANIFEST.with_name(f"manifest.corrupt.{datetime.now().strftime('%Y%m%d-%H%M%S')}.json")
-            MANIFEST.rename(corrupt)
-            print(f"[run_sweep] ⚠ 既存 manifest が読めません（{e}）。{corrupt} へ退避して作り直します。")
-    for j in results:
-        d = asdict(j)
-        d["name"] = j.name
-        existing[_job_key(d)] = d
-    manifest["jobs"] = list(existing.values())
-    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+    write_manifest(results, suite=args.suite, quick=args.quick, elapsed=elapsed)
 
     n_ok = sum(1 for j in results if j.status in ("ok", "skipped"))
     n_bad = len(results) - n_ok

@@ -9,7 +9,7 @@ from datetime import datetime
 import os
 import random
 import sys
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from pydantic import BaseModel, Field
 
@@ -85,6 +85,7 @@ class V2Simulation(BaseModel):
     exit_vehicles: list[str] = Field(default_factory=list)
     canceled_vehicles: list[str] = Field(default_factory=list)
     collision_history: list[CollisionEvent] = Field(default_factory=list)
+    collided_ids: set[str] = Field(default_factory=set)  # 衝突に一度でも関与した車両ID（達成率の未達成判定に使う）
     # 各車線の待ち行列（流入レーン選択の負荷分散に使う）。レーンは環境により可変なので動的に作る
     lane_queues: dict[str, list[str]] = Field(default_factory=dict)
 
@@ -99,6 +100,7 @@ class V2Simulation(BaseModel):
 
         running_list: list[str] = []
         tc_accumulator = 0.0
+        mandatory_failures: list[dict[str, Any]] = []  # 新定義で未達成となった必須LC要求の個票（run 終了時に CSV へ）
         inflow_closed = False  # simulation_time 到達時に一度だけ未発進車を除去（ドレーン開始）
         last_request_log_sec = -1
         tie_events = 0  # Phase A の鍵に同点が出た Tc ラウンド数（デッドロックフリーなら 0）
@@ -140,7 +142,8 @@ class V2Simulation(BaseModel):
                         continue
                     self.exit_vehicles.append(vid)
                     veh.record_arrival_time()
-                    veh.accumulate_exit_stats(stats)
+                    veh.accumulate_exit_stats(stats, vid in self.collided_ids)
+                    mandatory_failures += veh.mandatory_failure_rows(self.env.name, vid in self.collided_ids, "exit")
                     continue
 
                 # 混雑で未発進の車両
@@ -220,12 +223,11 @@ class V2Simulation(BaseModel):
             if veh.id not in running_list:
                 continue
             stats.calculate_vehicle_average_speed("", veh.speed_history)
-            veh.record_deadline_outcome(stats)
+            veh.record_deadline_outcome(stats, veh.id in self.collided_ids)
+            mandatory_failures += veh.mandatory_failure_rows(self.env.name, veh.id in self.collided_ids, "end")
 
-        collided: set[str] = set()
-        for _, vehicles in self.collision_history:
-            collided.update(vehicles)
-        canceled_without_collision = [v for v in self.canceled_vehicles if v not in collided]
+        stats.write_mandatory_failures(mandatory_failures)
+        canceled_without_collision = [v for v in self.canceled_vehicles if v not in self.collided_ids]
 
         self._print_simulation_info(running_list)
         print(f"Phase A: Tc rounds with key ties (should be 0): {tie_events}")
@@ -323,6 +325,7 @@ class V2Simulation(BaseModel):
             if abs(time_val - collision_time) < 1.0 and set(vehicles) == set(colliding_ids):
                 return
         self.collision_history.append(CollisionEvent(collision_time, colliding_ids))
+        self.collided_ids.update(colliding_ids)
         print(f"Collision detected at {collision_time:.1f} between: {', '.join(colliding_ids)}")
 
     def _should_continue(self) -> bool:

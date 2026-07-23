@@ -108,26 +108,71 @@ class V2CAV(BaseModel):
         """到着（範囲外に出た）時刻を記録する。到着後も snapshot には載るが、以降の観測・制御は行わない。"""
         self.arrival_time = get_sim_time()
 
-    def accumulate_exit_stats(self, stats: "SimulationStatistics") -> None:
+    def accumulate_exit_stats(self, stats: "SimulationStatistics", collided: bool) -> None:
         """範囲外に出た自車の走行時間・平均速度・締切達成を統計に加算する（全体のみ。route="" でグループ別には入れない）。"""
         if self.departure_time is not None and self.arrival_time is not None:
             stats.calculate_travel_time("", self.departure_time, self.arrival_time)
         stats.calculate_vehicle_average_speed("", self.speed_history)
-        self.record_deadline_outcome(stats)
+        self.record_deadline_outcome(stats, collided)
 
-    def record_deadline_outcome(self, stats: "SimulationStatistics") -> None:
+    def record_deadline_outcome(self, stats: "SimulationStatistics", collided: bool) -> None:
         """活性化した非回避必須LC操作について、締切達成（完了数/要求数）を統計へ記録する（F3）。
 
         要求数＝活性化した非回避操作（spawn 時の本来の必須LC。回避操作・未活性は除く）、
-        完了数＝うち締切位置までに目標レーンへ到達したもの。stuck で running のまま終わった車は
-        完了せず要求のみ計上＝失敗として現れる（テレポート無効方針 §2.4.1 と整合）。出口時と
-        シミュレーション終了時の双方から呼ばれ、出口/残存いずれの車も一度だけ計上される。
+        完了数＝うち「衝突に関与せず」締切位置までに目標レーンへ到達したもの。衝突に関与した車の
+        操作は目標到達の有無によらず未達成（collided）として数える＝達成率は衝突なし完了のみを分子に
+        取る。stuck で running のまま終わった車は完了せず要求のみ計上＝未完了（incomplete）として
+        現れる（テレポート無効方針 §2.4.1 と整合）。出口時とシミュレーション終了時の双方から呼ばれ、
+        出口/残存いずれの車も一度だけ計上される。
         """
         requested = [op for op in self.operations if not op.is_avoidance and op.activated]
         if not requested:
             return
+        if collided:
+            stats.record_deadline_achievement(len(requested), 0, len(requested), 0)
+            return
         completed = sum(1 for op in requested if op.completed_in_time)
-        stats.record_deadline_achievement(len(requested), completed)
+        stats.record_deadline_achievement(len(requested), completed, 0, len(requested) - completed)
+
+    def mandatory_failure_rows(self, env_name: str, collided: bool, phase: str) -> "list[dict[str, Any]]":
+        """新定義で未達成となる活性化済み非回避操作の個票行を返す（達成なら空）。
+
+        phase: "exit"=範囲外へ退出した時点 / "end"=終了時に running のまま。分類は
+        COLLIDED（衝突関与。目標到達済みでも未達成扱い）／TIMEOUT_STUCK（終了時未完了＝立ち往生）／
+        EXITED_INCOMPLETE（未完了のまま退出。通常起きない計測異常の検知用）。
+        """
+        rows: list[dict[str, Any]] = []
+        for op in self.operations:
+            if op.is_avoidance or not op.activated:
+                continue
+            if op.completed_in_time and not collided:
+                continue
+            if collided:
+                classification = "COLLIDED"
+            elif phase == "end":
+                classification = "TIMEOUT_STUCK"
+            else:
+                classification = "EXITED_INCOMPLETE"
+            rows.append(
+                {
+                    "veh_id": self.id,
+                    "env": env_name,
+                    "classification": classification,
+                    "phase": phase,
+                    "route": self.route,
+                    "target_lane": op.target_lane,
+                    "deadline_pos": op.deadline_pos,
+                    "activation_time": op.activation_time,
+                    "activation_pos": op.activation_pos,
+                    "completed_in_time_raw": op.completed_in_time,
+                    "collided": collided,
+                    "final_road": self.road,
+                    "final_lane": self.lane,
+                    "final_lane_pos": self.lane_pos,
+                    "final_speed": round(self.speed, 2),
+                }
+            )
+        return rows
 
     def active_operation(self) -> LCOperation | None:
         """未完了（is_done が False）の操作のうち、最も deadline が近いものを返す（なければ None）。"""
@@ -146,6 +191,7 @@ class V2CAV(BaseModel):
             ):
                 op.activated = True
                 op.activation_time = self.sim_time
+                op.activation_pos = self.lane_pos
 
     def update_deadline_achievement(self, mainlane_edge: str) -> None:
         """締切位置までに目標レーンへ到達した非回避操作を一度だけ記録する（締切達成率 F3 の分子判定）。
