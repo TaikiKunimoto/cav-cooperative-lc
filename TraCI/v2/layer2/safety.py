@@ -8,8 +8,6 @@ from status.status import CarAction
 from v2.constants import DELAY, FRICTION_COEFFICIENT, MIN_GAP
 from v2.lc_request import LCRequest
 
-VEH_LENGTH = 5.0  # 車長 [m]（vType length と一致）
-
 
 class Safety:
     """安全層：安全ギャップ G_req（式C）と次の1段LCの目標車線（状態を持たない静的ロジック）。"""

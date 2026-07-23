@@ -45,6 +45,22 @@ class Environment(BaseModel):
     mainlane_length: float  # 本線長
     groups: tuple[Group, ...]
 
+    def with_measured_length(self, actual_length: float) -> "Environment":
+        """本線の実測エッジ長を反映した Environment を返す（シミュレーション開始後に net から取得して適用）。
+
+        環境定義の ``mainlane_length`` は公称値で、netconvert が生成する実エッジ長（ジャンクション形状で
+        数m 伸びる）と一致しない。締切 D を公称値のままにすると「公称長〜実エッジ長」の区間で完了した
+        必須LC（物理的には lane-drop 手前で成功し出口へ到達）が失敗として誤計上される。
+        締切が公称長と一致するグループ（＝lane-drop 端を締切とする定義）の deadline_pos を実測長へ置き換える。
+        """
+        if actual_length <= 0:
+            raise ValueError(f"本線 {self.mainlane_edge} の実測長が不正です: {actual_length}")
+        groups = tuple(
+            g.model_copy(update={"deadline_pos": actual_length}) if g.deadline_pos == self.mainlane_length else g
+            for g in self.groups
+        )
+        return self.model_copy(update={"mainlane_length": actual_length, "groups": groups})
+
     def group_rates(self, total_inflow: float, mlc_ratio: float) -> list[GroupRate]:
         """総流入 Q と必須LC比率 f を、グループ別の流入量[veh/h]に展開する（グループ定義順を保持）。
 
@@ -121,17 +137,59 @@ WEAVE2 = Environment(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
         # 合流(下): OnRampBottom → 加速車線 lane0 → 目標 lane1 へ必須LC（下から上）
-        Group(name="merging_bottom", route="r_ramp_b", weight=1.0, target_lane=1, deadline_pos=392.0, depart_edge="OnRampBottom"),
+        Group(
+            name="merging_bottom",
+            route="r_ramp_b",
+            weight=1.0,
+            target_lane=1,
+            deadline_pos=392.0,
+            depart_edge="OnRampBottom",
+        ),
         # 合流(上): OnRampTop → 加速車線 lane3 → 目標 lane2 へ必須LC（上から下, 合流下と上下対称）
-        Group(name="merging_top", route="r_ramp_t", weight=1.0, target_lane=2, deadline_pos=392.0, depart_edge="OnRampTop"),
+        Group(
+            name="merging_top",
+            route="r_ramp_t",
+            weight=1.0,
+            target_lane=2,
+            deadline_pos=392.0,
+            depart_edge="OnRampTop",
+        ),
         # 分流(下): 本線 → 出口車線 lane0 へ必須LC → OffRampBottom（合流と逆向き＝織込み）
-        Group(name="diverging_bottom", route="r_exit_b", weight=1.0, target_lane=0, deadline_pos=392.0, depart_edge="MainApproach"),
+        Group(
+            name="diverging_bottom",
+            route="r_exit_b",
+            weight=1.0,
+            target_lane=0,
+            deadline_pos=392.0,
+            depart_edge="MainApproach",
+        ),
         # 分流(上): 本線 → 出口車線 lane3 へ必須LC → OffRampTop（分流下と上下対称）
-        Group(name="diverging_top", route="r_exit_t", weight=1.0, target_lane=3, deadline_pos=392.0, depart_edge="MainApproach"),
+        Group(
+            name="diverging_top",
+            route="r_exit_t",
+            weight=1.0,
+            target_lane=3,
+            deadline_pos=392.0,
+            depart_edge="MainApproach",
+        ),
         # 対角(下→上): OnRampBottom(lane0) → 対角 lane3 へ3車線必須LC → OffRampTop（織込みの交差移動。weight=2で強調）
-        Group(name="crossing_bt", route="r_cross_bt", weight=2.0, target_lane=3, deadline_pos=392.0, depart_edge="OnRampBottom"),
+        Group(
+            name="crossing_bt",
+            route="r_cross_bt",
+            weight=2.0,
+            target_lane=3,
+            deadline_pos=392.0,
+            depart_edge="OnRampBottom",
+        ),
         # 対角(上→下): OnRampTop(lane3) → 対角 lane0 へ3車線必須LC → OffRampBottom（対角下→上と上下対称, weight=2）
-        Group(name="crossing_tb", route="r_cross_tb", weight=2.0, target_lane=0, deadline_pos=392.0, depart_edge="OnRampTop"),
+        Group(
+            name="crossing_tb",
+            route="r_cross_tb",
+            weight=2.0,
+            target_lane=0,
+            deadline_pos=392.0,
+            depart_edge="OnRampTop",
+        ),
     ),
 )
 
@@ -150,7 +208,9 @@ WEAVE = Environment(
         # 合流（オンランプ → 補助車線 WeaveZone lane0 → 本線 lane1 へ上がる）
         Group(name="merging", route="r_ramp", weight=1.0, target_lane=1, deadline_pos=196.0, depart_edge="OnRamp"),
         # 分流（本線 → 補助車線 WeaveZone lane0 へ降りる → 出口）。合流と逆向きに補助車線で交差＝織込み
-        Group(name="diverging", route="r_exit", weight=1.0, target_lane=0, deadline_pos=196.0, depart_edge="MainApproach"),
+        Group(
+            name="diverging", route="r_exit", weight=1.0, target_lane=0, deadline_pos=196.0, depart_edge="MainApproach"
+        ),
     ),
 )
 

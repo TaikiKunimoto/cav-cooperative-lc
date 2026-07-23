@@ -11,6 +11,9 @@ import traci
 
 # slowDown の最小継続時間 [s]（1 step 相当）。異常な duration のフォールバック。
 _MIN_SLOWDOWN_DURATION = 0.1
+# slowDown 継続時間の上限。有限でも桁外れ（例: 微速時の v/decel ≈ 10^6 s）だと SUMO 側の時間表現を
+# 溢れさせ 'Invalid time interval' で接続ごと落ちる。シミュレーション実時間より十分長い1時間に丸める。
+_MAX_SLOWDOWN_DURATION = 3600.0
 
 
 # Vehicle系の関数
@@ -80,14 +83,16 @@ def get_veh_neighbors(id: str, mode: int) -> list[tuple[str, float]]:
 
 
 def slow_down(id: str, speed: float, duration: float) -> None:
-    """``traci.vehicle.slowDown`` の安全ラッパ。速度を非負・有限、継続時間を正・有限にクランプする。
+    """``traci.vehicle.slowDown`` の安全ラッパ。速度を非負・有限、継続時間を正・有限・上限内にクランプする。
 
     衝突/テレポート直後の異常状態で duration が ≤0・NaN・inf になると、SUMO が
     command 0xc4 'Invalid time interval' を返し TraCI 接続が落ちて run ごと中断する。
-    正常な正の duration はそのまま通すため、通常挙動は不変（異常値のみ最小1stepへ）。
+    有限でも桁外れに大きい duration（微速時の v/decel など）も同エラーになるため上限で丸める。
+    正常な正の duration はそのまま通すため、通常挙動は不変（異常値のみクランプ）。
     """
     safe_speed = speed if (math.isfinite(speed) and speed >= 0.0) else 0.0
     safe_duration = duration if (math.isfinite(duration) and duration > 0.0) else _MIN_SLOWDOWN_DURATION
+    safe_duration = min(safe_duration, _MAX_SLOWDOWN_DURATION)
     traci.vehicle.slowDown(id, safe_speed, safe_duration)
 
 
@@ -132,3 +137,8 @@ def get_lane_last_step_veh_ids(lane_id: str) -> list[str]:
 def get_edge_lane_number(edge_id: str) -> int:
     """edge のレーン数を返す。"""
     return cast(int, traci.edge.getLaneNumber(edge_id))
+
+
+def get_lane_length(lane_id: str) -> float:
+    """lane の実長 [m] を返す（net 上の実エッジ長。公称値とはジャンクション形状分ずれる）。"""
+    return cast(float, traci.lane.getLength(lane_id))
