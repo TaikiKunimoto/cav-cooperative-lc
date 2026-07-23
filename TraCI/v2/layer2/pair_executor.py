@@ -23,6 +23,7 @@ from utils.traci_wrapper import get_lane_max_speed, get_veh_neighbors, get_veh_s
 from v2.constants import (
     ALIGN_DELTA,
     HOLD_MARGIN,
+    LC_REACTION_LAG,
     LC_SAFETY_MARGIN,
     MAX_ACCEL,
     MAX_DECEL,
@@ -139,12 +140,17 @@ class Layer2:
 
     @staticmethod
     def _net_required(v_back: float, v_front: float) -> float:
-        """minGap 控除済みギャップに対する必要量 ＝ 相対制動項 ＋ 1step進化バッファ。
+        """minGap 控除済みギャップに対する必要量 ＝ 相対制動項 ＋ 追跡遅れ ＋ 1step進化バッファ。
 
-        後続 v_back が前方 v_front へ最大減速で追突しない車間の minGap 超過分。判定と changeLane
-        反映の1stepズレで相対位置が動くため ``LC_SAFETY_MARGIN`` を足す（境界挿入の側面衝突防止）。
+        後続 v_back が前方 v_front へ最大減速で追突しない車間の minGap 超過分。相対制動モデルは
+        「後続の即時最大減速」を仮定するが、実際の追従制御は前車速度を 0.1s 刻みで追いかけるため、
+        挿入直後に前車（挿入した要求車）が減速し始めると数step 分のラグで食い込む。その分を
+        ``v_back × LC_REACTION_LAG`` として足す（rear-end グレーズの防止。停止・微速域では ~0 なので
+        詰まった車列への挿入可能性は保たれる）。判定と changeLane 反映の1stepズレに対する
+        ``LC_SAFETY_MARGIN`` も足す（境界挿入の側面衝突防止）。
         """
-        return max(0.0, (v_back**2 - v_front**2) / (2 * abs(MAX_DECEL))) + LC_SAFETY_MARGIN
+        braking = max(0.0, (v_back**2 - v_front**2) / (2 * abs(MAX_DECEL)))
+        return braking + v_back * LC_REACTION_LAG + LC_SAFETY_MARGIN
 
     # --- 対向スワップ（織込みデッドロックの解消）---
 
@@ -180,6 +186,8 @@ class Layer2:
                 if not (
                     Layer2._swap_gap_ok(snap, a_next, a.current_pos, a_obs.speed, ignore_id=b.veh_id)
                     and Layer2._swap_gap_ok(snap, a.current_lane, b.current_pos, b_obs.speed, ignore_id=a.veh_id)
+                    and Layer2._swap_live_gap_ok(a.veh_id, a_obs.speed, a_next < a.current_lane, b.veh_id)
+                    and Layer2._swap_live_gap_ok(b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id)
                 ):
                     continue
                 traci.vehicle.changeLane(a.veh_id, a_next, 0)
@@ -196,11 +204,38 @@ class Layer2:
         return swapped
 
     @staticmethod
+    def _swap_live_gap_ok(veh_id: str, ego_speed: float, going_right: bool, partner_id: str) -> bool:
+        """スワップ相手を除く実測（getNeighbors）の前後ギャップ検査。
+
+        スナップショットの ``lane_members`` は本線 edge 上の車両しか含まず、車体がジャンクション
+        内部レーンに跨る車両（前端が junction に入り後端が本線に残る車・流入直前の車）が見えない。
+        その盲点の第三者と重なって交換すると side collision になるため、通常挿入と同じ
+        junction 越境の実測検査を追加で行う（相手＝partner は交換で居なくなるので除外）。
+        """
+        lat = 1 if going_right else 0
+        for nid, dist in get_veh_neighbors(veh_id, lat):  # 後続
+            if nid == partner_id:
+                continue
+            if dist < Layer2._net_required(get_veh_speed(nid), ego_speed):
+                return False
+        for nid, dist in get_veh_neighbors(veh_id, lat | 2):  # 先行
+            if nid == partner_id:
+                continue
+            if dist < Layer2._net_required(ego_speed, get_veh_speed(nid)):
+                return False
+        return True
+
+    @staticmethod
     def _swap_gap_ok(snap: Snapshot, lane: int, pos: float, speed: float, ignore_id: str) -> bool:
         """スワップ相手を除いた目標車線の最近傍 前走/後続 に対し、相対制動モデルの安全ギャップを満たすか。
 
         交換後もパートナーとは別レーンになるため、パートナー（ignore_id）だけを除外して判定する。
         スナップショットの縦位置は前端基準（getLanePosition）なので車長を差し引いて実ギャップにする。
+        静的要求は minGap でなく制動項＋余裕（``_net_required``）のみとする: スワップは互いの足跡を
+        入れ替えるだけで各車線の車間パターンをほぼ保存するため（新ギャップ＝旧ギャップ∓Δpos）、
+        現に成立している車列に minGap 未満の車間ができても停止・微速域では無害（SUMO の衝突は重なり
+        のみ）。minGap を要求すると、詰まった車列で第三者の 20cm 差がスワップを永久拒否し、その第三者
+        はスワップが動かないと動けない循環待ち（残存デッドロック）になる。
         """
         leader: VehObs | None = None
         follower: VehObs | None = None
@@ -215,11 +250,11 @@ class Layer2:
                 break
         if leader is not None and leader.lane_pos is not None:
             gap = (leader.lane_pos - VEH_LENGTH) - pos
-            if gap < MIN_GAP + Layer2._net_required(speed, leader.speed):
+            if gap < Layer2._net_required(speed, leader.speed):
                 return False
         if follower is not None and follower.lane_pos is not None:
             gap = (pos - VEH_LENGTH) - follower.lane_pos
-            if gap < MIN_GAP + Layer2._net_required(follower.speed, speed):
+            if gap < Layer2._net_required(follower.speed, speed):
                 return False
         return True
 
