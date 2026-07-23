@@ -1,9 +1,11 @@
 # Memory Index
 
 Claude Code の永続メモリ。このディレクトリは git 管理され、
-`~/.claude-personal/projects/<slug>/memory` からシンボリックリンクで参照される。
+`<config>/projects/<slug>/memory`（`<config>` は `CLAUDE_CONFIG_DIR`、未設定なら既定
+`~/.claude`。例: MacBook=`~/.claude-personal` / Desktop=`~/.claude`）からシンボリックリンクで参照される。
 
-別デバイスでセットアップする場合は `scripts/link-memory.sh` を実行する。
+別デバイスでセットアップする場合は `scripts/link-memory.sh` を実行する（そのマシンの
+config ディレクトリを自動判定してリンクを張る）。
 
 <!-- 1行1メモリ: - [Title](file.md) — hook。追加時は該当セクションへ -->
 
