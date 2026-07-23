@@ -199,14 +199,17 @@ class V2CAV(BaseModel):
                 self._emergency_brake(self.leader_speed)
             return
 
-        # 臨界制動バンド: 相対制動（最大減速で前車に追突しない）に必要な距離を割り込んだら、前車速度の
-        # 追従をやめて最大減速の停止プロファイルへ切り替える。「前車速度 − 1 を追いかける」制御は前車が
-        # 強く減速し続けると 1〜2step 分の追跡遅れで車間を食い込み、rear-end グレーズ（gap −0.0〜−1m の
-        # 接触）になる。バンド内では毎step 最大減速を張り、前車より遅くなって車間が回復したら通常追従へ戻る。
+        # 臨界制動バンド: 相対制動（最大減速で前車に追突しない）に必要な距離を割り込んだら、
+        # 「前車速度 − 1 を追いかける」通常追従をやめ、最大減速で前車速度へ合わせにいく。通常追従は
+        # 前車が強く減速し続けると 1〜2step 分の追跡遅れで車間を食い込み、rear-end グレーズ
+        # （gap −0.0〜−1m の接触）になる。目標を 0 でなく前車速度にするのが重要: 全停止プロファイルは
+        # 行列末尾への接近で過剰な早期停止（standoff）となり、衝撃波を増幅して織込み環境の流入を
+        # 崩壊させる。余裕は固定 1m ＋ 離散制御ラグ分（自車速度×0.2s）。
         if self.leader_distance is not None and self.leader_speed is not None and self.speed > self.leader_speed:
-            braking_needed = (self.speed**2 - self.leader_speed**2) / (2 * abs(MAX_DECEL)) + 1.0
+            speed_diff = self.speed - self.leader_speed
+            braking_needed = (self.speed**2 - self.leader_speed**2) / (2 * abs(MAX_DECEL)) + 1.0 + 0.2 * self.speed
             if self.leader_distance < braking_needed:
-                slow_down(self.id, 0.0, self.speed / abs(MAX_DECEL))
+                slow_down(self.id, self.leader_speed, speed_diff / abs(MAX_DECEL))
                 return
 
         # 協調・車線変更中は加速しない
