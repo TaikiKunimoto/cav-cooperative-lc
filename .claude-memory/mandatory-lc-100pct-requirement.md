@@ -1,11 +1,11 @@
 ---
 name: mandatory-lc-100pct-requirement
-description: "研究要件「5シナリオ必須LC100%」— PR#56レビュー待ち(要rebase)・ユーザー未決4件・修正の全体像・forensic/検証ツールの所在・運用の罠"
+description: "研究要件「5シナリオ必須LC100%」— 作動範囲内100%達成済み(pass6)・PR#56レビュー待ち・2指標分離・修正の全体像・forensic/検証ツールの所在・運用の罠"
 metadata: 
   node_type: memory
   type: project
   originSessionId: d7db6234-ee5a-41cb-bf74-40b65202abaa
-  modified: 2026-07-23T22:11:18.163Z
+  modified: 2026-07-23T23:40:04.610Z
 ---
 
 **研究要件（2026-07-24 ユーザー明言）**: 5評価シナリオ（diverge / merge / weave / weave2 / straight障害物）
@@ -14,28 +14,19 @@ metadata:
 
 **Why**: 論文（IPSJ 2026-09締切）の主張の前提条件。達成率<100%のままでは評価が成立しない。
 
-**状態（2026-07-24 06時・引き継ぎ完了時点）**: 修正完了・**PR #56 レビュー待ち**
-（branch `fix/100pct-mandatory-lc`・push済・作業ツリークリーン）。
-- **PR は main と CONFLICTING**: ブランチ根本のメモリ整理2コミット(397abd1/7b77a48)が **PR #55 として先に
-  squashマージ**されたため .claude-memory/MEMORY.md が衝突。origin/main へ rebase して2コミットを落とし
-  force-push すれば解消し、PR は v2 修正のみになる。
-- 最終スイープ（pass5, `scripts/eval/out/`, commit 9444472）: **385run・除外0・決定性一致**。
-  diverge **100.000%**(10,649/10,649)・merge **100.000%**(16,028/16,028)・straight障害物 回避完遂衝突0(25run)・
-  weave **Q≤3000で100%**・weave2 **Q≤3500で100%**(Q3000f0.6の1runを除く)。
-  修正前失敗1,062→**215件、全て織込み超過需要域の11run**（weave Q3500–4000 / weave2 Q4000 中心。
-  196m/392mゾーンに織込み流1,400–2,400台/h＝物理容量超過）。
-- 衝突は総93件（修正前と同水準を、打ち切りなし・完了LC大幅増のより厳しい条件で維持）。
-  **側面衝突(laneChange stage)は0件**。残りは高密度 creep 中の追突グレーズ（縦方向制御強化の将来課題）。
-
-**ユーザー未決4件**（勝手に進めない）:
-1. 織込み超過需要域の扱い: **(a) グリッドを作動包絡内へ**（weave Q≤3000 / weave2 Q≤3500。作業ゼロ・前任推奨）
-   / (b) ゾーン延伸（weave 196→350m級 / weave2 392→600m級。`config/v2/<env>/build.sh` 再生成＋
-   `TraCI/v2/environment.py` 公称長更新＋フル再スイープ）
-2. PR #56 のレビュー・マージ（上記 rebase 含む）
-3. diverge_baseline(v1比較)の再採取（summary の baseline 行は旧コード数値のまま。論文で v1 比較を使うなら
-   `run_all.py --suite baseline` 再実行）
-4. (小) summary_excluded.csv の旧リポジトリパス遺物（high-way-branch-v2・空名エントリ）掃除。
-   manifest 非破壊ルールと相談
+**状態（2026-07-24 08:45・プロンプト0完遂）**: **作動範囲内100%達成・PR #56 レビュー待ちのみ**
+（branch `fix/100pct-mandatory-lc`・9コミット・MERGEABLE・push済）。
+- 最終スイープ（**pass6**, `scripts/eval/out/`, commit 733023a→docs c92346c）: **385run・除外0・決定性一致**。
+  **作動範囲内（weave Q≤3000 / weave2 Q≤3500 / 他は全グリッド）の全315run・47,544要求で
+  締切達成率 100.0000%・未完了0**。全グリッドで失敗が残るのは超過需要域の11runのみ
+  （weave Q3500–4000 / weave2 Q4000。196m/392mゾーンに織込み流1,400–2,400台/h＝物理容量超過、作動限界として明示）。
+- 衝突は総90件（修正前と同水準・**側面衝突0**）を安全性指標として別掲（2指標分離）。straight障害物は衝突0。
+- **旧未決4件は全て決着（2026-07-24 ユーザー回答）**: ①超過需要域→(a)作動範囲(envelope)で提示
+  ②PR#56→rebase済み・レビューは本人 ③diverge_baseline→当面再採取しない ④excluded遺物→集計側フィルタで掃除（空に）。
+- 納品済み: Drive `修論評価/DPSWS2026評価_2026-07/00_logs/`（FINDINGS.md・summary一式・run_manifest.txt・
+  manifest.json・個票49run分・Excel）。ローカルは `../評価結果_dpsws2026/00_logs/`。
+- DPSWS2026 runbook のプロンプトA〜C の前提「fix/deadline-100 が main にマージ済み」は
+  **PR #56（branch名は fix/100pct-mandatory-lc）のマージがそれに相当**する。
 
 **修正の中身**（詳細は PR #56 本文。5コミット・v2のみ・v1バイト一致確認済み）:
 1. 打ち切りバイアス → ドレーン方式（流入600s締切・挿入待ち残は remove→canceled 確定、
