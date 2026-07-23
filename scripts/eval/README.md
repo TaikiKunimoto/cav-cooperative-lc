@@ -51,7 +51,9 @@ uv run python scripts/eval/run_all.py --skip-sweep
 
 ## 主要指標（CSV 列）
 
-- `deadline_achievement_rate` … **締切達成率＝必須LC完了/要求**（中核指標。straight障害物は母数0で空）
+- `deadline_achievement_rate` … **締切達成率＝必須LC完了/要求**（中核指標。straight障害物は母数0で空）。
+  流入締切後にドレーン（最大+900s）してから計上するため、シミュ終了打ち切りによる
+  「走行途中の車の失敗誤計上」は含まない（母数＝ゾーンに入って活性化した必須LC。canceled は母数外）
 - `total_collisions` / `min_TTC` / `TET` … 安全性
 - `traffic volume`（スループット）/ `canceled_vehicles` … 容量
   - 注意: `traffic volume` は **departed（入口通過）基準**＝ほぼ供給側。封鎖・渋滞下で

@@ -64,6 +64,9 @@ uv run python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle lane,po
 - `--env`：評価環境（既定 `diverge`）
 - `--obstacle lane,pos,time`：突発障害物（走行中の1台を `lane`・`pos` で停止＝障害物化、`time` で発生）
 - `--nogui`：ヘッドレス実行
+- 流入は 600s で締め切り（挿入待ちの残りは canceled 確定）、その後ネット上の必須LC・回避操作が
+  完了するまで最大 +900s ドレーン（掃き出し）してから終了する。終了時刻の打ち切りで走行途中の車を
+  「締切未達」に誤計上しないための計測プロトコル（締切達成率の母数＝ゾーンに入って活性化した必須LC）。
 
 ```bash
 uv run python -m v2 1 3400 0.5 --nogui                          # 分流D・総流入3400・必須LC比率0.5
