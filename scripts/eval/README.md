@@ -52,15 +52,16 @@ uv run python scripts/eval/run_all.py --skip-sweep
 
 ## 主要指標（CSV 列）
 
-- `deadline_achievement_rate` … **締切達成率＝衝突なく締切内に完了した必須LC/発生した要求**（中核指標。
-  straight障害物は母数0で空）。**衝突に関与した車線変更車両は目標到達済みでも未達成として数える**。
-  内訳列: `mandatory_lc_completed`（衝突なし完了）/ `mandatory_lc_collided`（衝突関与）/
-  `mandatory_lc_incomplete`（衝突なし未完了＝立ち往生・締切超過）。
+- `deadline_achievement_rate` … **締切達成率＝締切内に完了した必須LC/発生した要求**（中核指標。
+  straight障害物は母数0で空）。**2指標分離方式（2026-07-24 判断）**: 衝突は達成率に織り込まず、
+  安全性指標（`total_collisions` と `mandatory_lc_collided`＝衝突関与車の要求数。完了/未完了と重なり得る
+  参考列）として別掲する。`mandatory_lc_incomplete`＝未完了（立ち往生・締切超過。= total − completed）。
   流入締切後にドレーン（最大+900s）してから計上するため、シミュ終了打ち切りによる
   「走行途中の車の失敗誤計上」は含まない（母数＝ゾーンに入って活性化した必須LC。canceled は母数外）
-- `raw/<run名>__failures.csv` … **失敗個票**（新定義で未達成の要求ごとに車両ID・分類
-  COLLIDED/TIMEOUT_STUCK/EXITED_INCOMPLETE・発生/締切位置・最終状態）。**失敗ゼロの run では作られない**
-  ＝このファイルが無いことが 100% の証跡
+- `raw/<run名>__failures.csv` … **失敗・衝突個票**（未完了要求＝TIMEOUT_STUCK/EXITED_INCOMPLETE と、
+  衝突関与車の要求＝COLLIDED（完了済みでも記録、completed_in_time_raw 列で判別）ごとに車両ID・
+  発生/締切位置・最終状態）。**該当ゼロの run では作られない**＝このファイルが無いことが
+  「完了100%かつ衝突関与LC 0」の証跡
 - **作動包絡（operating envelope）** … 提案手法が必須LC 100% を満たす負荷域（weave Q≤3000 / weave2 Q≤3500 /
   他は全グリッド）。主結果は `summary_scenario_envelope.{csv,md}`、全グリッド（作動限界の明示込み）は
   `summary_scenario.{csv,md}` を見る

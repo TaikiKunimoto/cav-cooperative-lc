@@ -20,9 +20,9 @@ class SimulationStatsData(BaseModel):
     min_TTC: float = float("inf")  # 記録された最小TTC
     emergency_brake_count: int = 0  # 急ブレーキ回数
     mandatory_lc_total: int = 0  # 締切達成率の母数: 活性化した非回避必須LC操作の数（要求数）
-    mandatory_lc_completed: int = 0  # 締切達成率の分子: うち「衝突なく」締切までに目標レーンへ到達した数
-    mandatory_lc_collided: int = 0  # うち衝突に関与した車の操作数（目標到達済みでも未達成として数える）
-    mandatory_lc_incomplete: int = 0  # うち衝突なしだが締切内に完了できなかった操作数（立ち往生・締切超過）
+    mandatory_lc_completed: int = 0  # 締切達成率の分子: うち締切までに目標レーンへ到達した数（完了数）
+    mandatory_lc_collided: int = 0  # うち衝突に関与した車の操作数（安全性の参考列。完了/未完了と重なり得る）
+    mandatory_lc_incomplete: int = 0  # うち締切内に完了できなかった操作数（立ち往生・締切超過。= total - completed）
 
 
 class SimulationStatistics:
@@ -128,36 +128,39 @@ class SimulationStatistics:
     def record_deadline_achievement(self, requested: int, completed: int, collided: int, incomplete: int) -> None:
         """必須LC（非回避・活性化済み）の要求数と結果内訳を累積する（締切達成率の母数/分子）。
 
-        completed は「衝突に関与せず締切内に完了」した数（新定義の分子）。collided は衝突関与により
-        未達成扱いとなった数、incomplete は衝突なしで未完了（立ち往生・締切超過）の数。
-        requested == completed + collided + incomplete が常に成り立つ（成り立たない呼び出しは拒否）。
+        達成率は completed（締切内に完了）/ requested の2指標分離方式（2026-07-24 ユーザー判断）:
+        衝突は達成率に織り込まず、collided（衝突関与車の操作数。完了済みでも数える参考列）として
+        別掲する。incomplete は締切内に完了できなかった数で、requested == completed + incomplete が
+        常に成り立つ（成り立たない呼び出しは拒否）。collided は completed/incomplete と重なり得る。
         """
-        if requested != completed + collided + incomplete:
+        if requested != completed + incomplete:
             raise ValueError(
                 f"deadline achievement の内訳が不整合です: requested={requested} != "
-                f"completed={completed} + collided={collided} + incomplete={incomplete}"
+                f"completed={completed} + incomplete={incomplete}"
             )
+        if collided > requested:
+            raise ValueError(f"衝突関与数が要求数を超えています: collided={collided} > requested={requested}")
         self.data.mandatory_lc_total += requested
         self.data.mandatory_lc_completed += completed
         self.data.mandatory_lc_collided += collided
         self.data.mandatory_lc_incomplete += incomplete
 
     def _deadline_achievement_rate(self) -> Optional[float]:
-        """締切達成率＝衝突なし完了数/要求数（要求が無ければ None）。"""
+        """締切達成率＝完了数/要求数（要求が無ければ None）。"""
         if self.data.mandatory_lc_total == 0:
             return None
         return self.data.mandatory_lc_completed / self.data.mandatory_lc_total
 
     def deadline_summary(self) -> tuple[int, int, Optional[float]]:
-        """締切達成の (要求数, 衝突なし完了数, 達成率) を返す（達成率は要求が無ければ None）。表示・ログ用の公開アクセサ。"""
+        """締切達成の (要求数, 完了数, 達成率) を返す（達成率は要求が無ければ None）。表示・ログ用の公開アクセサ。"""
         return self.data.mandatory_lc_total, self.data.mandatory_lc_completed, self._deadline_achievement_rate()
 
     def write_mandatory_failures(self, rows: list[dict[str, Any]]) -> None:
-        """新定義で未達成となった必須LC要求の個票を `<結果CSV名>__failures.csv` に書き出す（失敗ゼロなら作らない）。
+        """未完了または衝突関与の必須LC要求の個票を `<結果CSV名>__failures.csv` に書き出す（該当ゼロなら作らない）。
 
-        1行=1未達成要求（車両ID・env・分類・発生/締切位置・最終状態）。ファイルが無い＝その run は
-        失敗ゼロ、を意味させるため空ファイルは作らない。列は行 dict のキー（呼び出し側=V2CAV.mandatory_failure_rows
-        が全行同一キーで構成する）。
+        1行=1要求（車両ID・env・分類・発生/締切位置・最終状態）。ファイルが無い＝その run は
+        「完了100%かつ衝突関与LC 0」、を意味させるため空ファイルは作らない。列は行 dict のキー
+        （呼び出し側=V2CAV.mandatory_failure_rows が全行同一キーで構成する）。
         """
         if not rows:
             return

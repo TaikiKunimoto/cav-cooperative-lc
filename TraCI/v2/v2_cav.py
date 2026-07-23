@@ -119,26 +119,26 @@ class V2CAV(BaseModel):
         """活性化した非回避必須LC操作について、締切達成（完了数/要求数）を統計へ記録する（F3）。
 
         要求数＝活性化した非回避操作（spawn 時の本来の必須LC。回避操作・未活性は除く）、
-        完了数＝うち「衝突に関与せず」締切位置までに目標レーンへ到達したもの。衝突に関与した車の
-        操作は目標到達の有無によらず未達成（collided）として数える＝達成率は衝突なし完了のみを分子に
-        取る。stuck で running のまま終わった車は完了せず要求のみ計上＝未完了（incomplete）として
-        現れる（テレポート無効方針 §2.4.1 と整合）。出口時とシミュレーション終了時の双方から呼ばれ、
+        完了数＝うち締切位置までに目標レーンへ到達したもの（達成率の分子。2指標分離方式のため
+        衝突は織り込まない）。衝突に関与した車の操作数は collided（安全性の参考列）として別掲する。
+        stuck で running のまま終わった車は完了せず要求のみ計上＝未完了（incomplete）として現れる
+        （テレポート無効方針 §2.4.1 と整合）。出口時とシミュレーション終了時の双方から呼ばれ、
         出口/残存いずれの車も一度だけ計上される。
         """
         requested = [op for op in self.operations if not op.is_avoidance and op.activated]
         if not requested:
             return
-        if collided:
-            stats.record_deadline_achievement(len(requested), 0, len(requested), 0)
-            return
         completed = sum(1 for op in requested if op.completed_in_time)
-        stats.record_deadline_achievement(len(requested), completed, 0, len(requested) - completed)
+        n_collided = len(requested) if collided else 0
+        stats.record_deadline_achievement(len(requested), completed, n_collided, len(requested) - completed)
 
     def mandatory_failure_rows(self, env_name: str, collided: bool, phase: str) -> "list[dict[str, Any]]":
-        """新定義で未達成となる活性化済み非回避操作の個票行を返す（達成なら空）。
+        """未完了または衝突関与の活性化済み非回避操作の個票行を返す（該当なしなら空）。
 
+        個票の対象＝(a) 締切内に完了しなかった要求（達成率の失敗）と (b) 衝突関与車の要求
+        （完了済みでも安全性の透明性のため記録。completed_in_time_raw 列で完了有無が分かる）。
         phase: "exit"=範囲外へ退出した時点 / "end"=終了時に running のまま。分類は
-        COLLIDED（衝突関与。目標到達済みでも未達成扱い）／TIMEOUT_STUCK（終了時未完了＝立ち往生）／
+        COLLIDED（衝突関与）／TIMEOUT_STUCK（終了時未完了＝立ち往生）／
         EXITED_INCOMPLETE（未完了のまま退出。通常起きない計測異常の検知用）。
         """
         rows: list[dict[str, Any]] = []

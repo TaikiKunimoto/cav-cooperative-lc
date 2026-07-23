@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: d7db6234-ee5a-41cb-bf74-40b65202abaa
-  modified: 2026-07-23T21:11:50.305Z
+  modified: 2026-07-23T21:58:17.975Z
 ---
 
 **研究要件（2026-07-24 ユーザー明言）**: 5評価シナリオ（diverge / merge / weave / weave2 / straight障害物）
@@ -51,6 +51,16 @@ metadata:
 ／スワップ静的要求を minGap→制動項+余裕に緩和（停止車列で20cm差の循環待ち解消）／追従に臨界制動バンド=
 **前車速度への**最大減速マッチング（目標0の全停止プロファイルは衝撃波を増幅し織込み流入が崩壊する。一度やらかした）
 ／`slow_down` に duration 上限クランプ（微速時 v/decel 溢れ→'Invalid time interval' 接続死の防止）。
+
+**やってはいけない（2026-07-24 実証）**: 緊急ブレーキ（gap<MIN_GAP時の `_emergency_brake` の瞬時 setSpeed ジャンプ）を
+「有界減速＋ギャップ回復則」に置換する試み → **衝突が増える**（47run比較で関与LC 33→46・総衝突61・14runで増加・
+canceled も乱れる）ため差し戻し済み。瞬時ジャンプは当該ペアの接触を確実に防ぐ magic brake で、除去すると第一接触が増える。
+creep衝突（追突グレーズ、SUMO警告 decel>wished が直前に出る）の解消は縦方向制御の本格再設計が必要な難所。
+
+**新定義（衝突込み達成率）の実測影響（2026-07-24）**: 包絡内で衝突関与LC 33件（32件は**締切内完了後の事後関与**＝もらい事故
+含む）＋weave2 Q3000f0.6s2 の未完了23件 → 包絡内総計 99.88%（100%はこの2点の扱い次第）。
+weave2 Q3000f0.6s2 は**全車 speed=0 の全域グリッドロック**（位置7.8〜396.9m に静止・canceled94・drain cap到達）＝
+容量飽和でなく離散デッドロックの残存変種で、forensic での個別修正の余地あり。
 
 **ツール**（`.claude-memory/tools/` に保全。旧 scratchpad 由来・リポジトリ非改変の monkeypatch 計装）:
 - `forensic.py` — 失敗の車両別分類（OK/COLLIDED/ARRIVED_UNRECORDED/STUCK_AT_WALL/STUCK_QUEUE/CENSORED）＋
