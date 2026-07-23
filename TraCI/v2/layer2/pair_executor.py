@@ -29,6 +29,7 @@ from v2.constants import (
     MAX_DECEL,
     MAX_SPEED,
     MIN_GAP,
+    SWAP_STOPPED_EPS,
     SWAP_WINDOW,
     VEH_LENGTH,
 )
@@ -183,11 +184,17 @@ class Layer2:
                     continue
                 a_obs = snap.obs[a.veh_id]
                 b_obs = snap.obs[b.veh_id]
+                # 壁位置（両者とも締切の直前）でのみ、停止車列に対する live 検査の minGap 緩和を許す。
+                # 壁ペアは前方余地が無く他の解消手段（前進整列・提供車の譲歩）が幾何学的に存在しない一方、
+                # 中間帯の停止ペアまで緩和すると流全体が組み変わり別条件へ失敗が移動する（47run比較で実証）。
+                at_wall = (
+                    a.current_pos >= a.deadline_pos - SWAP_WINDOW and b.current_pos >= b.deadline_pos - SWAP_WINDOW
+                )
                 if not (
                     Layer2._swap_gap_ok(snap, a_next, a.current_pos, a_obs.speed, ignore_id=b.veh_id)
                     and Layer2._swap_gap_ok(snap, a.current_lane, b.current_pos, b_obs.speed, ignore_id=a.veh_id)
-                    and Layer2._swap_live_gap_ok(a.veh_id, a_obs.speed, a_next < a.current_lane, b.veh_id)
-                    and Layer2._swap_live_gap_ok(b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id)
+                    and Layer2._swap_live_gap_ok(a.veh_id, a_obs.speed, a_next < a.current_lane, b.veh_id, at_wall)
+                    and Layer2._swap_live_gap_ok(b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id, at_wall)
                 ):
                     continue
                 traci.vehicle.changeLane(a.veh_id, a_next, 0)
@@ -204,24 +211,42 @@ class Layer2:
         return swapped
 
     @staticmethod
-    def _swap_live_gap_ok(veh_id: str, ego_speed: float, going_right: bool, partner_id: str) -> bool:
+    def _swap_live_gap_ok(veh_id: str, ego_speed: float, going_right: bool, partner_id: str, at_wall: bool) -> bool:
         """スワップ相手を除く実測（getNeighbors）の前後ギャップ検査。
 
         スナップショットの ``lane_members`` は本線 edge 上の車両しか含まず、車体がジャンクション
         内部レーンに跨る車両（前端が junction に入り後端が本線に残る車・流入直前の車）が見えない。
         その盲点の第三者と重なって交換すると side collision になるため、通常挿入と同じ
         junction 越境の実測検査を追加で行う（相手＝partner は交換で居なくなるので除外）。
+
+        要求量は原則、通常挿入と同じ「バンパー間 minGap+余裕」。ただし**壁ペア（at_wall=両者とも
+        締切直前）かつ自車・第三者とも事実上停止（< SWAP_STOPPED_EPS）の場合に限り** minGap 分を
+        差し引いた物理ギャップ基準に緩和する: 停止車列の自然間隔（バンパー間≈minGap）の第三者が
+        0.4m 差で live 検査だけを永久に落とし、壁位置で整列した対向ペアが交換できず両レーン先頭が
+        凍結する全域グリッドロックになる（weave2 Q3000 f0.6 seed2 で実測した残存変種）。壁ペアは
+        前方余地が無く他の解消手段が幾何学的に存在しない。停止域では minGap 未満の車間も無害
+        （SUMO の衝突は重なりのみ）。一方、緩和を走行中や中間帯の停止ペアへ広げると流全体が
+        組み変わり別条件へ失敗が移動する（衝突増・新たな未完了。47run 比較で実証）ため、
+        壁ペア×停止域に限定する。
         """
         lat = 1 if going_right else 0
         for nid, dist in get_veh_neighbors(veh_id, lat):  # 後続
             if nid == partner_id:
                 continue
-            if dist < Layer2._net_required(get_veh_speed(nid), ego_speed):
+            v_n = get_veh_speed(nid)
+            required = Layer2._net_required(v_n, ego_speed)
+            if at_wall and max(ego_speed, v_n) < SWAP_STOPPED_EPS:
+                required -= MIN_GAP
+            if dist < required:
                 return False
         for nid, dist in get_veh_neighbors(veh_id, lat | 2):  # 先行
             if nid == partner_id:
                 continue
-            if dist < Layer2._net_required(ego_speed, get_veh_speed(nid)):
+            v_n = get_veh_speed(nid)
+            required = Layer2._net_required(ego_speed, v_n)
+            if at_wall and max(ego_speed, v_n) < SWAP_STOPPED_EPS:
+                required -= MIN_GAP
+            if dist < required:
                 return False
         return True
 

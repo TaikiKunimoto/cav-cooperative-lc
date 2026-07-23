@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: d7db6234-ee5a-41cb-bf74-40b65202abaa
-  modified: 2026-07-23T21:58:17.975Z
+  modified: 2026-07-23T22:11:18.163Z
 ---
 
 **研究要件（2026-07-24 ユーザー明言）**: 5評価シナリオ（diverge / merge / weave / weave2 / straight障害物）
@@ -57,10 +57,14 @@ metadata:
 canceled も乱れる）ため差し戻し済み。瞬時ジャンプは当該ペアの接触を確実に防ぐ magic brake で、除去すると第一接触が増える。
 creep衝突（追突グレーズ、SUMO警告 decel>wished が直前に出る）の解消は縦方向制御の本格再設計が必要な難所。
 
-**新定義（衝突込み達成率）の実測影響（2026-07-24）**: 包絡内で衝突関与LC 33件（32件は**締切内完了後の事後関与**＝もらい事故
-含む）＋weave2 Q3000f0.6s2 の未完了23件 → 包絡内総計 99.88%（100%はこの2点の扱い次第）。
-weave2 Q3000f0.6s2 は**全車 speed=0 の全域グリッドロック**（位置7.8〜396.9m に静止・canceled94・drain cap到達）＝
-容量飽和でなく離散デッドロックの残存変種で、forensic での個別修正の余地あり。
+**達成率の定義（2026-07-24 ユーザー判断＝2指標分離）**: 達成率＝**締切内完了/発生**（完了率）を論文の主指標とし、
+衝突は安全性指標（total_collisions・mandatory_lc_collided=衝突関与車の要求数の参考列）として**別掲**する。
+根拠: 包絡内の衝突関与LC 33件中32件は**締切内完了後の事後関与**（もらい事故含む）で調停機構の失敗ではない。
+runbookタスク2の字義（衝突込み定義）だと包絡内99.88%になるため分離を選択。
+**衝突ゼロ化（縦方向制御の再設計）は Issue #57 で将来タスクとして管理**（忘れない、がユーザー指示）。
+weave2 Q3000f0.6s2（包絡内唯一の完了失敗24件）は**全車 speed=0 の全域グリッドロック**（位置7.8〜396.9mに静止・
+canceled94・drain cap到達）＝離散デッドロックの残存変種 → forensic で修正を試みる（ユーザー承認済み。
+純粋な容量飽和と判明したら包絡精密化=weave2 f0.6のみQ≤2500 へフォールバック）。
 
 **ツール**（`.claude-memory/tools/` に保全。旧 scratchpad 由来・リポジトリ非改変の monkeypatch 計装）:
 - `forensic.py` — 失敗の車両別分類（OK/COLLIDED/ARRIVED_UNRECORDED/STUCK_AT_WALL/STUCK_QUEUE/CENSORED）＋
