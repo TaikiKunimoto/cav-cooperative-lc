@@ -21,7 +21,7 @@ config ディレクトリを自動判定してリンクを張る）。
 
 ## プロジェクト方針・状態（project）
 
-- [必須LC 100%要件と修正の全体像](mandatory-lc-100pct-requirement.md) — 5シナリオ100%必達／原因4系統と修正／forensic手法／修正前データの所在
+- [必須LC 100%要件と修正の全体像](mandatory-lc-100pct-requirement.md) — 100%化ほぼ完了・PR#56待ち(要rebase)／ユーザー未決4件／修正4系統＋追加／forensic・verify_sweepツールは tools/ 配下／運用の罠
 - [v1は今後不使用](v1-frozen-no-longer-used.md) — v1凍結／golden full再採取は不要（PR#32でスキップ）
 - [Pythonツールチェーンの注意点](python-toolchain-quirks.md) — uv移行は完了。.gitignoreのstatisticsパターンをruffが素通りする罠・リポジトリ改名で.venvが壊れる罠に注意
 - [v2評価スイープ 2026-06](v2-evaluation-2026-06.md) — 提案手法v2の修論評価（達成率97.9–99.6%/高負荷で衝突増）。当時の操作・現行run_all.py・非自明な制約・Drive投入
