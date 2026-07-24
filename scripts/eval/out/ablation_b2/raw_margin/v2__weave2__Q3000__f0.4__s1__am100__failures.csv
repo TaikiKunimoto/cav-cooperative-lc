@@ -1,0 +1,3 @@
+veh_id,env,classification,phase,route,target_lane,deadline_pos,activation_time,activation_pos,completed_in_time_raw,collided,final_road,final_lane,final_lane_pos,final_speed
+17,weave2,COLLIDED,exit,r_cross_bt,3,396.91,34.5,298.9960000000001,False,True,OffRampTop,0,54.92599999999999,27.78
+13,weave2,COLLIDED,exit,r_cross_bt,3,396.91,27.8,298.0136834726602,True,True,OffRampTop,0,56.045868039307734,17.42
