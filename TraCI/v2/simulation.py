@@ -181,10 +181,10 @@ class V2Simulation(BaseModel):
                 self.obstacle.escalate(active, self.env.mainlane_edge, obstacle_placed_pos, obstacle_num_lanes)
 
             # --- 毎Tc 2フェーズ調停。Phase A（鍵計算）→ Phase B（割当＋役割付与）。Layer2 実行は制御後に行う ---
-            # policy=off は Layer1/Layer2・縦制御を丸ごと行わず SUMO 標準（LC2013・Krauss）に委ねる。
+            # 非協調（off/off-late）は Layer1/Layer2・縦制御を丸ごと行わず SUMO 標準（LC2013・Krauss）に委ねる。
             # 観測・活性化・締切判定・衝突検出（上の per-step 処理）は全ポリシー共通に動き続ける。
             tc_accumulator += TIME_STEP
-            if self.policy is not Policy.OFF and tc_accumulator + 1e-9 >= TC:
+            if not self.policy.is_noncooperative and tc_accumulator + 1e-9 >= TC:
                 tc_accumulator = 0.0
                 snap = Snapshot.capture(active, current_time, self.env.mainlane_edge)
                 requests = LCRequest.build_all(snap)
@@ -205,7 +205,7 @@ class V2Simulation(BaseModel):
                     last_request_log_sec = current_sec
 
             # --- 制御（速度）。traci の速度指令は次 step に反映されるため観測順と独立 ---
-            if self.policy is not Policy.OFF:
+            if not self.policy.is_noncooperative:
                 for veh in active:
                     veh.control_speed()
 
@@ -317,7 +317,8 @@ class V2Simulation(BaseModel):
                 V2CAV(
                     id=str(self.veh_id),
                     operations=operations,
-                    sumo_default_control=self.policy is Policy.OFF,
+                    sumo_default_control=self.policy.is_noncooperative,
+                    mlc_notice_at_activation=self.policy is Policy.OFF_LATE,
                 )
             )
             self.lane_queues.setdefault(depart_lane, []).append(str(self.veh_id))

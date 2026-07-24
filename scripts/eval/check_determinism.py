@@ -71,7 +71,7 @@ def main() -> None:
     ap.add_argument("--seed", default="1")
     ap.add_argument("--runs", type=int, default=2, help="実行回数（2以上）")
     ap.add_argument("--obstacle", default=None, help="lane,pos,time（任意）")
-    ap.add_argument("--policy", default="edf", choices=["edf", "none", "off"], help="調停ポリシー（柱B）")
+    ap.add_argument("--policy", default="edf", choices=["edf", "none", "off", "off-late"], help="調停ポリシー（柱B）")
     args = ap.parse_args()
     if args.runs < 2:
         raise SystemExit(f"--runs は2以上を指定してください: {args.runs}")

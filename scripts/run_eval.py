@@ -99,7 +99,9 @@ def append_run_manifest(lines: list[str]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="一括評価ランナー（policy×env×Q×f×seed×並列度）")
-    ap.add_argument("--policy", choices=["edf", "none", "off"], default="edf", help="調停ポリシー（既定 edf）")
+    ap.add_argument(
+        "--policy", choices=["edf", "none", "off", "off-late"], default="edf", help="調停ポリシー（既定 edf）"
+    )
     ap.add_argument("--env", nargs="+", choices=KNOWN_ENVS, default=["diverge", "merge", "weave", "weave2"])
     ap.add_argument("--q", nargs="+", type=int, default=rs.Q_FULL, help="総流入 Q [veh/h] の水準")
     ap.add_argument("--f", nargs="+", type=float, default=rs.F_FULL, help="必須LC比率 f の水準")
