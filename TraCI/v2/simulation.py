@@ -236,6 +236,10 @@ class V2Simulation(BaseModel):
         requested, completed, rate = stats.deadline_summary()
         rate_str = f"{rate:.3f}" if rate is not None else "-"
         print(f"Deadline: mandatory-LC completed/requested = {completed}/{requested} (rate {rate_str})")
+        if self.obstacle is not None:
+            a_requested, a_completed, a_rate = stats.avoidance_summary()
+            a_rate_str = f"{a_rate:.3f}" if a_rate is not None else "-"
+            print(f"Deadline: avoidance-LC completed/requested = {a_completed}/{a_requested} (rate {a_rate_str})")
         total_collisions, total_involved = self._print_collision_summary()
 
         results = {

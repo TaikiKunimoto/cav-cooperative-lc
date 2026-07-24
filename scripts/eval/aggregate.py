@@ -31,6 +31,11 @@ METRIC_COLS = {
     "mandatory_lc_completed": "mlc_completed",
     "mandatory_lc_collided": "mlc_collided",
     "mandatory_lc_incomplete": "mlc_incomplete",
+    "avoidance_lc_total": "avoid_total",
+    "avoidance_lc_completed": "avoid_completed",
+    "avoidance_lc_collided": "avoid_collided",
+    "avoidance_lc_incomplete": "avoid_incomplete",
+    "avoidance_achievement_rate": "avoid_rate",
     "total_collisions": "collisions",
     "total_vehicles_involved": "collision_vehicles",
     "min_TTC": "min_ttc",
@@ -148,6 +153,14 @@ def main() -> None:
     # 封鎖・渋滞で「捌けているか」を見るときはこちらを使う）
     df["exit_throughput"] = df["exited"] * 3600.0 / df["sim_time"]
 
+    # 統合達成率: spawn 時の必須LC（mlc_*）と障害物回避（avoid_*）を合算した 完了/発生（柱A の主指標）。
+    # MLC 環境では avoid=0 のため deadline_rate と一致し、straight_obs では回避のみが母数になる。
+    # 旧スキーマ CSV（avoid 列なし）は NaN → 0 扱いにするが、両方 NaN（v1 等の未計測 run）は NaN のまま残す。
+    measured = df["mlc_total"].notna() | df["avoid_total"].notna()
+    for kind in ("total", "completed", "collided", "incomplete"):
+        df[f"req_{kind}"] = (df[f"mlc_{kind}"].fillna(0) + df[f"avoid_{kind}"].fillna(0)).where(measured)
+    df["achievement_rate"] = (df["req_completed"] / df["req_total"]).where(df["req_total"] > 0)
+
     df = df.sort_values(["method", "scenario", "q", "f", "seed"]).reset_index(drop=True)
     long_path = OUT_DIR / "summary_long.csv"
     df.to_csv(long_path, index=False)
@@ -167,8 +180,14 @@ def main() -> None:
                 n=("seed", "size"),
                 deadline_rate_mean=("deadline_rate", "mean"),
                 deadline_rate_min=("deadline_rate", "min"),
+                achievement_rate_mean=("achievement_rate", "mean"),
+                achievement_rate_min=("achievement_rate", "min"),
+                req_total_sum=("req_total", lambda s: s.sum(min_count=1)),
+                req_completed_sum=("req_completed", lambda s: s.sum(min_count=1)),
                 mlc_collided_sum=("mlc_collided", lambda s: s.sum(min_count=1)),
                 mlc_incomplete_sum=("mlc_incomplete", lambda s: s.sum(min_count=1)),
+                avoid_collided_sum=("avoid_collided", lambda s: s.sum(min_count=1)),
+                avoid_incomplete_sum=("avoid_incomplete", lambda s: s.sum(min_count=1)),
                 collisions_per_run=("collisions", "mean"),
                 collision_free_pct=("_collision_free", "mean"),
                 avg_speed_mean=("avg_speed", "mean"),
@@ -185,17 +204,24 @@ def main() -> None:
         return "-" if x is None or pd.isna(x) else f"{x:.{nd}f}"
 
     def scenario_md(agg: pd.DataFrame) -> str:
+        # 達成率は統合（必須LC＋障害物回避）。衝突関与LC・未完了LC も両者の合算で表示する。
         md_lines = [
             "| method | scenario | n | 締切達成率(平均) | 達成率(最小) | 衝突関与LC | 未完了LC | 衝突/run | 衝突0率[%] "
             "| 平均速度[m/s] | スループット[veh/h] | キャンセル(平均) |",
             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
+
+        def _sum2(a: float | None, b: float | None) -> str:
+            if pd.isna(a) and pd.isna(b):
+                return "-"
+            return str(int((0 if pd.isna(a) else a) + (0 if pd.isna(b) else b)))
+
         for _, r in agg.iterrows():
-            n_col = "-" if pd.isna(r["mlc_collided_sum"]) else str(int(r["mlc_collided_sum"]))
-            n_inc = "-" if pd.isna(r["mlc_incomplete_sum"]) else str(int(r["mlc_incomplete_sum"]))
+            n_col = _sum2(r["mlc_collided_sum"], r["avoid_collided_sum"])
+            n_inc = _sum2(r["mlc_incomplete_sum"], r["avoid_incomplete_sum"])
             md_lines.append(
                 f"| {r['method']} | {r['scenario']} | {int(r['n'])} | "
-                f"{fmt(r['deadline_rate_mean'])} | {fmt(r['deadline_rate_min'])} | {n_col} | {n_inc} | "
+                f"{fmt(r['achievement_rate_mean'])} | {fmt(r['achievement_rate_min'])} | {n_col} | {n_inc} | "
                 f"{fmt(r['collisions_per_run'], 2)} | {fmt(r['collision_free_pct'], 0)} | {fmt(r['avg_speed_mean'], 2)} | "
                 f"{fmt(r['throughput_mean'], 0)} | {fmt(r['canceled_mean'], 1)} |"
             )
