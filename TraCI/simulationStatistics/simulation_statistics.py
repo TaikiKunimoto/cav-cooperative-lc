@@ -171,6 +171,21 @@ class SimulationStatistics:
             writer.writeheader()
             writer.writerows(rows)
 
+    def write_mandatory_requests(self, rows: list[dict[str, Any]], fieldnames: list[str]) -> None:
+        """全必須LC要求（成功含む）の個票を `<結果CSV名>__requests.csv` に書き出す（完了余裕 margin 評価用）。
+
+        失敗個票（write_mandatory_failures）と異なり、該当ゼロでもヘッダのみのファイルを必ず作る:
+        「ファイルが無い＝margin ログ未実装の旧 run」と区別し、集計側が再実行要否を判定できるようにする。
+        fieldnames は呼び出し側（V2CAV.MANDATORY_REQUEST_FIELDS）が与える。行のキーと一致しなければ
+        DictWriter が例外を出す（黙って欠損させない）。
+        """
+        stem = self.filename[: -len(".csv")] if self.filename.endswith(".csv") else self.filename
+        path = stem + "__requests.csv"
+        with open(path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="raise")
+            writer.writeheader()
+            writer.writerows(rows)
+
     def _create_filename(self, filename: str) -> str:
         override = os.environ.get("EVAL_OUTPUT_NAME")
         if override:
