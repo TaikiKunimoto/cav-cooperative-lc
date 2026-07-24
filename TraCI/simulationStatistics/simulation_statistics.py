@@ -23,6 +23,12 @@ class SimulationStatsData(BaseModel):
     mandatory_lc_completed: int = 0  # 締切達成率の分子: うち締切までに目標レーンへ到達した数（完了数）
     mandatory_lc_collided: int = 0  # うち衝突に関与した車の操作数（安全性の参考列。完了/未完了と重なり得る）
     mandatory_lc_incomplete: int = 0  # うち締切内に完了できなかった操作数（立ち往生・締切超過。= total - completed）
+    # 突発障害物の回避操作（Bシナリオ）。母数=活性化した回避操作、完了=障害物位置（=締切）を通過した数。
+    # 必須LC（spawn時付与）と分けて記録し、集計側で統合達成率 (mandatory+avoidance) を計算できるようにする。
+    avoidance_lc_total: int = 0
+    avoidance_lc_completed: int = 0
+    avoidance_lc_collided: int = 0
+    avoidance_lc_incomplete: int = 0
 
 
 class SimulationStatistics:
@@ -145,15 +151,44 @@ class SimulationStatistics:
         self.data.mandatory_lc_collided += collided
         self.data.mandatory_lc_incomplete += incomplete
 
+    def record_avoidance_achievement(self, requested: int, completed: int, collided: int, incomplete: int) -> None:
+        """回避操作（突発障害物・活性化済み）の要求数と結果内訳を累積する（Bシナリオの達成率の母数/分子）。
+
+        完了＝障害物位置（=締切）の通過。回避は締切位置=障害物位置のため「通過＝締切内完了」が定義から
+        成り立つ（通過できない車は立ち往生か衝突）。衝突の扱いは必須LCと同じ2指標分離方式で、
+        collided は参考列として別掲する。整合条件も ``record_deadline_achievement`` と同一。
+        """
+        if requested != completed + incomplete:
+            raise ValueError(
+                f"avoidance achievement の内訳が不整合です: requested={requested} != "
+                f"completed={completed} + incomplete={incomplete}"
+            )
+        if collided > requested:
+            raise ValueError(f"衝突関与数が要求数を超えています: collided={collided} > requested={requested}")
+        self.data.avoidance_lc_total += requested
+        self.data.avoidance_lc_completed += completed
+        self.data.avoidance_lc_collided += collided
+        self.data.avoidance_lc_incomplete += incomplete
+
     def _deadline_achievement_rate(self) -> Optional[float]:
         """締切達成率＝完了数/要求数（要求が無ければ None）。"""
         if self.data.mandatory_lc_total == 0:
             return None
         return self.data.mandatory_lc_completed / self.data.mandatory_lc_total
 
+    def _avoidance_achievement_rate(self) -> Optional[float]:
+        """回避操作の達成率＝完了数/要求数（要求が無ければ None）。"""
+        if self.data.avoidance_lc_total == 0:
+            return None
+        return self.data.avoidance_lc_completed / self.data.avoidance_lc_total
+
     def deadline_summary(self) -> tuple[int, int, Optional[float]]:
         """締切達成の (要求数, 完了数, 達成率) を返す（達成率は要求が無ければ None）。表示・ログ用の公開アクセサ。"""
         return self.data.mandatory_lc_total, self.data.mandatory_lc_completed, self._deadline_achievement_rate()
+
+    def avoidance_summary(self) -> tuple[int, int, Optional[float]]:
+        """回避操作の (要求数, 完了数, 達成率) を返す（達成率は要求が無ければ None）。表示・ログ用の公開アクセサ。"""
+        return self.data.avoidance_lc_total, self.data.avoidance_lc_completed, self._avoidance_achievement_rate()
 
     def write_mandatory_failures(self, rows: list[dict[str, Any]]) -> None:
         """未完了または衝突関与の必須LC要求の個票を `<結果CSV名>__failures.csv` に書き出す（該当ゼロなら作らない）。
@@ -223,6 +258,11 @@ class SimulationStatistics:
                 "mandatory_lc_collided",
                 "mandatory_lc_incomplete",
                 "deadline_achievement_rate",
+                "avoidance_lc_total",
+                "avoidance_lc_completed",
+                "avoidance_lc_collided",
+                "avoidance_lc_incomplete",
+                "avoidance_achievement_rate",
             ]
         with open(self.filename, "w", newline="") as f:
             writer = csv.writer(f)
@@ -275,6 +315,11 @@ class SimulationStatistics:
                 self.data.mandatory_lc_collided,
                 self.data.mandatory_lc_incomplete,
                 self._deadline_achievement_rate(),
+                self.data.avoidance_lc_total,
+                self.data.avoidance_lc_completed,
+                self.data.avoidance_lc_collided,
+                self.data.avoidance_lc_incomplete,
+                self._avoidance_achievement_rate(),
             ]
         with open(self.filename, "a", newline="") as f:
             writer = csv.writer(f)
