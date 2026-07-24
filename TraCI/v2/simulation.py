@@ -29,11 +29,12 @@ from v2.constants import (
     TIME_STEP,
 )
 from v2.environment import Environment, Group
-from v2.layer1.priority import EDF
+from v2.layer1.priority import EDF, FCFS
 from v2.layer1.rsu import RSU, Assignment
 from v2.layer2.pair_executor import Layer2
 from v2.lc_request import LCOperation, LCRequest
 from v2.obstacle import Obstacle
+from v2.policy import Policy
 from v2.snapshot import Snapshot
 from v2.v2_cav import V2CAV
 
@@ -74,6 +75,7 @@ class V2Simulation(BaseModel):
     mlc_ratio: float  # 必須LC車の比率 f（0..1）
     seed: str  # 乱数シード（統計ラベル用。random.seed の実行はエントリ側）
     obstacle: Obstacle | None = None  # 突発障害物（指定レーン・位置・時刻）。None なら障害物なし
+    policy: Policy = Policy.EDF  # 調停ポリシー（アブレーション比較の切替軸。柱B）
 
     veh_id: int = 0  # 次に投入する車両へ振る連番ID
     # グループ別の流入時刻（環境のグループ定義順を保持）
@@ -179,13 +181,19 @@ class V2Simulation(BaseModel):
                 self.obstacle.escalate(active, self.env.mainlane_edge, obstacle_placed_pos, obstacle_num_lanes)
 
             # --- 毎Tc 2フェーズ調停。Phase A（鍵計算）→ Phase B（割当＋役割付与）。Layer2 実行は制御後に行う ---
+            # policy=off は Layer1/Layer2・縦制御を丸ごと行わず SUMO 標準（LC2013・Krauss）に委ねる。
+            # 観測・活性化・締切判定・衝突検出（上の per-step 処理）は全ポリシー共通に動き続ける。
             tc_accumulator += TIME_STEP
-            if tc_accumulator + 1e-9 >= TC:
+            if self.policy is not Policy.OFF and tc_accumulator + 1e-9 >= TC:
                 tc_accumulator = 0.0
                 snap = Snapshot.capture(active, current_time, self.env.mainlane_edge)
                 requests = LCRequest.build_all(snap)
-                keyed = EDF.order_requests(requests)  # Phase A: 全要求車の鍵を計算し EDF（dist昇順）にソート
-                assignments = RSU.arbitrate(keyed, snap)  # Phase B: 鍵順に提供車を占有印つきで確保
+                if self.policy is Policy.EDF:
+                    keyed = EDF.order_requests(requests)  # Phase A: 全要求車の鍵を計算し EDF（dist昇順）にソート
+                    assignments = RSU.arbitrate(keyed, snap)  # Phase B: 鍵順に提供車を占有印つきで確保
+                else:
+                    keyed = FCFS.order_requests(requests)  # Phase A': 発生順（早い者勝ち）にソート
+                    assignments = RSU.arbitrate_fcfs(keyed, snap)  # Phase B': 最近傍後続の素朴割当
                 req_by_id = {r.veh_id: r for _, r in keyed}
                 RSU.apply_roles(active, assignments)  # 毎Tc フル再構築（提供車=YIELDING / 要求車=LANE_CHANGING）
                 if not RSU.keys_unique(keyed):
@@ -197,8 +205,9 @@ class V2Simulation(BaseModel):
                     last_request_log_sec = current_sec
 
             # --- 制御（速度）。traci の速度指令は次 step に反映されるため観測順と独立 ---
-            for veh in active:
-                veh.control_speed()
+            if self.policy is not Policy.OFF:
+                for veh in active:
+                    veh.control_speed()
 
             # --- Layer2 実行。制御後に呼び、協調減速の slowDown と changeLane が最後の指令になるようにする ---
             if snap is not None:
@@ -304,7 +313,13 @@ class V2Simulation(BaseModel):
             operations: list[LCOperation] = []
             if group.target_lane is not None and group.deadline_pos is not None:
                 operations.append(LCOperation(target_lane=group.target_lane, deadline_pos=group.deadline_pos))
-            self.vehicles.append(V2CAV(id=str(self.veh_id), operations=operations))
+            self.vehicles.append(
+                V2CAV(
+                    id=str(self.veh_id),
+                    operations=operations,
+                    sumo_default_control=self.policy is Policy.OFF,
+                )
+            )
             self.lane_queues.setdefault(depart_lane, []).append(str(self.veh_id))
             self.veh_id += 1
 

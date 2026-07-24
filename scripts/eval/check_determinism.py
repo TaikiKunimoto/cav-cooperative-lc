@@ -30,7 +30,9 @@ TRACI_DIR = REPO_ROOT / "TraCI"
 PER_RUN_TIMEOUT_S = 900
 
 
-def run_once(idx: int, out_dir: Path, env_name: str, q: float, f: float, seed: str, obstacle: str | None) -> Path:
+def run_once(
+    idx: int, out_dir: Path, env_name: str, q: float, f: float, seed: str, obstacle: str | None, policy: str
+) -> Path:
     """v2 を1回実行し、生成された CSV パスを返す。失敗時は SystemExit。"""
     name = f"det{idx}__{env_name}__Q{q}__f{f}__s{seed}"
     env = dict(os.environ)
@@ -40,6 +42,8 @@ def run_once(idx: int, out_dir: Path, env_name: str, q: float, f: float, seed: s
     cmd = ["uv", "run", "python", "-m", "v2", seed, str(q), str(f), "--env", env_name, "--nogui"]
     if obstacle is not None:
         cmd += ["--obstacle", obstacle]
+    if policy != "edf":
+        cmd += ["--policy", policy]
     print(f"[determinism] run {idx}: {' '.join(cmd)}")
     with open(log_path, "w") as logf:
         proc = subprocess.run(
@@ -67,6 +71,7 @@ def main() -> None:
     ap.add_argument("--seed", default="1")
     ap.add_argument("--runs", type=int, default=2, help="実行回数（2以上）")
     ap.add_argument("--obstacle", default=None, help="lane,pos,time（任意）")
+    ap.add_argument("--policy", default="edf", choices=["edf", "none", "off"], help="調停ポリシー（柱B）")
     args = ap.parse_args()
     if args.runs < 2:
         raise SystemExit(f"--runs は2以上を指定してください: {args.runs}")
@@ -78,7 +83,7 @@ def main() -> None:
         paths = []
         for i in range(1, args.runs + 1):
             # 各回で EVAL_OUTPUT_NAME を変え、run間の上書き・スキップを防ぐ
-            paths.append(run_once(i, out_dir, args.env, args.q, args.f, args.seed, args.obstacle))
+            paths.append(run_once(i, out_dir, args.env, args.q, args.f, args.seed, args.obstacle, args.policy))
 
         base = data_rows(paths[0])
         ok = True

@@ -63,6 +63,9 @@ class V2CAV(BaseModel):
     operations: list[LCOperation] = Field(default_factory=list)
     # 障害物（突発）: True の車は停止し続け、調停（要求・提供）から除外される。snapshot には載る（安全判定で回避）。
     is_obstacle: bool = False
+    # 非協調モード（--policy off）: True なら SUMO 標準制御（LC2013・Krauss）を無効化せず残す。
+    # traci からの車線変更・速度指令は一切行わない前提（観測・締切判定の計測だけが動く）。
+    sumo_default_control: bool = False
     road: str | None = None
     lane_id: str | None = None
     lane: int | None = None
@@ -94,8 +97,10 @@ class V2CAV(BaseModel):
         self.type_id = get_veh_type(self.id)
         self.route = get_veh_route_id(self.id)
         self.lane_id = get_veh_lane_id(self.id)
-        traci.vehicle.setLaneChangeMode(self.id, 0)
-        traci.vehicle.setSpeedMode(self.id, 0)
+        if not self.sumo_default_control:
+            traci.vehicle.setLaneChangeMode(self.id, 0)
+            traci.vehicle.setSpeedMode(self.id, 0)
+        # minGap・tau は車両物理の統一（提案/ベースライン共通、F4）なのでポリシーに依らず揃える
         traci.vehicle.setMinGap(self.id, MIN_GAP)
         traci.vehicle.setTau(self.id, 1.0)
 
