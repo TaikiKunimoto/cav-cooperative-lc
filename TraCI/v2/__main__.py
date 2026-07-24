@@ -25,6 +25,7 @@ else:
 from sumolib import checkBinary
 import traci
 
+from v2.constants import ACTIVATION_MARGIN
 from v2.environment import ENVIRONMENTS
 from v2.obstacle import Obstacle
 from v2.policy import Policy
@@ -56,6 +57,13 @@ def _get_options() -> tuple[optparse.Values, list[str]]:
         default=Policy.EDF.value,
         help="arbitration policy: edf=提案 / none=優先度なし / off=非協調(LC2013) (default: edf)",
     )
+    parser.add_option(
+        "--activation-margin",
+        dest="activation_margin",
+        type="float",
+        default=ACTIVATION_MARGIN,
+        help=f"要求の活性化位置 [m]（締切Dの何m手前で活性化するか。既定 {ACTIVATION_MARGIN:.0f}。柱B-2の猶予距離比較用）",
+    )
     parser.add_option("--nogui", action="store_true", default=False, help="run the commandline version of sumo")
     return parser.parse_args()
 
@@ -86,13 +94,12 @@ if __name__ == "__main__":
         sys.exit(f"不明な --env '{options.env}'（利用可能: {', '.join(ENVIRONMENTS)}）")
 
     policy = Policy(options.policy)
-    if policy is not Policy.EDF and options.obstacle is not None:
-        sys.exit(
-            f"--policy {policy.value} と --obstacle の併用は未検証のため受け付けません"
-            "（障害物封鎖シナリオは提案手法 edf のみで評価する）"
-        )
+    if options.activation_margin <= 0:
+        sys.exit(f"--activation-margin は正の値で指定してください（受け取り: {options.activation_margin}）")
 
     filename = _create_file_name(env.name, total_inflow, mlc_ratio, seed, policy)
+    if options.activation_margin != ACTIVATION_MARGIN:
+        filename += f"_am{int(options.activation_margin)}"
     # track_deadline_achievement=True: 提案手法は締切達成率（必須LC完了率）を中核指標としてCSV出力する
     stats = SimulationStatistics(filename=filename, output_dir=OUTPUT_DIR, track_deadline_achievement=True)
 
@@ -108,5 +115,6 @@ if __name__ == "__main__":
         seed=seed,
         obstacle=obstacle,
         policy=policy,
+        activation_margin=options.activation_margin,
     )
     sim.run(stats)

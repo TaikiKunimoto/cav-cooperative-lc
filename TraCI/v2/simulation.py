@@ -24,6 +24,7 @@ from utils.traci_wrapper import (
     get_veh_id_list,
 )
 from v2.constants import (
+    ACTIVATION_MARGIN,
     DRAIN_MAX,
     TC,
     TIME_STEP,
@@ -34,6 +35,7 @@ from v2.layer1.rsu import RSU, Assignment
 from v2.layer2.pair_executor import Layer2
 from v2.lc_request import LCOperation, LCRequest
 from v2.obstacle import Obstacle
+from v2.obstacle_metrics import ObstacleMetrics
 from v2.policy import Policy
 from v2.snapshot import Snapshot
 from v2.v2_cav import V2CAV
@@ -76,6 +78,9 @@ class V2Simulation(BaseModel):
     seed: str  # 乱数シード（統計ラベル用。random.seed の実行はエントリ側）
     obstacle: Obstacle | None = None  # 突発障害物（指定レーン・位置・時刻）。None なら障害物なし
     policy: Policy = Policy.EDF  # 調停ポリシー（アブレーション比較の切替軸。柱B）
+    # 活性化窓 [m]（締切Dの何m手前から要求を活性化するか）。柱B-2 の猶予距離比較でのみ既定から変える。
+    # off-late の車線変更解禁位置も本値に連動する
+    activation_margin: float = ACTIVATION_MARGIN
 
     veh_id: int = 0  # 次に投入する車両へ振る連番ID
     # グループ別の流入時刻（環境のグループ定義順を保持）
@@ -99,6 +104,12 @@ class V2Simulation(BaseModel):
         obstacle_target_id: str | None = None  # 位置到達トリガで pos 手前から監視中の車（pos 到達で停止＝障害物化）
         if self.obstacle is not None:
             self.obstacle.validate_for(self.env.mainlane_edge, obstacle_num_lanes, self.env.mainlane_length)
+        # 柱B-2: 障害物 run の方式間比較指標（観測のみ・挙動不変。sidecar CSV へ出力）
+        obstacle_metrics = (
+            ObstacleMetrics(appear_time=self.obstacle.appear_time, obstacle_lane=self.obstacle.lane)
+            if self.obstacle is not None
+            else None
+        )
 
         running_list: list[str] = []
         tc_accumulator = 0.0
@@ -146,6 +157,8 @@ class V2Simulation(BaseModel):
                     veh.record_arrival_time()
                     veh.accumulate_exit_stats(stats, vid in self.collided_ids)
                     mandatory_failures += veh.mandatory_failure_rows(self.env.name, vid in self.collided_ids, "exit")
+                    if obstacle_metrics is not None:
+                        obstacle_metrics.on_exit(veh)
                     continue
 
                 # 混雑で未発進の車両
@@ -163,7 +176,7 @@ class V2Simulation(BaseModel):
 
                 veh.update_self_observation()  # 自車両の状態更新
                 # TODO: ここ本当に必要か，一回で良いのか？
-                veh.update_activation(self.env.mainlane_edge)  # MLC要求が活性化された際に一度だけ更新する
+                veh.update_activation(self.env.mainlane_edge, self.activation_margin)  # 活性化を一度だけ記録
                 veh.update_deadline_achievement(self.env.mainlane_edge)  # 締切までに目標到達したら一度だけ記録（F3）
                 active.append(veh)
                 self._update_lane_queue(vid)
@@ -176,9 +189,13 @@ class V2Simulation(BaseModel):
                 obstacle_target_id, obstacle_placed_pos = self.obstacle.place(
                     active, self.env.mainlane_edge, obstacle_target_id
                 )
+                if obstacle_metrics is not None and obstacle_placed_pos is not None:
+                    obstacle_metrics.on_placed(obstacle_placed_pos, current_time)
             # 障害物より後方・同一レーンの through 車に必須LC（回避）を動的付与＝エスカレーション（コア機構 §4）
             if self.obstacle is not None and obstacle_placed_pos is not None:
                 self.obstacle.escalate(active, self.env.mainlane_edge, obstacle_placed_pos, obstacle_num_lanes)
+            if obstacle_metrics is not None:
+                obstacle_metrics.step(active, self.env.mainlane_edge)
 
             # --- 毎Tc 2フェーズ調停。Phase A（鍵計算）→ Phase B（割当＋役割付与）。Layer2 実行は制御後に行う ---
             # 非協調（off/off-late）は Layer1/Layer2・縦制御を丸ごと行わず SUMO 標準（LC2013・Krauss）に委ねる。
@@ -187,7 +204,7 @@ class V2Simulation(BaseModel):
             if not self.policy.is_noncooperative and tc_accumulator + 1e-9 >= TC:
                 tc_accumulator = 0.0
                 snap = Snapshot.capture(active, current_time, self.env.mainlane_edge)
-                requests = LCRequest.build_all(snap)
+                requests = LCRequest.build_all(snap, self.activation_margin)
                 if self.policy is Policy.EDF:
                     keyed = EDF.order_requests(requests)  # Phase A: 全要求車の鍵を計算し EDF（dist昇順）にソート
                     assignments = RSU.arbitrate(keyed, snap)  # Phase B: 鍵順に提供車を占有印つきで確保
@@ -236,6 +253,10 @@ class V2Simulation(BaseModel):
             mandatory_failures += veh.mandatory_failure_rows(self.env.name, veh.id in self.collided_ids, "end")
 
         stats.write_mandatory_failures(mandatory_failures)
+        if obstacle_metrics is not None:
+            still_running = [veh for veh in self.vehicles if veh.id in running_list]
+            for suffix, rows in obstacle_metrics.summary_rows(still_running, get_sim_time()).items():
+                stats.write_sidecar(suffix, rows)
         canceled_without_collision = [v for v in self.canceled_vehicles if v not in self.collided_ids]
 
         self._print_simulation_info(running_list)
