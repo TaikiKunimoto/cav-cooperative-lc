@@ -1,0 +1,1771 @@
+Step #0.00 (0ms ?*RT. ?UPS, TraCI: 0ms, vehicles TOT 0 ACT 0 BUF 0)                       Step #10.00 (0ms ?*RT. ?UPS, TraCI: 3ms, vehicles TOT 9 ACT 9 BUF 0)                      Warning: Vehicle '4' performs emergency braking on lane 'WeaveZone_3' with decel=10.00, wished=5.00, severity=1.25, time=12.10.
+Warning: Vehicle '4' performs emergency braking on lane 'WeaveZone_3' with decel=10.00, wished=5.00, severity=1.25, time=12.60.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=12.70.
+Warning: Vehicle '7' performs emergency braking on lane 'WeaveZone_0' with decel=10.00, wished=5.00, severity=1.25, time=13.00.
+Warning: Vehicle '4' performs emergency braking on lane 'WeaveZone_3' with decel=10.00, wished=5.00, severity=1.25, time=13.10.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=13.20.
+Warning: Vehicle '7' performs emergency braking on lane 'WeaveZone_0' with decel=10.00, wished=5.00, severity=1.25, time=13.50.
+Warning: Vehicle '4' performs emergency braking on lane 'WeaveZone_3' with decel=10.00, wished=5.00, severity=1.25, time=13.60.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=13.70.
+Warning: Vehicle '16' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=13.70.
+Warning: Vehicle '7' performs emergency braking on lane 'WeaveZone_0' with decel=10.00, wished=5.00, severity=1.25, time=14.00.
+Warning: Vehicle '4' performs emergency braking on lane 'WeaveZone_3' with decel=10.00, wished=5.00, severity=1.25, time=14.10.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=14.20.
+Warning: Vehicle '7' performs emergency braking on lane 'WeaveZone_0' with decel=10.00, wished=5.00, severity=1.25, time=14.50.
+Warning: Vehicle '2' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=14.60.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=14.70.
+Warning: Vehicle '16' performs emergency braking on lane 'OnRampBottom_0' with decel=10.15, wished=5.00, severity=1.29, time=14.90.
+Warning: Vehicle '7' performs emergency braking on lane 'WeaveZone_0' with decel=10.00, wished=5.00, severity=1.25, time=15.00.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=9.95, wished=5.00, severity=1.24, time=15.00.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=11.75, wished=5.00, severity=1.69, time=15.40.
+Warning: Vehicle '7' performs emergency braking on lane 'WeaveZone_0' with decel=10.00, wished=5.00, severity=1.25, time=15.50.
+Warning: Vehicle '3' performs emergency braking on lane 'WeaveZone_1' with decel=10.00, wished=5.00, severity=1.25, time=15.60.
+Warning: Vehicle '6' performs emergency braking on lane 'WeaveZone_1' with decel=10.00, wished=5.00, severity=1.25, time=15.60.
+Warning: Vehicle '16' performs emergency braking on lane 'OnRampBottom_0' with decel=10.56, wished=5.00, severity=1.39, time=15.60.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=11.45, wished=5.00, severity=1.61, time=16.00.
+Warning: Vehicle '16' performs emergency braking on lane 'OnRampBottom_0' with decel=10.93, wished=5.00, severity=1.48, time=16.30.
+Warning: Vehicle '6' performs emergency braking on lane 'WeaveZone_1' with decel=11.27, wished=5.00, severity=1.57, time=16.40.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=13.68, wished=5.00, severity=2.17, time=16.50.
+Warning: Vehicle '16' performs emergency braking on lane 'OnRampBottom_0' with decel=10.25, wished=5.00, severity=1.31, time=16.90.
+Warning: Vehicle '7' performs emergency braking on lane 'WeaveZone_0' with decel=9.87, wished=5.00, severity=1.22, time=17.10.
+Warning: Vehicle '5' performs emergency braking on lane 'WeaveZone_2' with decel=13.84, wished=5.00, severity=2.21, time=17.20.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.69, wished=5.00, severity=1.42, time=17.70.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.01, wished=5.00, severity=1.25, time=18.90.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.25, wished=5.00, severity=1.31, time=19.70.
+Step #20.00 (0ms ?*RT. ?UPS, TraCI: 3ms, vehicles TOT 19 ACT 19 BUF 0)                    Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.95, wished=5.00, severity=1.49, time=20.40.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.53, wished=5.00, severity=1.38, time=21.10.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.52, wished=5.00, severity=1.38, time=21.90.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.55, wished=5.00, severity=1.39, time=22.60.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.88, wished=5.00, severity=1.47, time=23.30.
+Warning: Vehicle '11' performs emergency braking on lane 'WeaveZone_2' with decel=12.67, wished=5.00, severity=1.92, time=23.50.
+Warning: Vehicle '11' performs emergency braking on lane 'WeaveZone_2' with decel=13.32, wished=5.00, severity=2.08, time=23.70.
+Warning: Vehicle '11' performs emergency braking on lane 'WeaveZone_2' with decel=13.61, wished=5.00, severity=2.15, time=23.90.
+Warning: Vehicle '14' performs emergency braking on lane 'WeaveZone_0' with decel=11.70, wished=5.00, severity=1.67, time=24.10.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.14, wished=5.00, severity=1.29, time=24.10.
+Warning: Vehicle '11' performs emergency braking on lane 'WeaveZone_2' with decel=13.13, wished=5.00, severity=2.03, time=24.10.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=11.70, wished=5.00, severity=1.67, time=24.20.
+Warning: Vehicle '14' performs emergency braking on lane 'WeaveZone_0' with decel=12.14, wished=5.00, severity=1.78, time=24.30.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=12.66, wished=5.00, severity=1.92, time=24.40.
+Warning: Vehicle '14' performs emergency braking on lane 'WeaveZone_0' with decel=12.90, wished=5.00, severity=1.98, time=24.50.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=12.67, wished=5.00, severity=1.92, time=24.60.
+Warning: Vehicle '14' performs emergency braking on lane 'WeaveZone_0' with decel=11.11, wished=5.00, severity=1.53, time=24.80.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=11.31, wished=5.00, severity=1.58, time=24.90.
+Warning: Vehicle '14' performs emergency braking on lane 'WeaveZone_0' with decel=11.87, wished=5.00, severity=1.72, time=25.00.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=11.79, wished=5.00, severity=1.70, time=25.10.
+Warning: Vehicle '14' performs emergency braking on lane 'WeaveZone_0' with decel=11.44, wished=5.00, severity=1.61, time=25.30.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=10.64, wished=5.00, severity=1.41, time=25.40.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=11.40, wished=5.00, severity=1.60, time=25.50.
+Warning: Vehicle '14' performs emergency braking on lane 'WeaveZone_0' with decel=12.96, wished=5.00, severity=1.99, time=25.70.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=12.96, wished=5.00, severity=1.99, time=25.80.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=12.08, wished=5.00, severity=1.77, time=25.80.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=14.10, wished=5.00, severity=2.28, time=26.00.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=14.49, wished=5.00, severity=2.37, time=26.20.
+Warning: Vehicle '12' performs emergency braking on lane 'WeaveZone_2' with decel=12.51, wished=5.00, severity=1.88, time=26.40.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=10.06, wished=5.00, severity=1.27, time=26.70.
+Warning: Vehicle '12' performs emergency braking on lane 'WeaveZone_2' with decel=10.24, wished=5.00, severity=1.31, time=26.90.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=11.04, wished=5.00, severity=1.51, time=27.00.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=12.87, wished=5.00, severity=1.97, time=27.20.
+Warning: Vehicle '12' performs emergency braking on lane 'WeaveZone_2' with decel=12.29, wished=5.00, severity=1.82, time=27.20.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=12.51, wished=5.00, severity=1.88, time=27.20.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=11.85, wished=5.00, severity=1.71, time=27.50.
+Warning: Vehicle '12' performs emergency braking on lane 'WeaveZone_2' with decel=11.59, wished=5.00, severity=1.65, time=27.50.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=9.71, wished=5.00, severity=1.18, time=27.60.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=12.51, wished=5.00, severity=1.88, time=27.90.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=11.81, wished=5.00, severity=1.70, time=28.30.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=13.05, wished=5.00, severity=2.01, time=28.50.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=29.70.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=4.68, offset=0.05), time=29.80.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=7.02, offset=0.08), time=29.90.
+Step #30.00Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=9.36, offset=0.10), time=30.00.
+ (0ms ?*RT. ?UPS, TraCI: 4ms, vehicles TOT 27 ACT 22 BUF 0)                    Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=11.70, offset=0.13), time=30.10.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=14.04, offset=0.16), time=30.20.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=16.38, offset=0.18), time=30.30.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=18.72, offset=0.21), time=30.40.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=21.06, offset=0.23), time=30.50.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=23.40, offset=0.26), time=30.60.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=25.74, offset=0.29), time=30.70.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=28.08, offset=0.31), time=30.80.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=30.42, offset=0.34), time=30.90.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=32.76, offset=0.36), time=31.00.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=35.10, offset=0.39), time=31.10.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=37.44, offset=0.42), time=31.20.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=39.78, offset=0.44), time=31.30.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=42.12, offset=0.47), time=31.40.
+Warning: Vehicle '6' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=44.46, offset=0.49), time=31.50.
+Warning: Vehicle '13' performs emergency braking on lane 'WeaveZone_2' with decel=35.96, wished=5.00, severity=7.74, time=32.20.
+Warning: Vehicle '8' performs emergency braking on lane 'WeaveZone_1' with decel=28.99, wished=5.00, severity=6.00, time=32.60.
+Warning: Vehicle '11' performs emergency braking on lane 'WeaveZone_2' with decel=37.42, wished=5.00, severity=8.11, time=32.90.
+Warning: Vehicle '12' performs emergency braking on lane 'WeaveZone_3' with decel=13.15, wished=5.00, severity=2.04, time=33.30.
+Warning: Vehicle '23' performs emergency braking on lane 'WeaveZone_1' with decel=11.00, wished=5.00, severity=1.50, time=34.10.
+Warning: Vehicle '23' performs emergency braking on lane 'WeaveZone_1' with decel=9.55, wished=5.00, severity=1.14, time=35.10.
+Warning: Vehicle '18' performs emergency braking on lane 'WeaveZone_2' with decel=28.92, wished=5.00, severity=5.98, time=35.30.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=13.93, wished=5.00, severity=2.23, time=36.30.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=11.76, wished=5.00, severity=1.69, time=36.60.
+Warning: Vehicle '16' performs emergency braking on lane 'WeaveZone_0' with decel=15.16, wished=5.00, severity=2.54, time=36.80.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=11.45, wished=5.00, severity=1.61, time=36.90.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=11.65, wished=5.00, severity=1.66, time=37.20.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=10.60, wished=5.00, severity=1.40, time=37.50.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=11.55, wished=5.00, severity=1.64, time=37.80.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=11.87, wished=5.00, severity=1.72, time=38.10.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=10.83, wished=5.00, severity=1.46, time=38.40.
+Warning: Vehicle '19' performs emergency braking on lane 'WeaveZone_0' with decel=86.65, wished=5.00, severity=20.41, time=38.80.
+Warning: Vehicle '24' performs emergency braking on lane 'WeaveZone_2' with decel=9.71, wished=5.00, severity=1.18, time=38.90.
+Warning: Vehicle '34' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=39.50.
+Step #40.00 (1ms ~= 100.00*RT, ~26000.00UPS, TraCI: 10ms, vehicles TOT 35 ACT 26 BUF 0)   Warning: Vehicle '34' performs emergency braking on lane 'OnRampBottom_0' with decel=10.84, wished=5.00, severity=1.46, time=40.40.
+Warning: Vehicle '28' performs emergency braking on lane 'WeaveZone_3' with decel=13.97, wished=5.00, severity=2.24, time=40.90.
+Warning: Vehicle '34' performs emergency braking on lane 'OnRampBottom_0' with decel=10.32, wished=5.00, severity=1.33, time=41.20.
+Warning: Vehicle '28' performs emergency braking on lane 'WeaveZone_3' with decel=12.60, wished=5.00, severity=1.90, time=41.50.
+Warning: Vehicle '34' performs emergency braking on lane 'OnRampBottom_0' with decel=10.05, wished=5.00, severity=1.26, time=42.00.
+Warning: Vehicle '28' performs emergency braking on lane 'WeaveZone_3' with decel=14.36, wished=5.00, severity=2.34, time=42.20.
+Warning: Vehicle '34' performs emergency braking on lane 'OnRampBottom_0' with decel=10.68, wished=5.00, severity=1.42, time=42.80.
+Warning: Vehicle '22' performs emergency braking on lane 'WeaveZone_0' with decel=80.49, wished=5.00, severity=18.87, time=43.70.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=10.09, wished=5.00, severity=1.27, time=43.70.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=10.19, wished=5.00, severity=1.30, time=44.40.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=10.35, wished=5.00, severity=1.34, time=45.10.
+Warning: Vehicle '31' performs emergency braking on lane 'WeaveZone_2' with decel=12.88, wished=5.00, severity=1.97, time=45.20.
+Warning: Vehicle '31' performs emergency braking on lane 'WeaveZone_2' with decel=14.67, wished=5.00, severity=2.42, time=45.50.
+Warning: Vehicle '43' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=45.50.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=10.26, wished=5.00, severity=1.31, time=45.90.
+Warning: Vehicle '38' performs emergency braking on lane 'WeaveZone_0' with decel=9.33, wished=5.00, severity=1.08, time=46.30.
+Warning: Vehicle '21' performs emergency braking on lane 'WeaveZone_2' with decel=23.78, wished=5.00, severity=4.69, time=46.30.
+Warning: Vehicle '41' performs emergency braking on lane 'OnRampBottom_0' with decel=11.34, wished=5.00, severity=1.59, time=46.40.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=10.44, wished=5.00, severity=1.36, time=46.50.
+Warning: Vehicle '43' performs emergency braking on lane 'OnRampBottom_0' with decel=9.45, wished=5.00, severity=1.11, time=46.50.
+Warning: Vehicle '47' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=47.20.
+Warning: Vehicle '38' performs emergency braking on lane 'WeaveZone_0' with decel=10.85, wished=5.00, severity=1.46, time=47.20.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=10.66, wished=5.00, severity=1.41, time=47.30.
+Warning: Vehicle '41' performs emergency braking on lane 'OnRampBottom_0' with decel=12.49, wished=5.00, severity=1.87, time=47.30.
+Warning: Vehicle '43' performs emergency braking on lane 'OnRampBottom_0' with decel=13.18, wished=5.00, severity=2.05, time=47.40.
+Warning: Vehicle '38' performs emergency braking on lane 'WeaveZone_0' with decel=9.06, wished=5.00, severity=1.02, time=47.70.
+Warning: Vehicle '33' performs emergency braking on lane 'WeaveZone_0' with decel=10.00, wished=5.00, severity=1.25, time=47.90.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=11.05, wished=5.00, severity=1.51, time=48.00.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=11.71, wished=5.00, severity=1.68, time=48.20.
+Warning: Vehicle '48' performs emergency braking on lane 'OnRampTop_0' with decel=10.00, wished=5.00, severity=1.25, time=48.20.
+Warning: Vehicle '47' performs emergency braking on lane 'MainApproach_0' with decel=10.49, wished=5.00, severity=1.37, time=48.30.
+Warning: Vehicle '33' performs emergency braking on lane 'WeaveZone_0' with decel=12.88, wished=5.00, severity=1.97, time=48.30.
+Warning: Vehicle '43' performs emergency braking on lane 'OnRampBottom_0' with decel=13.55, wished=5.00, severity=2.14, time=48.30.
+Warning: Vehicle '23' performs emergency braking on lane 'WeaveZone_0' with decel=28.71, wished=5.00, severity=5.93, time=48.40.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=10.27, wished=5.00, severity=1.32, time=48.40.
+Warning: Vehicle '47' performs emergency braking on lane 'MainApproach_0' with decel=10.51, wished=5.00, severity=1.38, time=48.90.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=14.56, wished=5.00, severity=2.39, time=48.90.
+Warning: Vehicle '43' performs emergency braking on lane 'OnRampBottom_0' with decel=14.36, wished=5.00, severity=2.34, time=49.00.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=14.67, wished=5.00, severity=2.42, time=49.10.
+Warning: Vehicle '38' performs emergency braking on lane 'WeaveZone_0' with decel=9.01, wished=5.00, severity=1.00, time=49.50.
+Warning: Vehicle '48' performs emergency braking on lane 'OnRampTop_0' with decel=10.26, wished=5.00, severity=1.32, time=49.50.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=12.59, wished=5.00, severity=1.90, time=49.60.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=10.56, wished=5.00, severity=1.39, time=49.60.
+Warning: Vehicle '29' performs emergency braking on lane 'WeaveZone_2' with decel=126.74, wished=5.00, severity=30.44, time=49.60.
+Warning: Vehicle '50' performs emergency braking on lane 'OnRampTop_0' with decel=10.00, wished=5.00, severity=1.25, time=49.60.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=11.72, wished=5.00, severity=1.68, time=49.80.
+Warning: Vehicle '47' performs emergency braking on lane 'MainApproach_0' with decel=10.58, wished=5.00, severity=1.39, time=49.90.
+Step #50.00Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=12.39, wished=5.00, severity=1.85, time=50.00.
+ (0ms ?*RT. ?UPS, TraCI: 14ms, vehicles TOT 51 ACT 38 BUF 0)                   Warning: Vehicle '48' performs emergency braking on lane 'OnRampTop_0' with decel=10.06, wished=5.00, severity=1.27, time=50.30.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=11.58, wished=5.00, severity=1.65, time=50.40.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=14.85, wished=5.00, severity=2.46, time=50.40.
+Warning: Vehicle '50' performs emergency braking on lane 'OnRampTop_0' with decel=11.85, wished=5.00, severity=1.71, time=50.40.
+Warning: Vehicle '37' performs emergency braking on lane 'WeaveZone_2' with decel=12.66, wished=5.00, severity=1.91, time=50.60.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=12.76, wished=5.00, severity=1.94, time=50.70.
+Warning: Vehicle '47' performs emergency braking on lane ':WeaveStart_0_0' with decel=10.97, wished=5.00, severity=1.49, time=50.80.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=13.91, wished=5.00, severity=2.23, time=50.90.
+Warning: Vehicle '20' performs emergency braking on lane 'WeaveZone_1' with decel=15.52, wished=5.00, severity=2.63, time=51.00.
+Warning: Vehicle '48' performs emergency braking on lane 'OnRampTop_0' with decel=10.19, wished=5.00, severity=1.30, time=51.00.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=11.34, wished=5.00, severity=1.59, time=51.10.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=11.37, wished=5.00, severity=1.59, time=51.10.
+Warning: Vehicle '50' performs emergency braking on lane 'OnRampTop_0' with decel=12.18, wished=5.00, severity=1.80, time=51.10.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=11.36, wished=5.00, severity=1.59, time=51.50.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=11.89, wished=5.00, severity=1.72, time=51.50.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=10.61, wished=5.00, severity=1.40, time=51.60.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=12.26, wished=5.00, severity=1.82, time=51.80.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=10.02, wished=5.00, severity=1.26, time=52.00.
+Warning: Vehicle '27' performs emergency braking on lane 'WeaveZone_1' with decel=13.64, wished=5.00, severity=2.16, time=52.00.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=9.94, wished=5.00, severity=1.24, time=52.10.
+Warning: Vehicle '50' performs emergency braking on lane 'OnRampTop_0' with decel=11.37, wished=5.00, severity=1.59, time=52.10.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=12.12, wished=5.00, severity=1.78, time=52.20.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=13.57, wished=5.00, severity=2.14, time=52.20.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=10.20, wished=5.00, severity=1.30, time=52.20.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=14.17, wished=5.00, severity=2.29, time=52.60.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=10.08, wished=5.00, severity=1.27, time=52.70.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=11.18, wished=5.00, severity=1.55, time=53.00.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=10.00, wished=5.00, severity=1.25, time=53.20.
+Warning: Vehicle '42' performs emergency braking on lane 'WeaveZone_1' with decel=12.91, wished=5.00, severity=1.98, time=53.40.
+Warning: Vehicle '50' performs emergency braking on lane ':WeaveStart_2_0' with decel=10.08, wished=5.00, severity=1.27, time=53.40.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=10.37, wished=5.00, severity=1.34, time=53.50.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=13.01, wished=5.00, severity=2.00, time=53.50.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=13.12, wished=5.00, severity=2.03, time=53.60.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=12.60, wished=5.00, severity=1.90, time=53.60.
+Warning: Vehicle '30' performs emergency braking on lane 'WeaveZone_1' with decel=23.86, wished=5.00, severity=4.71, time=53.60.
+Warning: Vehicle '42' performs emergency braking on lane 'WeaveZone_1' with decel=13.83, wished=5.00, severity=2.21, time=53.90.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=12.03, wished=5.00, severity=1.76, time=54.00.
+Warning: Vehicle '17' performs emergency braking on lane 'WeaveZone_1' with decel=9.80, wished=5.00, severity=1.20, time=54.10.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=14.42, wished=5.00, severity=2.35, time=54.30.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=10.66, wished=5.00, severity=1.42, time=54.30.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=13.89, wished=5.00, severity=2.22, time=54.40.
+Warning: Vehicle '42' performs emergency braking on lane 'WeaveZone_1' with decel=13.72, wished=5.00, severity=2.18, time=54.50.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=10.73, wished=5.00, severity=1.43, time=54.60.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=11.68, wished=5.00, severity=1.67, time=54.90.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=10.14, wished=5.00, severity=1.29, time=55.00.
+Warning: Vehicle '32' performs emergency braking on lane 'WeaveZone_0' with decel=61.30, wished=5.00, severity=14.07, time=55.10.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=10.78, wished=5.00, severity=1.45, time=55.10.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=14.52, wished=5.00, severity=2.38, time=55.20.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=14.56, wished=5.00, severity=2.39, time=55.40.
+Warning: Vehicle '44' performs emergency braking on lane 'WeaveZone_3' with decel=11.30, wished=5.00, severity=1.58, time=55.40.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=13.18, wished=5.00, severity=2.04, time=55.50.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=12.27, wished=5.00, severity=1.82, time=55.70.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=14.59, wished=5.00, severity=2.40, time=55.70.
+Warning: Vehicle '39' performs emergency braking on lane 'WeaveZone_3' with decel=13.85, wished=5.00, severity=2.21, time=55.80.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=13.11, wished=5.00, severity=2.03, time=55.90.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=12.38, wished=5.00, severity=1.84, time=56.00.
+Warning: Vehicle '39' performs emergency braking on lane 'WeaveZone_3' with decel=14.44, wished=5.00, severity=2.36, time=56.10.
+Warning: Vehicle '47' performs emergency braking on lane 'WeaveZone_1' with decel=10.63, wished=5.00, severity=1.41, time=56.30.
+Warning: Vehicle '39' performs emergency braking on lane 'WeaveZone_3' with decel=14.29, wished=5.00, severity=2.32, time=56.40.
+Warning: Vehicle '33' performs emergency braking on lane 'WeaveZone_0' with decel=66.64, wished=5.00, severity=15.41, time=56.50.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=13.37, wished=5.00, severity=2.09, time=56.50.
+Warning: Vehicle '39' performs emergency braking on lane 'WeaveZone_3' with decel=10.36, wished=5.00, severity=1.34, time=56.60.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=11.15, wished=5.00, severity=1.54, time=56.70.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=9.60, wished=5.00, severity=1.15, time=56.80.
+Warning: Vehicle '39' performs emergency braking on lane 'WeaveZone_3' with decel=14.10, wished=5.00, severity=2.27, time=56.90.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=13.32, wished=5.00, severity=2.08, time=57.00.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=10.27, wished=5.00, severity=1.32, time=57.00.
+Warning: Vehicle '39' performs emergency braking on lane 'WeaveZone_3' with decel=11.86, wished=5.00, severity=1.72, time=57.10.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=10.88, wished=5.00, severity=1.47, time=57.10.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=11.15, wished=5.00, severity=1.54, time=57.20.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=11.85, wished=5.00, severity=1.71, time=57.50.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=11.77, wished=5.00, severity=1.69, time=57.60.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=9.42, wished=5.00, severity=1.10, time=57.70.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=10.32, wished=5.00, severity=1.33, time=57.80.
+Warning: Vehicle '34' performs emergency braking on lane 'WeaveZone_0' with decel=80.34, wished=5.00, severity=18.84, time=57.90.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=14.58, wished=5.00, severity=2.39, time=57.90.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=11.74, wished=5.00, severity=1.69, time=58.00.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=14.07, wished=5.00, severity=2.27, time=58.10.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=12.21, wished=5.00, severity=1.80, time=58.30.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=12.39, wished=5.00, severity=1.85, time=58.40.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=14.62, wished=5.00, severity=2.40, time=58.60.
+Warning: Vehicle '35' performs emergency braking on lane 'WeaveZone_2' with decel=30.75, wished=5.00, severity=6.44, time=58.70.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=12.12, wished=5.00, severity=1.78, time=58.70.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=10.80, wished=5.00, severity=1.45, time=58.80.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=13.47, wished=5.00, severity=2.12, time=59.10.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=11.62, wished=5.00, severity=1.66, time=59.50.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=10.43, wished=5.00, severity=1.36, time=59.70.
+Step #60.00 (0ms ?*RT. ?UPS, TraCI: 16ms, vehicles TOT 58 ACT 42 BUF 0)                   Warning: Vehicle '38' performs emergency braking on lane 'WeaveZone_0' with decel=74.24, wished=5.00, severity=17.31, time=60.30.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=12.80, wished=5.00, severity=1.95, time=60.30.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=9.15, wished=5.00, severity=1.04, time=60.30.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=14.83, wished=5.00, severity=2.46, time=60.40.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=11.58, wished=5.00, severity=1.64, time=60.60.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=12.03, wished=5.00, severity=1.76, time=61.00.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=11.96, wished=5.00, severity=1.74, time=61.30.
+Warning: Teleporting vehicle '40'; collision with vehicle '34', lane='WeaveZone_1', gap=-0.14, time=61.50, stage=move.
+Warning: Vehicle '40' ends teleporting on edge 'OffRampTop', time=61.50.
+Warning: Vehicle '41' performs emergency braking on lane 'WeaveZone_0' with decel=77.74, wished=5.00, severity=18.19, time=61.90.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=12.69, wished=5.00, severity=1.92, time=61.90.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=11.93, wished=5.00, severity=1.73, time=62.40.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=14.64, wished=5.00, severity=2.41, time=62.40.
+Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=14.61, wished=5.00, severity=2.40, time=62.50.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=12.31, wished=5.00, severity=1.83, time=62.60.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=11.93, wished=5.00, severity=1.73, time=62.80.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=14.61, wished=5.00, severity=2.40, time=62.90.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=11.45, wished=5.00, severity=1.61, time=63.00.
+Warning: Vehicle '45' performs emergency braking on lane 'WeaveZone_2' with decel=14.11, wished=5.00, severity=2.28, time=63.20.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=11.71, wished=5.00, severity=1.68, time=63.20.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=12.53, wished=5.00, severity=1.88, time=63.40.
+Warning: Vehicle '43' performs emergency braking on lane 'WeaveZone_0' with decel=70.65, wished=5.00, severity=16.41, time=63.60.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=12.60, wished=5.00, severity=1.90, time=63.60.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=11.51, wished=5.00, severity=1.63, time=64.30.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=12.16, wished=5.00, severity=1.79, time=64.50.
+Warning: Vehicle '15' performs emergency braking on lane 'WeaveZone_1' with decel=18.30, wished=5.00, severity=3.33, time=65.10.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=12.60, wished=5.00, severity=1.90, time=65.30.
+Warning: Vehicle '49' performs emergency braking on lane 'WeaveZone_2' with decel=28.86, wished=5.00, severity=5.96, time=65.50.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=9.90, wished=5.00, severity=1.23, time=65.60.
+Warning: Vehicle '62' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=66.20.
+Warning: Vehicle '59' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=66.50.
+Warning: Vehicle '62' performs emergency braking on lane 'MainApproach_0' with decel=10.66, wished=5.00, severity=1.41, time=67.00.
+Warning: Vehicle '59' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=67.40.
+Warning: Vehicle '63' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=67.60.
+Warning: Vehicle '62' performs emergency braking on lane 'MainApproach_0' with decel=11.02, wished=5.00, severity=1.51, time=67.90.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=11.48, wished=5.00, severity=1.62, time=67.90.
+Warning: Vehicle '63' performs emergency braking on lane 'MainApproach_0' with decel=13.63, wished=5.00, severity=2.16, time=68.00.
+Warning: Vehicle '59' performs emergency braking on lane 'WeaveZone_2' with decel=10.00, wished=5.00, severity=1.25, time=68.30.
+Warning: Vehicle '52' performs emergency braking on lane 'WeaveZone_2' with decel=11.50, wished=5.00, severity=1.63, time=68.50.
+Warning: Vehicle '62' performs emergency braking on lane 'MainApproach_0' with decel=10.27, wished=5.00, severity=1.32, time=68.60.
+Warning: Vehicle '63' performs emergency braking on lane 'MainApproach_0' with decel=10.95, wished=5.00, severity=1.49, time=68.70.
+Warning: Vehicle '59' performs emergency braking on lane 'WeaveZone_2' with decel=14.16, wished=5.00, severity=2.29, time=69.20.
+Warning: Vehicle '62' performs emergency braking on lane 'MainApproach_0' with decel=10.26, wished=5.00, severity=1.32, time=69.40.
+Warning: Vehicle '46' performs emergency braking on lane 'WeaveZone_3' with decel=14.93, wished=5.00, severity=2.48, time=69.40.
+Warning: Vehicle '51' performs emergency braking on lane 'WeaveZone_1' with decel=21.23, wished=5.00, severity=4.06, time=69.40.
+Warning: Vehicle '63' performs emergency braking on lane 'MainApproach_0' with decel=14.32, wished=5.00, severity=2.33, time=69.50.
+Warning: Vehicle '59' performs emergency braking on lane 'WeaveZone_2' with decel=14.31, wished=5.00, severity=2.33, time=69.50.
+Warning: Vehicle '52' performs emergency braking on lane 'WeaveZone_2' with decel=9.59, wished=5.00, severity=1.15, time=69.60.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=10.00, wished=5.00, severity=1.25, time=69.60.
+Step #70.00Warning: Vehicle '49' performs emergency braking on lane 'WeaveZone_2' with decel=24.06, wished=5.00, severity=4.76, time=70.00.
+ (0ms ?*RT. ?UPS, TraCI: 17ms, vehicles TOT 64 ACT 45 BUF 0)                   Warning: Vehicle '48' performs emergency braking on lane 'WeaveZone_3' with decel=19.19, wished=5.00, severity=3.55, time=70.30.
+Warning: Vehicle '52' performs emergency braking on lane 'WeaveZone_2' with decel=28.30, wished=5.00, severity=5.82, time=70.40.
+Warning: Vehicle '62' performs emergency braking on lane 'WeaveZone_1' with decel=10.73, wished=5.00, severity=1.43, time=70.40.
+Warning: Vehicle '63' performs emergency braking on lane 'MainApproach_0' with decel=9.98, wished=5.00, severity=1.24, time=70.50.
+Warning: Vehicle '53' performs emergency braking on lane 'WeaveZone_1' with decel=19.14, wished=5.00, severity=3.54, time=70.70.
+Warning: Vehicle '61' performs emergency braking on lane 'WeaveZone_1' with decel=12.80, wished=5.00, severity=1.95, time=70.90.
+Warning: Vehicle '62' performs emergency braking on lane 'WeaveZone_1' with decel=11.75, wished=5.00, severity=1.69, time=71.10.
+Warning: Vehicle '63' performs emergency braking on lane 'MainApproach_0' with decel=12.23, wished=5.00, severity=1.81, time=71.20.
+Warning: Vehicle '50' performs emergency braking on lane 'WeaveZone_3' with decel=43.07, wished=5.00, severity=9.52, time=71.20.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=11.83, wished=5.00, severity=1.71, time=71.40.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=11.23, wished=5.00, severity=1.56, time=71.70.
+Warning: Vehicle '62' performs emergency braking on lane 'WeaveZone_1' with decel=14.81, wished=5.00, severity=2.45, time=71.70.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=11.80, wished=5.00, severity=1.70, time=71.80.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=12.60, wished=5.00, severity=1.90, time=72.00.
+Warning: Vehicle '62' performs emergency braking on lane 'WeaveZone_1' with decel=14.83, wished=5.00, severity=2.46, time=72.20.
+Warning: Vehicle '54' performs emergency braking on lane 'WeaveZone_2' with decel=31.94, wished=5.00, severity=6.74, time=72.30.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=12.46, wished=5.00, severity=1.87, time=72.30.
+Warning: Vehicle '62' performs emergency braking on lane 'WeaveZone_1' with decel=14.81, wished=5.00, severity=2.45, time=72.70.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=11.82, wished=5.00, severity=1.71, time=72.80.
+Warning: Teleporting vehicle '13'; side collision with vehicle '16', lane='WeaveZone_2', gap=-2.28, time=73.50, stage=laneChange.
+Warning: Vehicle '13' ends teleporting on edge 'OffRampBottom', time=73.50.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=12.75, wished=5.00, severity=1.94, time=73.90.
+Warning: Teleporting vehicle '46'; side collision with vehicle '16', lane='WeaveZone_3', gap=-2.27, time=73.90, stage=laneChange.
+Warning: Vehicle '57' performs emergency braking on lane 'WeaveZone_2' with decel=37.31, wished=5.00, severity=8.08, time=74.50.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=12.82, wished=5.00, severity=1.95, time=74.50.
+Warning: Vehicle '45' performs emergency braking on lane 'WeaveZone_3' with decel=29.84, wished=5.00, severity=6.21, time=75.10.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=13.60, wished=5.00, severity=2.15, time=75.10.
+Warning: Vehicle '46' ends teleporting on edge 'OffRampBottom', time=75.30.
+Warning: Vehicle '46' performs emergency braking on lane 'OffRampBottom_0' with decel=270.00, wished=5.00, severity=66.25, time=75.40.
+Warning: Vehicle '55' performs emergency braking on lane 'WeaveZone_0' with decel=24.45, wished=5.00, severity=4.86, time=75.60.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=12.83, wished=5.00, severity=1.96, time=75.60.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=10.88, wished=5.00, severity=1.47, time=76.10.
+Warning: Vehicle '39' performs emergency braking on lane 'OffRampBottom_0' with decel=11.67, wished=5.00, severity=1.67, time=76.30.
+Warning: Vehicle '59' performs emergency braking on lane 'WeaveZone_2' with decel=41.91, wished=5.00, severity=9.23, time=76.50.
+Warning: Vehicle '56' performs emergency braking on lane 'WeaveZone_3' with decel=72.55, wished=5.00, severity=16.89, time=76.50.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=12.50, wished=5.00, severity=1.87, time=76.50.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=14.52, wished=5.00, severity=2.38, time=76.90.
+Warning: Vehicle '71' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=77.50.
+Warning: Vehicle '58' performs emergency braking on lane 'WeaveZone_3' with decel=91.35, wished=5.00, severity=21.59, time=78.20.
+Warning: Vehicle '71' performs emergency braking on lane 'OnRampBottom_0' with decel=10.06, wished=5.00, severity=1.26, time=78.30.
+Warning: Vehicle '71' performs emergency braking on lane 'OnRampBottom_0' with decel=10.76, wished=5.00, severity=1.44, time=79.10.
+Warning: Vehicle '60' performs emergency braking on lane 'WeaveZone_1' with decel=30.20, wished=5.00, severity=6.30, time=79.30.
+Warning: Vehicle '71' performs emergency braking on lane 'OnRampBottom_0' with decel=10.34, wished=5.00, severity=1.34, time=79.90.
+Step #80.00 (0ms ?*RT. ?UPS, TraCI: 16ms, vehicles TOT 74 ACT 54 BUF 0)                   Warning: Vehicle '61' performs emergency braking on lane 'WeaveZone_1' with decel=30.60, wished=5.00, severity=6.40, time=80.30.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=14.27, wished=5.00, severity=2.32, time=80.40.
+Warning: Vehicle '71' performs emergency braking on lane 'OnRampBottom_0' with decel=10.04, wished=5.00, severity=1.26, time=80.50.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=11.77, wished=5.00, severity=1.69, time=80.70.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=12.37, wished=5.00, severity=1.84, time=81.00.
+Warning: Vehicle '67' performs emergency braking on lane 'WeaveZone_1' with decel=14.42, wished=5.00, severity=2.35, time=81.00.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=10.40, wished=5.00, severity=1.35, time=81.30.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=10.32, wished=5.00, severity=1.33, time=81.40.
+Warning: Vehicle '67' performs emergency braking on lane 'WeaveZone_1' with decel=12.08, wished=5.00, severity=1.77, time=81.40.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=11.02, wished=5.00, severity=1.50, time=81.60.
+Warning: Vehicle '62' performs emergency braking on lane 'WeaveZone_1' with decel=37.60, wished=5.00, severity=8.15, time=81.80.
+Warning: Vehicle '67' performs emergency braking on lane 'WeaveZone_1' with decel=12.62, wished=5.00, severity=1.91, time=81.80.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=11.87, wished=5.00, severity=1.72, time=81.90.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=10.23, wished=5.00, severity=1.31, time=82.10.
+Warning: Vehicle '67' performs emergency braking on lane 'WeaveZone_1' with decel=11.82, wished=5.00, severity=1.70, time=82.10.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=11.26, wished=5.00, severity=1.56, time=82.20.
+Warning: Vehicle '67' performs emergency braking on lane 'WeaveZone_1' with decel=12.16, wished=5.00, severity=1.79, time=82.40.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=11.21, wished=5.00, severity=1.55, time=82.50.
+Warning: Vehicle '67' performs emergency braking on lane 'WeaveZone_1' with decel=12.60, wished=5.00, severity=1.90, time=82.60.
+Warning: Vehicle '70' performs emergency braking on lane 'WeaveZone_0' with decel=14.67, wished=5.00, severity=2.42, time=82.90.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=10.04, wished=5.00, severity=1.26, time=82.90.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=12.79, wished=5.00, severity=1.95, time=82.90.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=14.67, wished=5.00, severity=2.42, time=83.00.
+Warning: Vehicle '70' performs emergency braking on lane 'WeaveZone_0' with decel=12.77, wished=5.00, severity=1.94, time=83.30.
+Warning: Vehicle '63' performs emergency braking on lane 'WeaveZone_1' with decel=44.85, wished=5.00, severity=9.96, time=83.30.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=11.17, wished=5.00, severity=1.54, time=83.40.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=12.32, wished=5.00, severity=1.83, time=84.30.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=12.23, wished=5.00, severity=1.81, time=84.90.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=12.35, wished=5.00, severity=1.84, time=85.40.
+Warning: Vehicle '66' performs emergency braking on lane 'WeaveZone_1' with decel=44.25, wished=5.00, severity=9.81, time=85.70.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=12.57, wished=5.00, severity=1.89, time=85.80.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=10.55, wished=5.00, severity=1.39, time=86.30.
+Warning: Vehicle '81' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=86.70.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=11.69, wished=5.00, severity=1.67, time=86.70.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=11.99, wished=5.00, severity=1.75, time=87.10.
+Warning: Vehicle '67' performs emergency braking on lane 'WeaveZone_1' with decel=46.99, wished=5.00, severity=10.50, time=87.20.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=12.35, wished=5.00, severity=1.84, time=87.40.
+Warning: Vehicle '83' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=87.50.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=12.03, wished=5.00, severity=1.76, time=87.80.
+Warning: Vehicle '81' performs emergency braking on lane 'MainApproach_0' with decel=10.10, wished=5.00, severity=1.28, time=88.10.
+Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=88.20.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=14.05, wished=5.00, severity=2.26, time=88.20.
+Warning: Vehicle '83' performs emergency braking on lane 'OnRampBottom_0' with decel=10.19, wished=5.00, severity=1.30, time=88.30.
+Warning: Vehicle '81' performs emergency braking on lane 'MainApproach_0' with decel=10.15, wished=5.00, severity=1.29, time=88.60.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=9.01, wished=5.00, severity=1.00, time=88.80.
+Warning: Vehicle '64' performs emergency braking on lane 'WeaveZone_3' with decel=60.04, wished=5.00, severity=13.76, time=88.80.
+Warning: Vehicle '83' performs emergency braking on lane 'OnRampBottom_0' with decel=10.01, wished=5.00, severity=1.25, time=89.00.
+Warning: Vehicle '81' performs emergency braking on lane 'MainApproach_0' with decel=10.27, wished=5.00, severity=1.32, time=89.20.
+Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=11.64, wished=5.00, severity=1.66, time=89.30.
+Step #90.00Warning: Vehicle '81' performs emergency braking on lane 'MainApproach_0' with decel=10.81, wished=5.00, severity=1.45, time=90.00.
+Warning: Vehicle '65' performs emergency braking on lane 'WeaveZone_3' with decel=59.75, wished=5.00, severity=13.69, time=90.00.
+ (0ms ?*RT. ?UPS, TraCI: 15ms, vehicles TOT 86 ACT 61 BUF 0)                   Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=12.93, wished=5.00, severity=1.98, time=90.10.
+Warning: Vehicle '83' performs emergency braking on lane 'OnRampBottom_0' with decel=10.46, wished=5.00, severity=1.37, time=90.20.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=10.82, wished=5.00, severity=1.46, time=90.70.
+Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=13.09, wished=5.00, severity=2.02, time=90.80.
+Warning: Vehicle '68' performs emergency braking on lane 'WeaveZone_2' with decel=25.14, wished=5.00, severity=5.04, time=90.80.
+Warning: Vehicle '72' performs emergency braking on lane 'WeaveZone_1' with decel=40.40, wished=5.00, severity=8.85, time=91.00.
+Warning: Vehicle '83' performs emergency braking on lane 'OnRampBottom_0' with decel=10.06, wished=5.00, severity=1.27, time=91.00.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=11.57, wished=5.00, severity=1.64, time=91.10.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=10.54, wished=5.00, severity=1.39, time=91.20.
+Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=11.49, wished=5.00, severity=1.62, time=91.30.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=13.75, wished=5.00, severity=2.19, time=91.30.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=12.38, wished=5.00, severity=1.85, time=91.40.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=13.52, wished=5.00, severity=2.13, time=91.50.
+Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=11.50, wished=5.00, severity=1.63, time=91.60.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=10.44, wished=5.00, severity=1.36, time=91.60.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=14.58, wished=5.00, severity=2.39, time=91.60.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=11.57, wished=5.00, severity=1.64, time=91.60.
+Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=11.57, wished=5.00, severity=1.64, time=91.70.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=14.82, wished=5.00, severity=2.46, time=91.70.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=12.78, wished=5.00, severity=1.95, time=91.80.
+Warning: Vehicle '84' performs emergency braking on lane 'MainApproach_0' with decel=9.96, wished=5.00, severity=1.24, time=91.90.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=11.59, wished=5.00, severity=1.65, time=91.90.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=13.75, wished=5.00, severity=2.19, time=91.90.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=13.56, wished=5.00, severity=2.14, time=92.00.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=13.35, wished=5.00, severity=2.09, time=92.10.
+Warning: Vehicle '69' performs emergency braking on lane 'WeaveZone_0' with decel=25.15, wished=5.00, severity=5.04, time=92.20.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=11.30, wished=5.00, severity=1.57, time=92.20.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=13.34, wished=5.00, severity=2.08, time=92.20.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=13.40, wished=5.00, severity=2.10, time=92.30.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=10.29, wished=5.00, severity=1.32, time=92.50.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=10.42, wished=5.00, severity=1.36, time=92.60.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=13.40, wished=5.00, severity=2.10, time=92.60.
+Warning: Vehicle '73' performs emergency braking on lane 'WeaveZone_2' with decel=22.00, wished=5.00, severity=4.25, time=92.90.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=11.90, wished=5.00, severity=1.72, time=92.90.
+Warning: Vehicle '70' performs emergency braking on lane 'WeaveZone_0' with decel=32.50, wished=5.00, severity=6.87, time=93.10.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=10.24, wished=5.00, severity=1.31, time=93.20.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=11.62, wished=5.00, severity=1.65, time=93.20.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=11.67, wished=5.00, severity=1.67, time=93.30.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=11.85, wished=5.00, severity=1.71, time=93.50.
+Warning: Vehicle '84' performs emergency braking on lane 'WeaveZone_1' with decel=9.70, wished=5.00, severity=1.18, time=93.70.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=11.87, wished=5.00, severity=1.72, time=93.80.
+Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=9.31, wished=5.00, severity=1.08, time=93.80.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=10.62, wished=5.00, severity=1.41, time=93.90.
+Warning: Vehicle '82' performs emergency braking on lane 'WeaveZone_0' with decel=12.09, wished=5.00, severity=1.77, time=94.00.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=13.82, wished=5.00, severity=2.21, time=94.10.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=12.65, wished=5.00, severity=1.91, time=94.10.
+Warning: Vehicle '84' performs emergency braking on lane 'WeaveZone_1' with decel=9.89, wished=5.00, severity=1.22, time=94.20.
+Warning: Vehicle '71' performs emergency braking on lane 'WeaveZone_0' with decel=41.44, wished=5.00, severity=9.11, time=94.40.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=9.74, wished=5.00, severity=1.19, time=94.50.
+Warning: Vehicle '84' performs emergency braking on lane 'WeaveZone_1' with decel=11.05, wished=5.00, severity=1.51, time=94.60.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=13.01, wished=5.00, severity=2.00, time=94.80.
+Warning: Vehicle '74' performs emergency braking on lane 'WeaveZone_2' with decel=30.15, wished=5.00, severity=6.29, time=95.10.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=11.56, wished=5.00, severity=1.64, time=95.30.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=12.94, wished=5.00, severity=1.99, time=95.60.
+Warning: Vehicle '84' performs emergency braking on lane 'WeaveZone_1' with decel=9.12, wished=5.00, severity=1.03, time=95.80.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=11.94, wished=5.00, severity=1.73, time=95.90.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=11.06, wished=5.00, severity=1.51, time=96.30.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=11.85, wished=5.00, severity=1.71, time=96.50.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=12.26, wished=5.00, severity=1.81, time=96.80.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=11.31, wished=5.00, severity=1.58, time=97.10.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=12.60, wished=5.00, severity=1.90, time=97.40.
+Warning: Vehicle '79' performs emergency braking on lane 'WeaveZone_2' with decel=25.35, wished=5.00, severity=5.09, time=97.90.
+Warning: Vehicle '77' performs emergency braking on lane 'WeaveZone_1' with decel=25.50, wished=5.00, severity=5.13, time=98.50.
+Warning: Vehicle '80' performs emergency braking on lane 'WeaveZone_1' with decel=36.90, wished=5.00, severity=7.98, time=99.20.
+Step #100.00 (0ms ?*RT. ?UPS, TraCI: 23ms, vehicles TOT 88 ACT 63 BUF 0)                  Warning: Vehicle '81' performs emergency braking on lane 'WeaveZone_1' with decel=46.95, wished=5.00, severity=10.49, time=100.30.
+Warning: Vehicle '78' performs emergency braking on lane 'WeaveZone_0' with decel=19.60, wished=5.00, severity=3.65, time=100.40.
+Warning: Vehicle '75' performs emergency braking on lane 'WeaveZone_3' with decel=32.74, wished=5.00, severity=6.93, time=100.80.
+Warning: Vehicle '82' performs emergency braking on lane 'WeaveZone_0' with decel=30.15, wished=5.00, severity=6.29, time=101.50.
+Warning: Vehicle '76' performs emergency braking on lane 'WeaveZone_3' with decel=45.04, wished=5.00, severity=10.01, time=101.60.
+Warning: Vehicle '84' performs emergency braking on lane 'WeaveZone_1' with decel=52.85, wished=5.00, severity=11.96, time=101.60.
+Warning: Vehicle '83' performs emergency braking on lane 'WeaveZone_0' with decel=32.10, wished=5.00, severity=6.77, time=102.90.
+Warning: Vehicle '85' performs emergency braking on lane 'WeaveZone_2' with decel=27.95, wished=5.00, severity=5.74, time=103.60.
+Warning: Vehicle '94' performs emergency braking on lane 'OnRampTop_0' with decel=10.00, wished=5.00, severity=1.25, time=106.50.
+Warning: Vehicle '94' performs emergency braking on lane 'OnRampTop_0' with decel=10.91, wished=5.00, severity=1.48, time=107.20.
+Warning: Vehicle '86' performs emergency braking on lane 'WeaveZone_2' with decel=27.01, wished=5.00, severity=5.50, time=107.80.
+Warning: Vehicle '94' performs emergency braking on lane 'OnRampTop_0' with decel=10.10, wished=5.00, severity=1.27, time=107.80.
+Warning: Vehicle '93' performs emergency braking on lane 'MainApproach_0' with decel=13.46, wished=5.00, severity=2.12, time=108.00.
+Warning: Vehicle '93' performs emergency braking on lane 'MainApproach_0' with decel=11.37, wished=5.00, severity=1.59, time=108.30.
+Warning: Vehicle '94' performs emergency braking on lane 'OnRampTop_0' with decel=10.67, wished=5.00, severity=1.42, time=108.40.
+Warning: Vehicle '93' performs emergency braking on lane 'MainApproach_0' with decel=12.73, wished=5.00, severity=1.93, time=108.60.
+Warning: Vehicle '94' performs emergency braking on lane 'OnRampTop_0' with decel=10.05, wished=5.00, severity=1.26, time=109.40.
+Step #110.00 (1ms ~= 100.00*RT, ~72000.00UPS, TraCI: 23ms, vehicles TOT 97 ACT 72 BUF 0)  Warning: Vehicle '94' performs emergency braking on lane ':WeaveStart_2_0' with decel=10.34, wished=5.00, severity=1.33, time=110.10.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=10.18, wished=5.00, severity=1.29, time=110.80.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=10.68, wished=5.00, severity=1.42, time=111.50.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=10.69, wished=5.00, severity=1.42, time=112.20.
+Warning: Vehicle '96' performs emergency braking on lane ':WeaveStart_2_0' with decel=9.61, wished=5.00, severity=1.15, time=112.70.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=10.80, wished=5.00, severity=1.45, time=112.90.
+Warning: Vehicle '92' performs emergency braking on lane 'WeaveZone_3' with decel=12.67, wished=5.00, severity=1.92, time=113.40.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=9.69, wished=5.00, severity=1.17, time=113.50.
+Warning: Vehicle '88' performs emergency braking on lane 'WeaveZone_2' with decel=34.46, wished=5.00, severity=7.37, time=113.90.
+Warning: Vehicle '87' performs emergency braking on lane 'WeaveZone_3' with decel=24.75, wished=5.00, severity=4.94, time=114.20.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=14.60, wished=5.00, severity=2.40, time=114.50.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=12.42, wished=5.00, severity=1.85, time=114.90.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=12.18, wished=5.00, severity=1.80, time=115.30.
+Warning: Vehicle '89' performs emergency braking on lane 'WeaveZone_2' with decel=23.60, wished=5.00, severity=4.65, time=115.60.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=12.80, wished=5.00, severity=1.95, time=115.60.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=13.11, wished=5.00, severity=2.03, time=115.90.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=12.80, wished=5.00, severity=1.95, time=116.20.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=12.12, wished=5.00, severity=1.78, time=116.50.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=13.21, wished=5.00, severity=2.05, time=116.90.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=9.36, wished=5.00, severity=1.09, time=117.30.
+Warning: Vehicle '91' performs emergency braking on lane 'WeaveZone_1' with decel=19.84, wished=5.00, severity=3.71, time=117.40.
+Warning: Vehicle '93' performs emergency braking on lane 'WeaveZone_1' with decel=36.65, wished=5.00, severity=7.91, time=118.20.
+Step #120.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 104 ACT 79 BUF 0)                 Warning: Vehicle '95' performs emergency braking on lane 'WeaveZone_1' with decel=28.24, wished=5.00, severity=5.81, time=120.10.
+Warning: Vehicle '90' performs emergency braking on lane 'WeaveZone_3' with decel=27.66, wished=5.00, severity=5.66, time=120.20.
+Warning: Vehicle '92' performs emergency braking on lane 'WeaveZone_3' with decel=41.01, wished=5.00, severity=9.00, time=121.20.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=11.41, wished=5.00, severity=1.60, time=122.40.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=11.96, wished=5.00, severity=1.74, time=122.60.
+Warning: Vehicle '94' performs emergency braking on lane 'WeaveZone_3' with decel=34.65, wished=5.00, severity=7.41, time=122.70.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=10.42, wished=5.00, severity=1.35, time=122.90.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=11.97, wished=5.00, severity=1.74, time=123.10.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=12.36, wished=5.00, severity=1.84, time=123.30.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=12.42, wished=5.00, severity=1.86, time=123.50.
+Warning: Vehicle '97' performs emergency braking on lane 'WeaveZone_2' with decel=26.21, wished=5.00, severity=5.30, time=123.60.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=11.90, wished=5.00, severity=1.73, time=123.70.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=12.60, wished=5.00, severity=1.90, time=123.90.
+Warning: Vehicle '98' performs emergency braking on lane 'WeaveZone_1' with decel=31.04, wished=5.00, severity=6.51, time=123.90.
+Warning: Vehicle '96' performs emergency braking on lane 'WeaveZone_3' with decel=42.70, wished=5.00, severity=9.43, time=124.30.
+Warning: Vehicle '102' performs emergency braking on lane 'WeaveZone_1' with decel=31.70, wished=5.00, severity=6.67, time=126.10.
+Warning: Vehicle '99' performs emergency braking on lane 'WeaveZone_3' with decel=35.40, wished=5.00, severity=7.60, time=127.20.
+Warning: Vehicle '100' performs emergency braking on lane 'WeaveZone_3' with decel=33.15, wished=5.00, severity=7.04, time=128.80.
+Step #130.00 (0ms ?*RT. ?UPS, TraCI: 29ms, vehicles TOT 109 ACT 84 BUF 0)                 Warning: Vehicle '101' performs emergency braking on lane 'WeaveZone_0' with decel=29.16, wished=5.00, severity=6.04, time=130.90.
+Warning: Vehicle '103' performs emergency braking on lane 'WeaveZone_2' with decel=29.89, wished=5.00, severity=6.22, time=132.30.
+Warning: Vehicle '104' performs emergency braking on lane 'WeaveZone_2' with decel=33.40, wished=5.00, severity=7.10, time=134.20.
+Warning: Vehicle '112' performs emergency braking on lane 'MainApproach_1' with decel=11.53, wished=5.00, severity=1.63, time=134.50.
+Warning: Vehicle '112' performs emergency braking on lane 'MainApproach_1' with decel=11.81, wished=5.00, severity=1.70, time=134.70.
+Warning: Vehicle '112' performs emergency braking on lane 'MainApproach_1' with decel=12.09, wished=5.00, severity=1.77, time=135.00.
+Warning: Vehicle '112' performs emergency braking on lane 'MainApproach_1' with decel=12.24, wished=5.00, severity=1.81, time=135.30.
+Warning: Vehicle '112' performs emergency braking on lane 'MainApproach_1' with decel=11.35, wished=5.00, severity=1.59, time=135.60.
+Warning: Vehicle '112' performs emergency braking on lane 'MainApproach_1' with decel=11.73, wished=5.00, severity=1.68, time=135.90.
+Warning: Vehicle '112' performs emergency braking on lane 'WeaveZone_2' with decel=11.40, wished=5.00, severity=1.60, time=136.20.
+Warning: Vehicle '112' performs emergency braking on lane 'WeaveZone_2' with decel=10.61, wished=5.00, severity=1.40, time=136.50.
+Warning: Vehicle '112' performs emergency braking on lane 'WeaveZone_2' with decel=11.46, wished=5.00, severity=1.62, time=136.80.
+Warning: Vehicle '112' performs emergency braking on lane 'WeaveZone_2' with decel=11.27, wished=5.00, severity=1.57, time=137.10.
+Warning: Vehicle '112' performs emergency braking on lane 'WeaveZone_2' with decel=12.78, wished=5.00, severity=1.95, time=137.40.
+Warning: Vehicle '107' performs emergency braking on lane 'WeaveZone_1' with decel=29.26, wished=5.00, severity=6.06, time=137.40.
+Warning: Vehicle '112' performs emergency braking on lane 'WeaveZone_2' with decel=9.73, wished=5.00, severity=1.18, time=137.90.
+Warning: Vehicle '105' performs emergency braking on lane 'WeaveZone_3' with decel=29.46, wished=5.00, severity=6.12, time=138.50.
+Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=11.93, wished=5.00, severity=1.73, time=139.10.
+Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=13.31, wished=5.00, severity=2.08, time=139.30.
+Warning: Vehicle '106' performs emergency braking on lane 'WeaveZone_0' with decel=30.86, wished=5.00, severity=6.47, time=139.40.
+Warning: Vehicle '109' performs emergency braking on lane 'WeaveZone_1' with decel=23.40, wished=5.00, severity=4.60, time=139.40.
+Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=13.94, wished=5.00, severity=2.23, time=139.50.
+Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=13.68, wished=5.00, severity=2.17, time=139.70.
+Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=13.05, wished=5.00, severity=2.01, time=139.90.
+Step #140.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 118 ACT 93 BUF 0)                 Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=14.01, wished=5.00, severity=2.25, time=140.10.
+Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=13.74, wished=5.00, severity=2.18, time=140.30.
+Warning: Vehicle '114' performs emergency braking on lane 'MainApproach_0' with decel=13.37, wished=5.00, severity=2.09, time=140.50.
+Warning: Vehicle '108' performs emergency braking on lane 'WeaveZone_0' with decel=23.00, wished=5.00, severity=4.50, time=141.50.
+Warning: Vehicle '110' performs emergency braking on lane 'WeaveZone_2' with decel=29.04, wished=5.00, severity=6.01, time=143.60.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=14.47, wished=5.00, severity=2.37, time=143.90.
+Warning: Vehicle '111' performs emergency braking on lane 'WeaveZone_0' with decel=20.54, wished=5.00, severity=3.89, time=144.20.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=12.01, wished=5.00, severity=1.75, time=144.20.
+Warning: Vehicle '112' performs emergency braking on lane 'WeaveZone_2' with decel=41.20, wished=5.00, severity=9.05, time=144.30.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=10.70, wished=5.00, severity=1.43, time=144.50.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=11.78, wished=5.00, severity=1.70, time=144.80.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=11.90, wished=5.00, severity=1.73, time=145.10.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=11.15, wished=5.00, severity=1.54, time=145.40.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=11.43, wished=5.00, severity=1.61, time=145.70.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=11.26, wished=5.00, severity=1.56, time=146.00.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=11.48, wished=5.00, severity=1.62, time=146.30.
+Warning: Vehicle '113' performs emergency braking on lane 'WeaveZone_1' with decel=20.89, wished=5.00, severity=3.97, time=146.30.
+Warning: Vehicle '124' performs emergency braking on lane 'MainApproach_1' with decel=13.94, wished=5.00, severity=2.24, time=146.60.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=12.79, wished=5.00, severity=1.95, time=146.60.
+Warning: Vehicle '124' performs emergency braking on lane 'MainApproach_1' with decel=11.52, wished=5.00, severity=1.63, time=146.90.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=9.74, wished=5.00, severity=1.18, time=147.10.
+Warning: Vehicle '114' performs emergency braking on lane 'WeaveZone_1' with decel=25.55, wished=5.00, severity=5.14, time=147.10.
+Warning: Vehicle '124' performs emergency braking on lane 'MainApproach_1' with decel=12.76, wished=5.00, severity=1.94, time=147.20.
+Warning: Vehicle '124' performs emergency braking on lane 'MainApproach_1' with decel=9.76, wished=5.00, severity=1.19, time=147.70.
+Warning: Vehicle '123' performs emergency braking on lane 'MainApproach_0' with decel=14.80, wished=5.00, severity=2.45, time=148.20.
+Warning: Vehicle '123' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=148.40.
+Warning: Vehicle '123' performs emergency braking on lane 'MainApproach_0' with decel=12.48, wished=5.00, severity=1.87, time=148.60.
+Warning: Vehicle '118' performs emergency braking on lane 'WeaveZone_1' with decel=33.45, wished=5.00, severity=7.11, time=148.60.
+Warning: Vehicle '123' performs emergency braking on lane 'MainApproach_0' with decel=12.17, wished=5.00, severity=1.79, time=148.80.
+Warning: Vehicle '123' performs emergency braking on lane 'MainApproach_0' with decel=12.56, wished=5.00, severity=1.89, time=149.00.
+Warning: Vehicle '123' performs emergency braking on lane 'MainApproach_0' with decel=11.45, wished=5.00, severity=1.61, time=149.20.
+Warning: Vehicle '123' performs emergency braking on lane 'MainApproach_0' with decel=9.90, wished=5.00, severity=1.23, time=149.50.
+Step #150.00 (0ms ?*RT. ?UPS, TraCI: 22ms, vehicles TOT 125 ACT 100 BUF 0)                Warning: Vehicle '127' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=152.20.
+Warning: Vehicle '122' performs emergency braking on lane 'WeaveZone_1' with decel=27.20, wished=5.00, severity=5.55, time=153.00.
+Warning: Vehicle '127' performs emergency braking on lane 'MainApproach_0' with decel=14.21, wished=5.00, severity=2.30, time=153.10.
+Warning: Vehicle '115' performs emergency braking on lane 'WeaveZone_3' with decel=24.49, wished=5.00, severity=4.87, time=153.20.
+Warning: Vehicle '127' performs emergency braking on lane 'MainApproach_0' with decel=12.14, wished=5.00, severity=1.78, time=153.30.
+Warning: Vehicle '127' performs emergency braking on lane 'MainApproach_0' with decel=11.91, wished=5.00, severity=1.73, time=153.50.
+Warning: Vehicle '116' performs emergency braking on lane 'WeaveZone_0' with decel=17.75, wished=5.00, severity=3.19, time=153.50.
+Warning: Vehicle '127' performs emergency braking on lane 'MainApproach_0' with decel=9.90, wished=5.00, severity=1.23, time=153.80.
+Warning: Vehicle '117' performs emergency braking on lane 'WeaveZone_3' with decel=38.91, wished=5.00, severity=8.48, time=153.90.
+Warning: Vehicle '123' performs emergency braking on lane 'WeaveZone_1' with decel=19.70, wished=5.00, severity=3.68, time=154.30.
+Warning: Vehicle '119' performs emergency braking on lane 'WeaveZone_3' with decel=41.75, wished=5.00, severity=9.19, time=155.20.
+Warning: Vehicle '120' performs emergency braking on lane 'WeaveZone_2' with decel=25.28, wished=5.00, severity=5.07, time=155.90.
+Warning: Vehicle '121' performs emergency braking on lane 'WeaveZone_0' with decel=17.56, wished=5.00, severity=3.14, time=156.70.
+Warning: Vehicle '124' performs emergency braking on lane 'WeaveZone_2' with decel=40.70, wished=5.00, severity=8.93, time=156.70.
+Warning: Vehicle '132' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=157.20.
+Warning: Vehicle '132' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=157.40.
+Warning: Vehicle '132' performs emergency braking on lane 'MainApproach_0' with decel=12.32, wished=5.00, severity=1.83, time=157.60.
+Warning: Vehicle '125' performs emergency braking on lane 'WeaveZone_1' with decel=31.81, wished=5.00, severity=6.70, time=157.60.
+Warning: Vehicle '127' performs emergency braking on lane 'WeaveZone_1' with decel=25.45, wished=5.00, severity=5.11, time=159.10.
+Step #160.00 (0ms ?*RT. ?UPS, TraCI: 34ms, vehicles TOT 134 ACT 109 BUF 0)                Warning: Vehicle '126' performs emergency braking on lane 'WeaveZone_2' with decel=18.85, wished=5.00, severity=3.46, time=160.40.
+Warning: Vehicle '130' performs emergency braking on lane 'WeaveZone_1' with decel=20.44, wished=5.00, severity=3.86, time=161.70.
+Warning: Vehicle '132' performs emergency braking on lane 'MainApproach_0' with decel=25.84, wished=5.00, severity=5.21, time=163.20.
+Warning: Vehicle '132' performs emergency braking on lane 'MainApproach_0' with decel=15.60, wished=5.00, severity=2.65, time=163.90.
+Warning: Vehicle '132' performs emergency braking on lane 'MainApproach_0' with decel=13.00, wished=5.00, severity=2.00, time=164.50.
+Warning: Vehicle '132' performs emergency braking on lane 'MainApproach_0' with decel=10.40, wished=5.00, severity=1.35, time=165.00.
+Warning: Vehicle '128' performs emergency braking on lane 'WeaveZone_3' with decel=29.54, wished=5.00, severity=6.14, time=166.00.
+Warning: Vehicle '129' performs emergency braking on lane 'WeaveZone_0' with decel=24.76, wished=5.00, severity=4.94, time=166.70.
+Warning: Vehicle '131' performs emergency braking on lane 'WeaveZone_3' with decel=31.25, wished=5.00, severity=6.56, time=167.20.
+Warning: Vehicle '137' performs emergency braking on lane 'OnRampTop_0' with decel=11.62, wished=5.00, severity=1.65, time=167.30.
+Warning: Vehicle '137' performs emergency braking on lane 'OnRampTop_0' with decel=14.90, wished=5.00, severity=2.48, time=167.50.
+Warning: Vehicle '139' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=167.70.
+Warning: Vehicle '133' performs emergency braking on lane 'WeaveZone_2' with decel=20.15, wished=5.00, severity=3.79, time=168.70.
+Warning: Vehicle '139' performs emergency braking on lane 'MainApproach_0' with decel=13.03, wished=5.00, severity=2.01, time=169.90.
+ Retrying in 1 seconds
+Simulation started
+[env] mainlane WeaveZone: measured length 396.91 m
+depart_times[through]: [0.1, 1.1, 3.1, 6.1, 13.1, 14.1, 16.1, 24.1, 25.1, 26.1, 31.1, 33.1, 35.1, 40.1, 42.1, 45.1, 47.1, 49.1, 51.1, 52.1, 56.1, 59.1, 61.1, 62.1, 64.1, 72.1, 73.1, 74.1, 78.1, 81.1, 84.1, 85.1, 86.1, 88.1, 89.1, 94.1, 100.1, 103.1, 104.1, 106.1, 109.1, 110.1, 113.1, 116.1, 119.1, 123.1, 126.1, 130.1, 131.1, 136.1, 137.1, 140.1, 144.1, 145.1, 146.1, 150.1, 151.1, 152.1, 155.1, 157.1, 164.1, 167.1, 170.1, 173.1, 174.1, 176.1, 179.1, 186.1, 189.1, 193.1, 201.1, 203.1, 217.1, 218.1, 221.1, 226.1, 227.1, 235.1, 238.1, 241.1, 242.1, 244.1, 248.1, 255.1, 256.1, 258.1, 259.1, 265.1, 266.1, 267.1, 280.1, 281.1, 282.1, 287.1, 292.1, 294.1, 295.1, 297.1, 298.1, 299.1, 300.1, 301.1, 307.1, 311.1, 314.1, 316.1, 317.1, 320.1, 323.1, 326.1, 332.1, 334.1, 340.1, 343.1, 345.1, 346.1, 349.1, 350.1, 352.1, 353.1, 356.1, 361.1, 364.1, 365.1, 370.1, 372.1, 374.1, 375.1, 380.1, 383.1, 386.1, 389.1, 392.1, 395.1, 397.1, 401.1, 410.1, 413.1, 420.1, 424.1, 430.1, 436.1, 439.1, 440.1, 442.1, 443.1, 445.1, 446.1, 453.1, 454.1, 455.1, 458.1, 460.1, 463.1, 467.1, 469.1, 470.1, 475.1, 478.1, 479.1, 485.1, 489.1, 490.1, 494.1, 501.1, 503.1, 506.1, 507.1, 511.1, 514.1, 516.1, 517.1, 518.1, 522.1, 526.1, 528.1, 529.1, 530.1, 532.1, 535.1, 540.1, 542.1, 543.1, 545.1, 549.1, 553.1, 554.1, 557.1, 559.1, 562.1, 567.1, 569.1, 571.1, 576.1, 578.1, 580.1, 581.1, 582.1, 584.1, 599.1]
+depart_times[merging_bottom]: [1.1, 12.1, 25.1, 45.1, 74.1, 76.1, 77.1, 84.1, 86.1, 131.1, 144.1, 213.1, 248.1, 269.1, 272.1, 304.1, 311.1, 318.1, 328.1, 332.1, 365.1, 381.1, 417.1, 420.1, 427.1, 428.1, 474.1, 476.1, 484.1, 509.1, 516.1, 517.1, 528.1, 529.1, 537.1, 544.1, 571.1]
+depart_times[merging_top]: [0.1, 10.1, 41.1, 45.1, 48.1, 49.1, 70.1, 83.1, 103.1, 138.1, 152.1, 207.1, 212.1, 231.1, 237.1, 241.1, 269.1, 274.1, 289.1, 312.1, 327.1, 341.1, 363.1, 377.1, 400.1, 456.1, 458.1, 464.1, 506.1, 528.1, 529.1, 554.1, 563.1, 568.1, 593.1, 595.1, 596.1]
+depart_times[diverging_bottom]: [11.1, 25.1, 66.1, 78.1, 132.1, 158.1, 176.1, 180.1, 195.1, 203.1, 206.1, 223.1, 230.1, 255.1, 261.1, 264.1, 270.1, 275.1, 276.1, 285.1, 289.1, 292.1, 294.1, 337.1, 361.1, 362.1, 373.1, 395.1, 446.1, 456.1, 473.1, 476.1, 485.1, 498.1, 539.1, 543.1, 599.1]
+depart_times[diverging_top]: [3.1, 10.1, 35.1, 43.1, 46.1, 52.1, 67.1, 84.1, 146.1, 175.1, 184.1, 194.1, 236.1, 237.1, 244.1, 248.1, 265.1, 281.1, 291.1, 305.1, 309.1, 317.1, 321.1, 326.1, 327.1, 338.1, 349.1, 350.1, 376.1, 382.1, 402.1, 424.1, 436.1, 443.1, 518.1, 565.1, 569.1]
+depart_times[crossing_bt]: [3.1, 11.1, 13.1, 20.1, 36.1, 38.1, 39.1, 42.1, 44.1, 57.1, 86.1, 115.1, 124.1, 128.1, 139.1, 153.1, 160.1, 166.1, 173.1, 183.1, 202.1, 210.1, 215.1, 239.1, 249.1, 261.1, 267.1, 268.1, 272.1, 278.1, 287.1, 292.1, 303.1, 307.1, 308.1, 321.1, 325.1, 351.1, 361.1, 365.1, 366.1, 369.1, 372.1, 376.1, 384.1, 389.1, 394.1, 395.1, 408.1, 414.1, 416.1, 466.1, 474.1, 482.1, 484.1, 486.1, 493.1, 498.1, 502.1, 515.1, 518.1, 519.1, 537.1, 556.1, 558.1, 568.1, 570.1, 574.1, 575.1, 578.1, 579.1, 582.1, 584.1, 592.1, 595.1]
+depart_times[crossing_tb]: [2.1, 11.1, 26.1, 29.1, 31.1, 42.1, 46.1, 58.1, 60.1, 70.1, 82.1, 96.1, 105.1, 106.1, 109.1, 113.1, 114.1, 123.1, 139.1, 142.1, 155.1, 162.1, 164.1, 168.1, 170.1, 177.1, 201.1, 210.1, 216.1, 231.1, 245.1, 251.1, 256.1, 264.1, 287.1, 302.1, 319.1, 322.1, 332.1, 334.1, 352.1, 363.1, 365.1, 379.1, 382.1, 386.1, 388.1, 393.1, 396.1, 406.1, 410.1, 414.1, 433.1, 434.1, 442.1, 449.1, 453.1, 465.1, 483.1, 486.1, 503.1, 510.1, 524.1, 529.1, 535.1, 537.1, 540.1, 541.1, 545.1, 549.1, 570.1, 574.1, 579.1, 582.1, 589.1]
+====================================================
+TIME: 0.0  Now: 11:16:08.419913
+====================================================
+[Tc t=0.1] requests=0 assigned=0
+====================================================
+TIME: 10.0  Now: 11:16:08.648641
+====================================================
+====================================================
+TIME: 20.0  Now: 11:16:09.169264
+====================================================
+[swap] t=28.7 13(lane3->2) <-> 12(lane2->3) pos 340.2/345.4
+====================================================
+TIME: 30.0  Now: 11:16:09.711517
+====================================================
+[swap] t=31.5 6(lane2->3) <-> 9(lane3->2) pos 396.9/396.7
+====================================================
+TIME: 40.0  Now: 11:16:10.429923
+====================================================
+[Tc t=50.0] requests=7 assigned=5
+    veh=26 dist=-89.3 k=3 <- provider=13
+    veh=19 dist=-79.3 k=3 <- provider=15
+    veh=28 dist=-68.6 k=3 <- provider=18
+    veh=16 dist=-39.7 k=2 <- provider=11
+    veh=13 dist=-35.4 k=2 <- provider=-
+    veh=11 dist=-22.6 k=2 <- provider=-
+    veh=22 dist=30.6 k=1 <- provider=17
+====================================================
+TIME: 50.0  Now: 11:16:11.552445
+====================================================
+====================================================
+TIME: 60.0  Now: 11:16:12.905222
+====================================================
+Collision detected at 61.5 between: 34, 40
+====================================================
+TIME: 70.0  Now: 11:16:14.308560
+====================================================
+[swap] t=73.5 39(lane2->1) <-> 16(lane1->2) pos 396.9/391.8
+Collision detected at 73.5 between: 16, 13
+[swap] t=73.9 44(lane3->2) <-> 16(lane2->3) pos 396.9/391.9
+Collision detected at 73.9 between: 16, 46
+====================================================
+TIME: 80.0  Now: 11:16:15.859180
+====================================================
+====================================================
+TIME: 90.0  Now: 11:16:17.459405
+====================================================
+[Tc t=100.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-2.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 100.0  Now: 11:16:19.350100
+====================================================
+====================================================
+TIME: 110.0  Now: 11:16:21.285887
+====================================================
+====================================================
+TIME: 120.0  Now: 11:16:23.406356
+====================================================
+====================================================
+TIME: 130.0  Now: 11:16:25.866242
+====================================================
+====================================================
+TIME: 140.0  Now: 11:16:28.409604
+====================================================
+[Tc t=150.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 150.0  Now: 11:16:31.281472
+====================================================
+====================================================
+TIME: 160.0  Now: 11:16:34.204492
+====================================================
+====================================================Step #170.00 (1ms ~= 100.00*RT, ~116000.00UPS, TraCI: 40ms, vehicles TOT 141 ACT 116 BUF 0Warning: Vehicle '139' performs emergency braking on lane 'MainApproach_0' with decel=10.36, wished=5.00, severity=1.34, time=170.20.
+Warning: Vehicle '139' performs emergency braking on lane 'MainApproach_0' with decel=11.50, wished=5.00, severity=1.63, time=170.50.
+Warning: Vehicle '139' performs emergency braking on lane 'MainApproach_0' with decel=12.95, wished=5.00, severity=1.99, time=170.80.
+Warning: Vehicle '139' performs emergency braking on lane 'MainApproach_0' with decel=9.74, wished=5.00, severity=1.18, time=171.30.
+Warning: Vehicle '134' performs emergency braking on lane 'WeaveZone_0' with decel=27.56, wished=5.00, severity=5.64, time=172.70.
+Warning: Vehicle '142' performs emergency braking on lane 'OnRampTop_0' with decel=11.41, wished=5.00, severity=1.60, time=173.50.
+Warning: Vehicle '142' performs emergency braking on lane 'OnRampTop_0' with decel=12.34, wished=5.00, severity=1.84, time=173.70.
+Warning: Vehicle '136' performs emergency braking on lane 'MainApproach_0' with decel=24.61, wished=5.00, severity=4.90, time=174.00.
+Warning: Vehicle '142' performs emergency braking on lane 'WeaveZone_3' with decel=9.90, wished=5.00, severity=1.23, time=174.10.
+Warning: Vehicle '139' performs emergency braking on lane 'MainApproach_0' with decel=33.20, wished=5.00, severity=7.05, time=174.60.
+Warning: Vehicle '135' performs emergency braking on lane 'WeaveZone_3' with decel=30.15, wished=5.00, severity=6.29, time=175.00.
+Warning: Vehicle '141' performs emergency braking on lane 'MainApproach_0' with decel=32.80, wished=5.00, severity=6.95, time=175.50.
+Warning: Vehicle '137' performs emergency braking on lane 'WeaveZone_3' with decel=30.90, wished=5.00, severity=6.47, time=176.00.
+Warning: Vehicle '148' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=176.20.
+Warning: Vehicle '148' performs emergency braking on lane 'MainApproach_1' with decel=9.81, wished=5.00, severity=1.20, time=176.70.
+Warning: Vehicle '147' performs emergency braking on lane 'MainApproach_0' with decel=10.00, wished=5.00, severity=1.25, time=176.70.
+Warning: Vehicle '147' performs emergency braking on lane 'MainApproach_0' with decel=12.60, wished=5.00, severity=1.90, time=176.90.
+Warning: Vehicle '143' performs emergency braking on lane 'MainApproach_0' with decel=20.94, wished=5.00, severity=3.99, time=177.70.
+Warning: Vehicle '138' performs emergency braking on lane 'WeaveZone_0' with decel=25.06, wished=5.00, severity=5.02, time=178.20.
+Warning: Vehicle '140' performs emergency braking on lane 'WeaveZone_3' with decel=28.00, wished=5.00, severity=5.75, time=178.60.
+Warning: Vehicle '146' performs emergency braking on lane 'MainApproach_0' with decel=28.80, wished=5.00, severity=5.95, time=178.80.
+Warning: Vehicle '147' performs emergency braking on lane 'MainApproach_0' with decel=28.54, wished=5.00, severity=5.89, time=179.80.
+Step #180.00 (1ms ~= 100.00*RT, ~126000.00UPS, TraCI: 34ms, vehicles TOT 151 ACT 126 BUF 0Warning: Vehicle '142' performs emergency braking on lane 'WeaveZone_3' with decel=34.85, wished=5.00, severity=7.46, time=180.50.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=180.70.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=12.87, wished=5.00, severity=1.97, time=181.60.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=12.77, wished=5.00, severity=1.94, time=181.90.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=11.99, wished=5.00, severity=1.75, time=182.30.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=13.36, wished=5.00, severity=2.09, time=182.60.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=12.44, wished=5.00, severity=1.86, time=182.90.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=11.26, wished=5.00, severity=1.57, time=183.20.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=12.38, wished=5.00, severity=1.85, time=183.40.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=11.31, wished=5.00, severity=1.58, time=183.70.
+Warning: Vehicle '151' performs emergency braking on lane 'MainApproach_1' with decel=9.90, wished=5.00, severity=1.23, time=184.10.
+Warning: Vehicle '145' performs emergency braking on lane 'WeaveZone_2' with decel=24.89, wished=5.00, severity=4.97, time=184.40.
+Warning: Vehicle '144' performs emergency braking on lane 'WeaveZone_0' with decel=30.50, wished=5.00, severity=6.38, time=185.10.
+Warning: Vehicle '148' performs emergency braking on lane 'WeaveZone_2' with decel=29.15, wished=5.00, severity=6.04, time=185.30.
+Warning: Vehicle '150' performs emergency braking on lane 'WeaveZone_2' with decel=35.75, wished=5.00, severity=7.69, time=187.00.
+Warning: Vehicle '153' performs emergency braking on lane 'MainApproach_0' with decel=23.16, wished=5.00, severity=4.54, time=188.40.
+Warning: Vehicle '151' performs emergency braking on lane 'WeaveZone_2' with decel=28.65, wished=5.00, severity=5.91, time=188.60.
+Warning: Vehicle '149' performs emergency braking on lane 'WeaveZone_3' with decel=28.40, wished=5.00, severity=5.85, time=188.60.
+Warning: Vehicle '154' performs emergency braking on lane 'MainApproach_0' with decel=32.87, wished=5.00, severity=6.97, time=188.90.
+Step #190.00 (0ms ?*RT. ?UPS, TraCI: 37ms, vehicles TOT 156 ACT 131 BUF 0)                Warning: Vehicle '158' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=195.20.
+Warning: Vehicle '152' performs emergency braking on lane 'WeaveZone_0' with decel=24.65, wished=5.00, severity=4.91, time=195.20.
+Warning: Vehicle '158' performs emergency braking on lane 'MainApproach_1' with decel=12.70, wished=5.00, severity=1.92, time=196.70.
+Warning: Vehicle '158' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=196.90.
+Warning: Vehicle '158' performs emergency braking on lane 'MainApproach_1' with decel=12.60, wished=5.00, severity=1.90, time=197.10.
+Warning: Vehicle '155' performs emergency braking on lane 'WeaveZone_2' with decel=24.56, wished=5.00, severity=4.89, time=197.80.
+Step #200.00 (1ms ~= 100.00*RT, ~133000.00UPS, TraCI: 39ms, vehicles TOT 158 ACT 133 BUF 1Warning: Vehicle '156' performs emergency braking on lane 'WeaveZone_2' with decel=32.11, wished=5.00, severity=6.78, time=200.50.
+Warning: Vehicle '158' performs emergency braking on lane 'WeaveZone_2' with decel=33.51, wished=5.00, severity=7.13, time=201.90.
+Warning: Vehicle '162' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=203.30.
+Warning: Vehicle '163' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=205.10.
+Warning: Vehicle '162' performs emergency braking on lane 'MainApproach_1' with decel=14.80, wished=5.00, severity=2.45, time=205.30.
+Warning: Vehicle '163' performs emergency braking on lane 'MainApproach_1' with decel=11.77, wished=5.00, severity=1.69, time=205.40.
+Warning: Vehicle '162' performs emergency braking on lane 'MainApproach_1' with decel=13.82, wished=5.00, severity=2.21, time=205.60.
+Warning: Vehicle '163' performs emergency braking on lane 'MainApproach_1' with decel=14.70, wished=5.00, severity=2.43, time=205.70.
+Warning: Vehicle '162' performs emergency braking on lane 'MainApproach_1' with decel=12.86, wished=5.00, severity=1.96, time=205.90.
+Warning: Vehicle '162' performs emergency braking on lane 'MainApproach_1' with decel=13.65, wished=5.00, severity=2.16, time=206.10.
+Warning: Vehicle '163' performs emergency braking on lane 'MainApproach_1' with decel=9.81, wished=5.00, severity=1.20, time=206.60.
+Warning: Vehicle '164' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=206.70.
+Warning: Vehicle '163' performs emergency braking on lane 'MainApproach_1' with decel=11.09, wished=5.00, severity=1.52, time=207.00.
+Warning: Vehicle '164' performs emergency braking on lane 'MainApproach_1' with decel=11.08, wished=5.00, severity=1.52, time=207.20.
+Warning: Vehicle '164' performs emergency braking on lane 'MainApproach_1' with decel=10.92, wished=5.00, severity=1.48, time=207.80.
+Warning: Vehicle '164' performs emergency braking on lane 'MainApproach_1' with decel=14.99, wished=5.00, severity=2.50, time=208.30.
+Warning: Vehicle '159' performs emergency braking on lane 'MainApproach_1' with decel=20.34, wished=5.00, severity=3.84, time=209.80.
+Step #210.00 (0ms ?*RT. ?UPS, TraCI: 23ms, vehicles TOT 165 ACT 140 BUF 1)                Warning: Vehicle '162' performs emergency braking on lane 'MainApproach_1' with decel=31.10, wished=5.00, severity=6.52, time=210.40.
+Warning: Vehicle '163' performs emergency braking on lane 'MainApproach_1' with decel=31.50, wished=5.00, severity=6.63, time=211.30.
+Warning: Vehicle '164' performs emergency braking on lane 'MainApproach_1' with decel=44.86, wished=5.00, severity=9.96, time=212.10.
+Warning: Vehicle '160' performs emergency braking on lane 'WeaveZone_3' with decel=19.95, wished=5.00, severity=3.74, time=212.50.
+Warning: Vehicle '168' performs emergency braking on lane 'OnRampTop_0' with decel=11.55, wished=5.00, severity=1.64, time=213.30.
+Warning: Vehicle '168' performs emergency braking on lane 'OnRampTop_0' with decel=11.61, wished=5.00, severity=1.65, time=213.50.
+Warning: Vehicle '161' performs emergency braking on lane 'WeaveZone_0' with decel=25.31, wished=5.00, severity=5.08, time=213.80.
+Warning: Vehicle '168' performs emergency braking on lane 'OnRampTop_0' with decel=12.60, wished=5.00, severity=1.90, time=213.80.
+Warning: Vehicle '170' performs emergency braking on lane 'OnRampBottom_0' with decel=14.61, wished=5.00, severity=2.40, time=216.30.
+Warning: Vehicle '170' performs emergency braking on lane 'OnRampBottom_0' with decel=14.77, wished=5.00, severity=2.44, time=216.80.
+Warning: Vehicle '165' performs emergency braking on lane 'WeaveZone_3' with decel=21.94, wished=5.00, severity=4.24, time=217.10.
+Warning: Vehicle '167' performs emergency braking on lane 'WeaveZone_3' with decel=25.33, wished=5.00, severity=5.08, time=219.10.
+Step #220.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 172 ACT 147 BUF 2)                Warning: Vehicle '173' performs emergency braking on lane 'MainApproach_1' with decel=10.00, wished=5.00, severity=1.25, time=220.90.
+Warning: Vehicle '168' performs emergency braking on lane 'WeaveZone_3' with decel=26.21, wished=5.00, severity=5.30, time=220.90.
+Warning: Vehicle '166' performs emergency braking on lane 'WeaveZone_0' with decel=24.51, wished=5.00, severity=4.88, time=221.10.
+Warning: Vehicle '173' performs emergency braking on lane 'MainApproach_1' with decel=13.01, wished=5.00, severity=2.00, time=221.90.
+Warning: Vehicle '173' performs emergency braking on lane 'MainApproach_1' with decel=9.71, wished=5.00, severity=1.18, time=222.30.
+Warning: Vehicle '169' performs emergency braking on lane 'WeaveZone_0' with decel=40.10, wished=5.00, severity=8.78, time=222.30.
+Warning: Vehicle '174' performs emergency braking on lane 'MainApproach_1' with decel=9.53, wished=5.00, severity=1.13, time=222.80.
+Warning: Vehicle '174' performs emergency braking on lane 'MainApproach_1' with decel=10.50, wished=5.00, severity=1.38, time=223.30.
+Warning: Vehicle '170' performs emergency braking on lane 'WeaveZone_0' with decel=23.20, wished=5.00, severity=4.55, time=224.30.
+Warning: Vehicle '172' performs emergency braking on lane 'MainApproach_1' with decel=29.80, wished=5.00, severity=6.20, time=224.70.
+Warning: Vehicle '175' performs emergency braking on lane 'MainApproach_1' with decel=10.10, wished=5.00, severity=1.28, time=224.70.
+Warning: Vehicle '171' performs emergency braking on lane 'WeaveZone_3' with decel=19.86, wished=5.00, severity=3.71, time=225.00.
+Warning: Vehicle '173' performs emergency braking on lane 'MainApproach_1' with decel=36.95, wished=5.00, severity=7.99, time=225.30.
+Warning: Vehicle '174' performs emergency braking on lane 'MainApproach_1' with decel=41.25, wished=5.00, severity=9.06, time=226.00.
+Warning: Vehicle '175' performs emergency braking on lane 'MainApproach_1' with decel=44.40, wished=5.00, severity=9.85, time=226.70.
+Warning: Vehicle '176' performs emergency braking on lane 'MainApproach_1' with decel=34.66, wished=5.00, severity=7.41, time=227.40.
+Step #230.00 (1ms ~= 100.00*RT, ~151000.00UPS, TraCI: 35ms, vehicles TOT 176 ACT 151 BUF 2Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=10.00, wished=5.00, severity=1.25, time=232.50.
+Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=14.18, wished=5.00, severity=2.29, time=233.00.
+Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=12.52, wished=5.00, severity=1.88, time=233.40.
+Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=14.80, wished=5.00, severity=2.45, time=233.90.
+Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=11.18, wished=5.00, severity=1.55, time=234.20.
+Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=12.16, wished=5.00, severity=1.79, time=234.50.
+Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=12.83, wished=5.00, severity=1.96, time=234.80.
+Warning: Vehicle '180' performs emergency braking on lane 'OnRampTop_0' with decel=9.78, wished=5.00, severity=1.20, time=235.30.
+Step #240.00 (1ms ~= 100.00*RT, ~155000.00UPS, TraCI: 36ms, vehicles TOT 180 ACT 155 BUF 7Warning: Vehicle '179' performs emergency braking on lane 'WeaveZone_3' with decel=29.00, wished=5.00, severity=6.00, time=240.50.
+Warning: Vehicle '180' performs emergency braking on lane 'WeaveZone_3' with decel=42.81, wished=5.00, severity=9.45, time=241.20.
+Warning: Vehicle '183' performs emergency braking on lane 'WeaveZone_3' with decel=21.30, wished=5.00, severity=4.08, time=245.10.
+Warning: Vehicle '188' performs emergency braking on lane 'WeaveZone_3' with decel=21.09, wished=5.00, severity=4.02, time=248.50.
+Warning: Vehicle '186' performs emergency braking on lane 'WeaveZone_0' with decel=24.94, wished=5.00, severity=4.99, time=249.30.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=249.50.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=11.92, wished=5.00, severity=1.73, time=249.70.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=12.96, wished=5.00, severity=1.99, time=249.90.
+Step #250.00 (0ms ?*RT. ?UPS, TraCI: 56ms, vehicles TOT 184 ACT 159 BUF 13)               Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=13.06, wished=5.00, severity=2.01, time=250.10.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=12.13, wished=5.00, severity=1.78, time=250.30.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=10.61, wished=5.00, severity=1.40, time=250.60.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=11.68, wished=5.00, severity=1.67, time=250.90.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=11.71, wished=5.00, severity=1.68, time=251.20.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=10.61, wished=5.00, severity=1.40, time=251.50.
+Warning: Vehicle '196' performs emergency braking on lane 'OnRampBottom_0' with decel=9.66, wished=5.00, severity=1.17, time=252.00.
+Warning: Vehicle '192' performs emergency braking on lane 'WeaveZone_3' with decel=28.54, wished=5.00, severity=5.88, time=252.60.
+Warning: Vehicle '194' performs emergency braking on lane 'WeaveZone_0' with decel=26.80, wished=5.00, severity=5.45, time=257.80.
+Warning: Vehicle '196' performs emergency braking on lane 'WeaveZone_0' with decel=40.50, wished=5.00, severity=8.88, time=258.50.
+Warning: Vehicle '197' performs emergency braking on lane 'OnRampTop_0' with decel=31.89, wished=5.00, severity=6.72, time=259.40.
+Step #260.00 (1ms ~= 100.00*RT, ~161000.00UPS, TraCI: 48ms, vehicles TOT 186 ACT 161 BUF 1Warning: Vehicle '197' performs emergency braking on lane 'OnRampTop_0' with decel=23.40, wished=5.00, severity=4.60, time=260.40.
+Warning: Vehicle '197' performs emergency braking on lane 'OnRampTop_0' with decel=18.20, wished=5.00, severity=3.30, time=261.20.
+Warning: Vehicle '197' performs emergency braking on lane 'OnRampTop_0' with decel=15.60, wished=5.00, severity=2.65, time=261.90.
+Warning: Vehicle '197' performs emergency braking on lane 'OnRampTop_0' with decel=10.40, wished=5.00, severity=1.35, time=262.40.
+Warning: Vehicle '201' performs emergency braking on lane 'OnRampTop_0' with decel=15.92, wished=5.00, severity=2.73, time=262.70.
+Warning: Vehicle '197' performs emergency braking on lane 'OnRampTop_0' with decel=10.40, wished=5.00, severity=1.35, time=262.90.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=11.82, wished=5.00, severity=1.71, time=268.80.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=12.15, wished=5.00, severity=1.79, time=269.00.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=12.21, wished=5.00, severity=1.80, time=269.20.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=12.05, wished=5.00, severity=1.76, time=269.40.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=12.56, wished=5.00, severity=1.89, time=269.60.
+Warning: Vehicle '214' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=269.70.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=12.90, wished=5.00, severity=1.97, time=269.80.
+Warning: Vehicle '214' performs emergency braking on lane 'OnRampBottom_0' with decel=10.46, wished=5.00, severity=1.37, time=269.90.
+Step #270.00Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=13.14, wished=5.00, severity=2.03, time=270.00.
+ (0ms ?*RT. ?UPS, TraCI: 43ms, vehicles TOT 192 ACT 167 BUF 24)               Warning: Vehicle '205' performs emergency braking on lane 'WeaveZone_0' with decel=25.95, wished=5.00, severity=5.24, time=270.10.
+Warning: Vehicle '214' performs emergency braking on lane 'OnRampBottom_0' with decel=13.07, wished=5.00, severity=2.02, time=270.10.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=13.60, wished=5.00, severity=2.15, time=270.20.
+Warning: Vehicle '214' performs emergency braking on lane 'OnRampBottom_0' with decel=13.87, wished=5.00, severity=2.22, time=270.30.
+Warning: Vehicle '213' performs emergency braking on lane 'OnRampBottom_0' with decel=12.19, wished=5.00, severity=1.80, time=270.40.
+Warning: Vehicle '214' performs emergency braking on lane 'OnRampBottom_0' with decel=12.90, wished=5.00, severity=1.98, time=270.60.
+Warning: Vehicle '214' performs emergency braking on lane 'OnRampBottom_0' with decel=13.76, wished=5.00, severity=2.19, time=271.20.
+Warning: Vehicle '207' performs emergency braking on lane 'OnRampTop_0' with decel=29.31, wished=5.00, severity=6.08, time=273.30.
+Warning: Vehicle '218' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=273.80.
+Warning: Vehicle '215' performs emergency braking on lane 'OnRampTop_0' with decel=35.90, wished=5.00, severity=7.73, time=274.20.
+Warning: Vehicle '218' performs emergency braking on lane 'OnRampBottom_0' with decel=10.36, wished=5.00, severity=1.34, time=274.20.
+Warning: Vehicle '218' performs emergency braking on lane 'OnRampBottom_0' with decel=13.42, wished=5.00, severity=2.10, time=274.60.
+Warning: Vehicle '212' performs emergency braking on lane 'WeaveZone_0' with decel=30.35, wished=5.00, severity=6.34, time=274.80.
+Warning: Vehicle '218' performs emergency braking on lane 'OnRampBottom_0' with decel=12.20, wished=5.00, severity=1.80, time=274.90.
+Warning: Vehicle '218' performs emergency braking on lane 'OnRampBottom_0' with decel=14.30, wished=5.00, severity=2.33, time=275.30.
+Warning: Vehicle '213' performs emergency braking on lane 'WeaveZone_0' with decel=34.55, wished=5.00, severity=7.39, time=275.60.
+Warning: Vehicle '218' performs emergency braking on lane 'OnRampBottom_0' with decel=9.90, wished=5.00, severity=1.23, time=275.70.
+Warning: Vehicle '214' performs emergency braking on lane 'WeaveZone_0' with decel=31.74, wished=5.00, severity=6.69, time=276.80.
+Warning: Vehicle '217' performs emergency braking on lane 'OnRampBottom_0' with decel=38.25, wished=5.00, severity=8.31, time=278.20.
+Warning: Vehicle '217' performs emergency braking on lane 'OnRampBottom_0' with decel=26.00, wished=5.00, severity=5.25, time=279.30.
+Step #280.00Warning: Vehicle '218' performs emergency braking on lane 'OnRampBottom_0' with decel=14.89, wished=5.00, severity=2.47, time=280.00.
+ (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 196 ACT 171 BUF 27)               Warning: Vehicle '217' performs emergency braking on lane 'OnRampBottom_0' with decel=18.20, wished=5.00, severity=3.30, time=280.10.
+Warning: Vehicle '219' performs emergency braking on lane 'OnRampTop_0' with decel=20.14, wished=5.00, severity=3.79, time=280.80.
+Warning: Vehicle '217' performs emergency braking on lane 'OnRampBottom_0' with decel=15.60, wished=5.00, severity=2.65, time=280.80.
+Warning: Vehicle '217' performs emergency braking on lane 'OnRampBottom_0' with decel=13.00, wished=5.00, severity=2.00, time=281.40.
+Warning: Vehicle '217' performs emergency braking on lane 'OnRampBottom_0' with decel=10.40, wished=5.00, severity=1.35, time=281.90.
+Warning: Vehicle '222' performs emergency braking on lane 'OnRampBottom_0' with decel=20.45, wished=5.00, severity=3.86, time=284.90.
+Step #290.00 (0ms ?*RT. ?UPS, TraCI: 42ms, vehicles TOT 198 ACT 173 BUF 35)               Warning: Vehicle '231' performs emergency braking on lane 'OnRampTop_0' with decel=10.00, wished=5.00, severity=1.25, time=290.90.
+Warning: Vehicle '231' performs emergency braking on lane 'OnRampTop_0' with decel=13.02, wished=5.00, severity=2.01, time=291.50.
+Warning: Vehicle '230' performs emergency braking on lane 'OnRampTop_0' with decel=20.25, wished=5.00, severity=3.81, time=294.00.
+Warning: Vehicle '231' performs emergency braking on lane 'OnRampTop_0' with decel=24.70, wished=5.00, severity=4.93, time=294.60.
+Warning: Vehicle '229' performs emergency braking on lane 'OnRampBottom_0' with decel=20.05, wished=5.00, severity=3.76, time=295.80.
+Warning: Vehicle '236' performs emergency braking on lane 'OnRampBottom_0' with decel=38.26, wished=5.00, severity=8.31, time=296.60.
+Step #300.00 (1ms ~= 100.00*RT, ~175000.00UPS, TraCI: 39ms, vehicles TOT 200 ACT 175 BUF 4Warning: Vehicle '245' performs emergency braking on lane 'OnRampTop_0' with decel=27.55, wished=5.00, severity=5.64, time=306.60.
+Warning: Vehicle '247' performs emergency braking on lane 'OnRampBottom_0' with decel=10.00, wished=5.00, severity=1.25, time=306.90.
+Warning: Vehicle '247' performs emergency braking on lane 'OnRampBottom_0' with decel=13.09, wished=5.00, severity=2.02, time=307.50.
+Step #310.00Warning: Vehicle '246' performs emergency braking on lane 'OnRampBottom_0' with decel=19.86, wished=5.00, severity=3.71, time=310.00.
+ (1ms ~= 100.00*RT, ~179000.00UPS, TraCI: 30ms, vehicles TOT 204 ACT 179 BUF 4Warning: Vehicle '247' performs emergency braking on lane 'OnRampBottom_0' with decel=31.26, wished=5.00, severity=6.56, time=310.50.
+Warning: Vehicle '250' performs emergency braking on lane 'OnRampBottom_0' with decel=44.10, wished=5.00, severity=9.78, time=311.10.
+Warning: Vehicle '251' performs emergency braking on lane 'OnRampBottom_0' with decel=30.54, wished=5.00, severity=6.39, time=311.90.
+Warning: Vehicle '255' performs emergency braking on lane 'OnRampTop_0' with decel=31.56, wished=5.00, severity=6.64, time=314.90.
+
+TIME: 170.0  Now: 11:16:37.362918
+====================================================
+====================================================
+TIME: 180.0  Now: 11:16:40.766634
+====================================================
+====================================================
+TIME: 190.0  Now: 11:16:44.507197
+====================================================
+[Tc t=200.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 200.0  Now: 11:16:48.180774
+====================================================
+====================================================
+TIME: 210.0  Now: 11:16:51.896315
+====================================================
+====================================================
+TIME: 220.0  Now: 11:16:55.953162
+====================================================
+====================================================
+TIME: 230.0  Now: 11:16:59.923804
+====================================================
+====================================================
+TIME: 240.0  Now: 11:17:04.236953
+====================================================
+[Tc t=250.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 250.0  Now: 11:17:08.578293
+====================================================
+====================================================
+TIME: 260.0  Now: 11:17:13.168756
+====================================================
+====================================================
+TIME: 270.0  Now: 11:17:17.775070
+====================================================
+====================================================
+TIME: 280.0  Now: 11:17:21.547425
+====================================================
+====================================================
+TIME: 290.0  Now: 11:17:24.834600
+====================================================
+[Tc t=300.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 300.0  Now: 11:17:28.363914
+====================================================
+====================================================
+TIME: 310.0  Now: 11:17:31.669567
+====================================================
+====================================================
+TIME: 320.0  Now: 11:17:35.266646
+====================================================
+====================================================
+TIME: 330.0  Now: 11:17:38.834312
+====================================================
+====================================================
+TIME: 340.0  Now: 11:17:42.170451
+====================================================
+[Tc t=350.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 350.0  Now: 11:17:45.332961
+====================================================
+====================================================
+TIME: 360.0  Now: 11:17:48.468034
+====================================================
+====================================================
+TIME: 370.0  Now: 11:17:51.467253
+====================================================
+====================================================
+TIME: 380.0  Now: 11:17:54.664801
+====================================================
+====================================================
+TIME: 390.0  Now: 11:17:57.909701
+====================================================
+[Tc t=400.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 400.0  Now: 11:18:01.406293
+====================================================
+====================================================
+TIME: 410.0  Now: 11:18:04.667013
+====================================================
+====================================================
+TIME: 420.0  Now: 11:18:07.974154
+====================================================
+====================================================
+TIME: 430.0  Now: 11:18:11.175750
+====================================================
+====================================================
+TIME: 440.0  Now: 11:18:14.450486
+====================================================
+[Tc t=450.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 450.0  Now: 11:18:17.688163
+====================================================
+====================================================
+TIME: 460.0  Now: 11:18:20.942905
+====================================================
+====================================================
+TIME: 470.0  Now: 11:18:24.061056
+====================================================
+====================================================
+TIME: 480.0  Now: 11:18:27.343533
+====================================================
+====================================================
+TIME: 490.0  Now: 11:18:30.510125
+====================================================
+[Tc t=500.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 500.0  Now: 11:18:33.834599
+====================================================
+====================================================
+TIME: 510.0  Now: 11:18:37.084454
+====================================================
+====================================================
+TIME: 520.0  Now: 11:18:40.170842
+====================================================
+====================================================
+TIME: 530.0  Now: 11:18:43.432252
+====================================================
+====================================================
+TIME: 540.0  Now: 11:18:46.628564
+====================================================
+[Tc t=550.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 550.0  Now: 11:18:49.945343
+====================================================
+====================================================
+TIME: 560.0  Now: 11:18:53.368866
+====================================================
+====================================================
+TIME: 570.0  Now: 11:18:56.745733
+====================================================
+====================================================
+TIME: 580.0  Now: 11:18:59.976406
+====================================================
+====================================================
+TIME: 590.0  Now: 11:19:03.292801
+====================================================
+[drain] inflow closed at t=600: removed 290 pending insertions
+[Tc t=600.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 600.0  Now: 11:19:06.577176
+====================================================
+====================================================
+TIME: 610.0  Now: 11:19:09.749706
+====================================================
+====================================================
+TIME: 620.0  Now: 11:19:13.078510
+====================================================
+====================================================
+TIME: 630.0  Now: 11:19:16.296473
+====================================================
+====================================================
+TIME: 640.0  Now: 11:19:19.721783
+====================================================
+[Tc t=650.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 650.0  Now: 11:19:23.204345
+====================================================
+====================================================
+TIME: 660.0  Now: 11:19:26.613189
+====================================================
+====================================================
+TIME: 670.0  Now: 11:19:29.769316
+====================================================
+====================================================
+TIME: 680.0  Now: 11:19:33.104594
+====================================================
+====================================================
+TIME: 690.0  Now: 11:19:36.680924
+====================================================
+[Tc t=700.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 700.0  Now: 11:19:40.091496
+====================================================
+====================================================
+TIME: 710.0  Now: 11:19:43.431329
+====================================================
+====================================================
+TIME: 720.0  Now: 11:19:46.666041
+====================================================
+====================================================
+TIME: 730.0  Now: 11:19:50.040037
+====================================================
+====================================================
+TIME: 740.0  Now: 11:19:53.194688
+====================================================
+[Tc t=750.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================Step #320.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 5Step #330.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 65)               Step #340.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 72)               Step #350.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 7Step #360.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 86)               Step #370.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 99)               Step #380.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 1Step #390.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 1Step #400.00 (0ms ?*RT. ?UPS, TraCI: 37ms, vehicles TOT 208 ACT 183 BUF 128)              Step #410.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 133)              Step #420.00 (0ms ?*RT. ?UPS, TraCI: 37ms, vehicles TOT 208 ACT 183 BUF 140)              Step #430.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 1Step #440.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 152)              Step #450.00 (0ms ?*RT. ?UPS, TraCI: 57ms, vehicles TOT 208 ACT 183 BUF 161)              Step #460.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 1Step #470.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 176)              Step #480.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 208 ACT 183 BUF 185)              Step #490.00 (0ms ?*RT. ?UPS, TraCI: 35ms, vehicles TOT 208 ACT 183 BUF 194)              Step #500.00 (0ms ?*RT. ?UPS, TraCI: 35ms, vehicles TOT 208 ACT 183 BUF 199)              Step #510.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 207)              Step #520.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 2Step #530.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 229)              Step #540.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 237)              Step #550.00 (0ms ?*RT. ?UPS, TraCI: 40ms, vehicles TOT 208 ACT 183 BUF 248)              Step #560.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 49ms, vehicles TOT 208 ACT 183 BUF 2Step #570.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 2Step #580.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 39ms, vehicles TOT 208 ACT 183 BUF 2Step #590.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 2Step #600.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 208 ACT 183 BUF 0)                Step #610.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0Step #620.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 208 ACT 183 BUF 0)                Step #630.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 208 ACT 183 BUF 0)                Step #640.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0Step #650.00 (0ms ?*RT. ?UPS, TraCI: 46ms, vehicles TOT 208 ACT 183 BUF 0)                Step #660.00 (0ms ?*RT. ?UPS, TraCI: 39ms, vehicles TOT 208 ACT 183 BUF 0)                Step #670.00 (0ms ?*RT. ?UPS, TraCI: 43ms, vehicles TOT 208 ACT 183 BUF 0)                Step #680.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 40ms, vehicles TOT 208 ACT 183 BUF 0Step #690.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 36ms, vehicles TOT 208 ACT 183 BUF 0Step #700.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 208 ACT 183 BUF 0)                Step #710.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)                Step #720.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0)                Step #730.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 208 ACT 183 BUF 0)                Step #740.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0Step #750.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)                Step #760.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0S
+TIME: 750.0  Now: 11:19:56.353029
+====================================================
+====================================================
+TIME: 760.0  Now: 11:19:59.789759
+====================================================
+====================================================
+TIME: 770.0  Now: 11:20:03.022821
+====================================================
+====================================================
+TIME: 780.0  Now: 11:20:06.261689
+====================================================
+====================================================
+TIME: 790.0  Now: 11:20:09.281496
+====================================================
+[Tc t=800.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 800.0  Now: 11:20:12.523539
+====================================================
+====================================================
+TIME: 810.0  Now: 11:20:15.736150
+====================================================
+====================================================
+TIME: 820.0  Now: 11:20:18.863421
+====================================================
+====================================================
+TIME: 830.0  Now: 11:20:21.939700
+====================================================
+====================================================
+TIME: 840.0  Now: 11:20:25.122593
+====================================================
+[Tc t=850.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 850.0  Now: 11:20:28.380014
+====================================================
+====================================================
+TIME: 860.0  Now: 11:20:31.474589
+====================================================
+====================================================
+TIME: 870.0  Now: 11:20:34.690415
+====================================================
+====================================================
+TIME: 880.0  Now: 11:20:37.969609
+====================================================
+====================================================
+TIME: 890.0  Now: 11:20:40.890725
+====================================================
+[Tc t=900.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 900.0  Now: 11:20:43.792877
+====================================================
+====================================================
+TIME: 910.0  Now: 11:20:46.884617
+====================================================
+====================================================
+TIME: 920.0  Now: 11:20:49.744675
+====================================================
+====================================================
+TIME: 930.0  Now: 11:20:52.628201
+====================================================
+====================================================
+TIME: 940.0  Now: 11:20:55.616291
+====================================================
+[Tc t=950.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 950.0  Now: 11:20:58.583469
+====================================================
+====================================================
+TIME: 960.0  Now: 11:21:01.711465
+====================================================
+====================================================
+TIME: 970.0  Now: 11:21:04.773644
+====================================================
+====================================================
+TIME: 980.0  Now: 11:21:07.901123
+====================================================
+====================================================
+TIME: 990.0  Now: 11:21:10.902762
+====================================================
+[Tc t=1000.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1000.0  Now: 11:21:13.997091
+====================================================
+====================================================
+TIME: 1010.0  Now: 11:21:16.931540
+====================================================
+====================================================
+TIME: 1020.0  Now: 11:21:20.077471
+====================================================
+====================================================
+TIME: 1030.0  Now: 11:21:23.138723
+====================================================
+====================================================
+TIME: 1040.0  Now: 11:21:26.436378
+====================================================
+[Tc t=1050.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54tep #770.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 31ms, vehicles TOT 208 ACT 183 BUF 0Step #780.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0)                Step #790.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)                Step #800.00 (0ms ?*RT. ?UPS, TraCI: 39ms, vehicles TOT 208 ACT 183 BUF 0)                Step #810.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)                Step #820.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0)                Step #830.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 49ms, vehicles TOT 208 ACT 183 BUF 0Step #840.00 (0ms ?*RT. ?UPS, TraCI: 29ms, vehicles TOT 208 ACT 183 BUF 0)                Step #850.00 (0ms ?*RT. ?UPS, TraCI: 29ms, vehicles TOT 208 ACT 183 BUF 0)                Step #860.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 30ms, vehicles TOT 208 ACT 183 BUF 0Step #870.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)                Step #880.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0Step #890.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 55ms, vehicles TOT 208 ACT 183 BUF 0Step #900.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 44ms, vehicles TOT 208 ACT 183 BUF 0Step #910.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)                Step #920.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0Step #930.00 (0ms ?*RT. ?UPS, TraCI: 53ms, vehicles TOT 208 ACT 183 BUF 0)                Step #940.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)                Step #950.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 208 ACT 183 BUF 0)                Step #960.00 (0ms ?*RT. ?UPS, TraCI: 40ms, vehicles TOT 208 ACT 183 BUF 0)                Step #970.00 (0ms ?*RT. ?UPS, TraCI: 33ms, vehicles TOT 208 ACT 183 BUF 0)                Step #980.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)                Step #990.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0Step #1000.00 (0ms ?*RT. ?UPS, TraCI: 50ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1010.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1020.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1030.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF Step #1040.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1050.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1060.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 31ms, vehicles TOT 208 ACT 183 BUF Step #1070.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF Step #1080.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1090.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1100.00 (0ms ?*RT. ?UPS, TraCI: 36ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1110.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF Step #1120.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF Step #1130.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1140.00 (0ms ?*RT. ?UPS, TraCI: 49ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1150.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF Step #1160.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 59ms, vehicles TOT 208 ACT 183 BUF Step #1170.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1180.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1190.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1200.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1210.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF St
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1050.0  Now: 11:21:29.512552
+====================================================
+====================================================
+TIME: 1060.0  Now: 11:21:32.638754
+====================================================
+====================================================
+TIME: 1070.0  Now: 11:21:35.696907
+====================================================
+====================================================
+TIME: 1080.0  Now: 11:21:38.852117
+====================================================
+====================================================
+TIME: 1090.0  Now: 11:21:41.832513
+====================================================
+[Tc t=1100.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1100.0  Now: 11:21:45.013354
+====================================================
+====================================================
+TIME: 1110.0  Now: 11:21:48.164970
+====================================================
+====================================================
+TIME: 1120.0  Now: 11:21:51.184805
+====================================================
+====================================================
+TIME: 1130.0  Now: 11:21:54.269283
+====================================================
+====================================================
+TIME: 1140.0  Now: 11:21:57.271975
+====================================================
+[Tc t=1150.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1150.0  Now: 11:22:00.341907
+====================================================
+====================================================
+TIME: 1160.0  Now: 11:22:03.391891
+====================================================
+====================================================
+TIME: 1170.0  Now: 11:22:06.631402
+====================================================
+====================================================
+TIME: 1180.0  Now: 11:22:09.757589
+====================================================
+====================================================
+TIME: 1190.0  Now: 11:22:12.677123
+====================================================
+[Tc t=1200.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1200.0  Now: 11:22:15.565366
+====================================================
+====================================================
+TIME: 1210.0  Now: 11:22:18.636942
+====================================================
+====================================================
+TIME: 1220.0  Now: 11:22:21.540374
+====================================================
+====================================================
+TIME: 1230.0  Now: 11:22:24.785134
+====================================================
+====================================================
+TIME: 1240.0  Now: 11:22:27.701723
+====================================================
+[Tc t=1250.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1250.0  Now: 11:22:30.569838
+====================================================
+====================================================
+TIME: 1260.0  Now: 11:22:33.583412
+====================================================
+====================================================
+TIME: 1270.0  Now: 11:22:36.760343
+====================================================
+====================================================
+TIME: 1280.0  Now: 11:22:39.756922
+====================================================
+====================================================
+TIME: 1290.0  Now: 11:22:42.878009
+====================================================
+[Tc t=1300.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1300.0  Now: 11:22:45.949504
+====================================================
+====================================================
+TIME: 1310.0  Now: 11:22:49.117094
+====================================================
+====================================================
+TIME: 1320.0  Now: 11:22:52.360878
+====================================================
+====================================================
+TIME: 1330.0  Now: 11:22:55.290665
+====================================================
+====================================================
+TIME: 1340.0  Now: 11:22:58.262611
+====================================================
+[Tc t=1350.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21ep #1220.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1230.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1240.00 (0ms ?*RT. ?UPS, TraCI: 29ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1250.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF Step #1260.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1270.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1280.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF Step #1290.00 (0ms ?*RT. ?UPS, TraCI: 37ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1300.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1310.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1320.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF Step #1330.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1340.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1350.00 (1ms ~= 100.00*RT, ~183000.00UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF Step #1360.00 (0ms ?*RT. ?UPS, TraCI: 50ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1370.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1380.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1390.00 (0ms ?*RT. ?UPS, TraCI: 40ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1400.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1410.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1420.00 (0ms ?*RT. ?UPS, TraCI: 60ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1430.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1440.00 (0ms ?*RT. ?UPS, TraCI: 35ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1450.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1460.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1470.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1480.00 (0ms ?*RT. ?UPS, TraCI: 29ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1490.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 208 ACT 183 BUF 0)               Step #1500.00 (0ms ?*RT. ?UPS, TraCI: 63ms, vehicles TOT 208 ACT 183 BUF 0)               
+
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1350.0  Now: 11:23:01.072878
+====================================================
+====================================================
+TIME: 1360.0  Now: 11:23:03.913079
+====================================================
+====================================================
+TIME: 1370.0  Now: 11:23:06.919450
+====================================================
+====================================================
+TIME: 1380.0  Now: 11:23:09.900083
+====================================================
+====================================================
+TIME: 1390.0  Now: 11:23:13.003033
+====================================================
+[Tc t=1400.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1400.0  Now: 11:23:15.926301
+====================================================
+====================================================
+TIME: 1410.0  Now: 11:23:18.832274
+====================================================
+====================================================
+TIME: 1420.0  Now: 11:23:21.726009
+====================================================
+====================================================
+TIME: 1430.0  Now: 11:23:24.860209
+====================================================
+====================================================
+TIME: 1440.0  Now: 11:23:27.895428
+====================================================
+[Tc t=1450.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1450.0  Now: 11:23:30.878503
+====================================================
+====================================================
+TIME: 1460.0  Now: 11:23:33.885470
+====================================================
+====================================================
+TIME: 1470.0  Now: 11:23:36.887013
+====================================================
+====================================================
+TIME: 1480.0  Now: 11:23:39.853599
+====================================================
+====================================================
+TIME: 1490.0  Now: 11:23:42.805157
+====================================================
+[Tc t=1500.0] requests=16 assigned=16
+    veh=32 dist=-48.6 k=3 <- provider=27
+    veh=56 dist=-47.5 k=3 <- provider=24
+    veh=33 dist=-38.5 k=3 <- provider=30
+    veh=58 dist=-37.3 k=3 <- provider=29
+    veh=19 dist=-29.3 k=2 <- provider=18
+    veh=38 dist=-27.9 k=3 <- provider=42
+    veh=11 dist=-22.6 k=2 <- provider=17
+    veh=41 dist=-17.3 k=3 <- provider=47
+    veh=65 dist=-16.8 k=3 <- provider=37
+    veh=75 dist=-6.4 k=3 <- provider=49
+    veh=48 dist=21.0 k=1 <- provider=21
+    veh=34 dist=22.1 k=2 <- provider=52
+    veh=22 dist=30.6 k=1 <- provider=20
+    veh=50 dist=31.4 k=1 <- provider=35
+    veh=64 dist=73.1 k=1 <- provider=54
+    veh=43 dist=93.2 k=1 <- provider=51
+====================================================
+TIME: 1500.0  Now: 11:23:45.845128
+====================================================
+=====================================
+simulation end
+total generated vehicles : 498
+running vehicles : 183
+exit vehicles : 25
+total departed vehicles : 208
+traffic volume: 1248.0 pcu/h
+canceled vehicles : 291
+=====================================
+Phase A: Tc rounds with key ties (should be 0): 0
+Phase B: Tc rounds with double-assigned providers (should be 0): 0
+Layer2: total instant lane changes executed: 39
+Deadline: mandatory-LC completed/requested = 19/38 (rate 0.500)
+
+=== Collision Summary ===
+Total collision events: 3
+Total vehicles involved: 6
+Time 61.5: Collision between vehicles: 34, 40
+Time 73.5: Collision between vehicles: 16, 13
+Time 73.9: Collision between vehicles: 16, 46

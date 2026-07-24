@@ -30,9 +30,11 @@ from utils.traci_wrapper import (
     slow_down,
 )
 from v2.constants import (
+    ACTIVATION_MARGIN,
     MAX_ACCEL,
     MAX_DECEL,
     MIN_GAP,
+    SUMO_DEFAULT_LC_MODE,
 )
 from v2.layer2.safety import Safety
 from v2.lc_request import LCOperation, LCRequest
@@ -63,6 +65,13 @@ class V2CAV(BaseModel):
     operations: list[LCOperation] = Field(default_factory=list)
     # 障害物（突発）: True の車は停止し続け、調停（要求・提供）から除外される。snapshot には載る（安全判定で回避）。
     is_obstacle: bool = False
+    # 非協調モード（--policy off / off-late）: True なら SUMO 標準制御（LC2013・Krauss）を無効化せず残す。
+    # traci からの車線変更・速度指令は一切行わない前提（観測・締切判定の計測だけが動く）。
+    sumo_default_control: bool = False
+    # 遅通知（--policy off-late）: 必須LC車は活性化窓に入るまで車線変更を凍結し、窓進入時に解禁する。
+    # 提案と同じ「締切付き要求が発生してから行動を開始する」情報タイミングに揃えるための制約。
+    mlc_notice_at_activation: bool = False
+    lc_unlocked: bool = False  # off-late の解禁を一度だけ行うためのフラグ
     road: str | None = None
     lane_id: str | None = None
     lane: int | None = None
@@ -94,8 +103,13 @@ class V2CAV(BaseModel):
         self.type_id = get_veh_type(self.id)
         self.route = get_veh_route_id(self.id)
         self.lane_id = get_veh_lane_id(self.id)
-        traci.vehicle.setLaneChangeMode(self.id, 0)
-        traci.vehicle.setSpeedMode(self.id, 0)
+        if not self.sumo_default_control:
+            traci.vehicle.setLaneChangeMode(self.id, 0)
+            traci.vehicle.setSpeedMode(self.id, 0)
+        elif self.mlc_notice_at_activation and self.operations:
+            # off-late: 必須LC車は要求（活性化）を知るまで車線変更を凍結。速度は SUMO 標準のまま
+            traci.vehicle.setLaneChangeMode(self.id, 0)
+        # minGap・tau は車両物理の統一（提案/ベースライン共通、F4）なのでポリシーに依らず揃える
         traci.vehicle.setMinGap(self.id, MIN_GAP)
         traci.vehicle.setTau(self.id, 1.0)
 
@@ -181,17 +195,25 @@ class V2CAV(BaseModel):
             return None
         return min(pending, key=lambda op: op.deadline_pos)
 
-    def update_activation(self, mainlane_edge: str) -> None:
-        """各未達成操作が活性化窓に初めて入った時刻を記録する（早め固定活性化、操作ごとに一度だけ）。"""
+    def update_activation(self, mainlane_edge: str, margin: float = ACTIVATION_MARGIN) -> None:
+        """各未達成操作が活性化窓に初めて入った時刻を記録する（早め固定活性化、操作ごとに一度だけ）。
+
+        off-late（遅通知の非協調）はここが「要求を知る」瞬間: 凍結していた車線変更を SUMO 標準
+        （LC2013 の既定モード）へ解禁し、以降の完遂は LC2013 に委ねる。
+        margin は既定で ACTIVATION_MARGIN（柱B-2 の猶予距離比較でのみ変える。解禁位置も連動する）。
+        """
         for op in self.operations:
             if op.activated:
                 continue
             if LCRequest.in_activation_window(
-                mainlane_edge, self.road, op.target_lane, op.deadline_pos, self.lane, self.lane_pos
+                mainlane_edge, self.road, op.target_lane, op.deadline_pos, self.lane, self.lane_pos, margin
             ):
                 op.activated = True
                 op.activation_time = self.sim_time
                 op.activation_pos = self.lane_pos
+        if self.mlc_notice_at_activation and not self.lc_unlocked and any(op.activated for op in self.operations):
+            traci.vehicle.setLaneChangeMode(self.id, SUMO_DEFAULT_LC_MODE)
+            self.lc_unlocked = True
 
     def update_deadline_achievement(self, mainlane_edge: str) -> None:
         """締切位置までに目標レーンへ到達した非回避操作を一度だけ記録する（締切達成率 F3 の分子判定）。
@@ -213,8 +235,15 @@ class V2CAV(BaseModel):
         操作リストは捨てない（締切達成率 F3 の母数のため保持）。本来の必須LCが活性化済みのまま障害物化
         された車は、停止して目標へ到達できず終了時に未完了＝失敗として計上される（テレポート無効方針 §2.4.1）。
         要求生成側 ``LCRequest.from_obs`` が is_obstacle を除外するため、操作を残しても障害物が要求を出すことはない。
+
+        非協調ポリシー（SUMO 標準制御が生きている車）でも障害物という摂動を提案と同一にするため、
+        速度モード・車線変更を明示的に無効化してから停止させる: 既定 speedMode のままでは緩減速で
+        指定位置より先に止まり、LC2013 が生きていると停止車が自力で車線変更して封鎖が解けてしまう。
+        edf/none では生成時に設定済みの値の再設定（冪等・挙動不変）。
         """
         self.is_obstacle = True
+        traci.vehicle.setSpeedMode(self.id, 0)
+        traci.vehicle.setLaneChangeMode(self.id, 0)
         traci.vehicle.setSpeed(self.id, 0.0)
 
     # --- 状態観測 ---
