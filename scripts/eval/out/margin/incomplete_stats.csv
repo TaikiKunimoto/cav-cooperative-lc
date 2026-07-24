@@ -1,0 +1,5 @@
+scenario,q,f,incomplete
+weave,3500,0.4,13
+weave,4000,0.4,14
+weave2,4000,0.4,20
+weave2,4000,0.6,39

@@ -9,7 +9,7 @@ Layer2 の自車挙動・必須LC活性化・障害物化を持つ。Layer1 調�
 import math
 import os
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -174,6 +174,60 @@ class V2CAV(BaseModel):
             )
         return rows
 
+    # 全要求個票（__requests.csv）の列。空 run でもヘッダを書けるよう writer へ明示的に渡す
+    MANDATORY_REQUEST_FIELDS: ClassVar[list[str]] = [
+        "veh_id",
+        "env",
+        "phase",
+        "route",
+        "target_lane",
+        "deadline_pos",
+        "activation_time",
+        "activation_pos",
+        "completion_time",
+        "completion_pos",
+        "completed_in_time",
+        "collided",
+        "final_lane",
+        "final_lane_pos",
+    ]
+
+    def mandatory_request_rows(self, env_name: str, collided: bool, phase: str) -> "list[dict[str, Any]]":
+        """活性化済みの全非回避必須LC操作の個票行を返す（成功要求を含む。完了余裕 margin 評価用）。
+
+        失敗個票（mandatory_failure_rows）と異なり完了した要求も1行ずつ出す。集計側が
+        margin = deadline_pos − completion_pos [m]、所要時間 = completion_time − activation_time [s]
+        を計算できるよう生値のまま出力する。未完了要求は completion_* が空欄になる。
+        """
+        rows: list[dict[str, Any]] = []
+        for op in self.operations:
+            if op.is_avoidance or not op.activated:
+                continue
+            if op.completed_in_time and (op.completion_time is None or op.completion_pos is None):
+                raise ValueError(
+                    f"完了済み必須LC操作に完了時刻/位置が記録されていません: veh={self.id} "
+                    f"target_lane={op.target_lane} deadline_pos={op.deadline_pos}"
+                )
+            rows.append(
+                {
+                    "veh_id": self.id,
+                    "env": env_name,
+                    "phase": phase,
+                    "route": self.route,
+                    "target_lane": op.target_lane,
+                    "deadline_pos": op.deadline_pos,
+                    "activation_time": op.activation_time,
+                    "activation_pos": op.activation_pos,
+                    "completion_time": op.completion_time,
+                    "completion_pos": op.completion_pos,
+                    "completed_in_time": op.completed_in_time,
+                    "collided": collided,
+                    "final_lane": self.lane,
+                    "final_lane_pos": self.lane_pos,
+                }
+            )
+        return rows
+
     def active_operation(self) -> LCOperation | None:
         """未完了（is_done が False）の操作のうち、最も deadline が近いものを返す（なければ None）。"""
         pending = [op for op in self.operations if not op.is_done(self.lane, self.lane_pos)]
@@ -206,6 +260,8 @@ class V2CAV(BaseModel):
                 continue
             if op.reached_target_in_time(self.lane, self.lane_pos):  # 回避操作は本メソッド内で False を返す
                 op.completed_in_time = True
+                op.completion_time = self.sim_time
+                op.completion_pos = self.lane_pos
 
     def make_obstacle(self) -> None:
         """この車を障害物（突発）にする。停止し、is_obstacle で調停（要求・提供）から外れる。
