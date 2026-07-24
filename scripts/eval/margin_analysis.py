@@ -166,20 +166,25 @@ class MarginReport:
         """作動包絡内のシナリオ別 margin サマリを CSV と論文スタイル tex 断片で出力する。"""
         comp = ds.completed(envelope_only=True)
         g = comp.groupby("scenario")["margin_m"]
-        summary = g.agg(n="size", mean="mean", p5=lambda s: s.quantile(0.05), min="min").reindex(ENVS).reset_index()
-        summary = summary.round({"mean": 1, "p5": 1, "min": 1})
+        summary = (
+            g.agg(n="size", mean="mean", median="median", p5=lambda s: s.quantile(0.05), min="min")
+            .reindex(ENVS)
+            .reset_index()
+        )
+        summary = summary.round({"mean": 1, "median": 1, "p5": 1, "min": 1})
         summary.to_csv(MARGIN_DIR / "margin_scenario.csv", index=False)
 
         lines = [
-            "% 完了余裕 [m] のシナリオ別統計（作動包絡内・全条件プール）。margin_scenario.csv から生成",
-            "\\begin{tabular}{lrrrr}",
+            "% 完了時の残距離（完了余裕）[m] のシナリオ別統計（作動包絡内・全条件プール）。margin_scenario.csv から生成",
+            "\\begin{tabular}{lrrrrr}",
             "\\hline \\hline",
-            "シナリオ & 要求数 & 平均 [m] & 5\\%点 [m] & 最小 [m] \\\\",
+            "シナリオ & 要求数 & 平均 [m] & 中央値 [m] & 5\\%点 [m] & 最小 [m] \\\\",
             "\\hline",
         ]
         for _, r in summary.iterrows():
             lines.append(
-                f"{ENV_LABEL[r['scenario']]} & {int(r['n'])} & {r['mean']:.1f} & {r['p5']:.1f} & {r['min']:.1f} \\\\"
+                f"{ENV_LABEL[r['scenario']]} & {int(r['n'])} & {r['mean']:.1f} & {r['median']:.1f} & "
+                f"{r['p5']:.1f} & {r['min']:.1f} \\\\"
             )
         lines += ["\\hline", "\\end{tabular}", ""]
         (MARGIN_DIR / "margin_scenario.tex").write_text("\n".join(lines), encoding="utf-8")
@@ -205,7 +210,7 @@ class MarginReport:
                 raise ValueError(f"CDF 対象の完了要求が 0 件です: scenario={env} envelope_only={envelope_only}")
             y = [(i + 1) / len(m) * 100 for i in range(len(m))]
             ax.plot(m, y, color=ENV_COLOR[env], linestyle=ENV_LINESTYLE[env], linewidth=2.0, label=ENV_LABEL[env])
-        ax.set_xlabel("完了余裕 [m]")
+        ax.set_xlabel("完了時の残距離 [m]")
         ax.set_ylabel("累積割合 [%]")
         ax.set_ylim(0, 100)
         ax.set_xlim(left=0)
