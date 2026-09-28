@@ -23,7 +23,7 @@
 - `scripts/eval/` — 評価スイープ・集計・作図・Excel（`/eval-sweep` スキル，運用ルールは `docs/評価運用SOP.md`）
 - `scripts/remote/` — sgnlab サーバでの実行（`/sgnlab-eval` スキル）
 - `tests/golden/` — v1 の挙動不変を確かめる golden-master
-- `docs/` — 実装計画（`実装計画_EDF統一調停_確定版.md` がアルゴリズム仕様），評価運用 SOP
+- `docs/` — `spec/`（現行コードの仕様。v2 を読む・直すときはまずここ），実装計画（`実装計画_EDF統一調停_確定版.md` は設計時の仕様），評価運用 SOP
 
 ## コマンド
 
