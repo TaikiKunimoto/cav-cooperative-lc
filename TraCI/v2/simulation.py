@@ -101,6 +101,7 @@ class V2Simulation(BaseModel):
         running_list: list[str] = []
         tc_accumulator = 0.0
         mandatory_failures: list[dict[str, Any]] = []  # 新定義で未達成となった必須LC要求の個票（run 終了時に CSV へ）
+        mandatory_requests: list[dict[str, Any]] = []  # 全必須LC要求の個票（成功含む。完了余裕 margin 評価用）
         inflow_closed = False  # simulation_time 到達時に一度だけ未発進車を除去（ドレーン開始）
         last_request_log_sec = -1
         tie_events = 0  # Phase A の鍵に同点が出た Tc ラウンド数（デッドロックフリーなら 0）
@@ -144,6 +145,7 @@ class V2Simulation(BaseModel):
                     veh.record_arrival_time()
                     veh.accumulate_exit_stats(stats, vid in self.collided_ids)
                     mandatory_failures += veh.mandatory_failure_rows(self.env.name, vid in self.collided_ids, "exit")
+                    mandatory_requests += veh.mandatory_request_rows(self.env.name, vid in self.collided_ids, "exit")
                     continue
 
                 # 混雑で未発進の車両
@@ -225,8 +227,10 @@ class V2Simulation(BaseModel):
             stats.calculate_vehicle_average_speed("", veh.speed_history)
             veh.record_deadline_outcome(stats, veh.id in self.collided_ids)
             mandatory_failures += veh.mandatory_failure_rows(self.env.name, veh.id in self.collided_ids, "end")
+            mandatory_requests += veh.mandatory_request_rows(self.env.name, veh.id in self.collided_ids, "end")
 
         stats.write_mandatory_failures(mandatory_failures)
+        stats.write_mandatory_requests(mandatory_requests, V2CAV.MANDATORY_REQUEST_FIELDS)
         canceled_without_collision = [v for v in self.canceled_vehicles if v not in self.collided_ids]
 
         self._print_simulation_info(running_list)
@@ -236,6 +240,10 @@ class V2Simulation(BaseModel):
         requested, completed, rate = stats.deadline_summary()
         rate_str = f"{rate:.3f}" if rate is not None else "-"
         print(f"Deadline: mandatory-LC completed/requested = {completed}/{requested} (rate {rate_str})")
+        if self.obstacle is not None:
+            a_requested, a_completed, a_rate = stats.avoidance_summary()
+            a_rate_str = f"{a_rate:.3f}" if a_rate is not None else "-"
+            print(f"Deadline: avoidance-LC completed/requested = {a_completed}/{a_requested} (rate {a_rate_str})")
         total_collisions, total_involved = self._print_collision_summary()
 
         results = {
