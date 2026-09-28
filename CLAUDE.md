@@ -35,7 +35,7 @@ uv run ruff check TraCI && uv run ruff format TraCI              # lint / format
 uv run mypy                                                      # 型検査（strict）
 uv run pre-commit run --all-files
 uv run python tests/golden/run_golden.py check --fast            # v1 の挙動不変の確認（軽量）
-uv run python tests/golden/run_golden.py check --suite v2        # v2 の挙動不変の確認（5 条件・3〜5 分）
+uv run python tests/golden/run_golden.py check --suite v2        # v2 の挙動不変の確認（5 条件・約 4 分）
 ```
 
 - フルスイープ（数百 jobs）はユーザーに確認してから回す。

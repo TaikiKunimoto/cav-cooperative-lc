@@ -74,7 +74,7 @@ class V2Case(NamedTuple):
         return [*cmd, "--obstacle", self.obstacle] if self.obstacle else cmd
 
 
-# 協調・スワップ・障害物回避の各パスを通る負荷（1 条件あたり 1〜3 分。並列に実行する）
+# 協調・スワップ・障害物回避の各パスを通る負荷（1 条件あたり 3〜4 分。並列に実行する）
 V2_CASES = [
     V2Case("diverge", "1", 2500, 0.4),
     V2Case("merge", "1", 2500, 0.4),
@@ -107,6 +107,9 @@ def normalize_stdout(text: str) -> str:
         line = raw.rstrip()
         if line.startswith("Now:"):
             line = "Now: <MASKED>"
+        elif "Now: " in line:
+            # v2 の進捗行（"TIME: 10.0  Now: 11:31:49.095844"）。シミュ時刻は残し、実時刻だけマスクする
+            line = re.sub(r"Now: [\d:.]+", "Now: <MASKED>", line)
         elif line.startswith("Step #"):
             # SUMOの進捗行。タイミング部分(ms/RT/UPS/TraCI)はマスクし、
             # 決定的な車両数(vehicles TOT/ACT/BUF)は残す（挙動の細粒度フィンガープリント）。

@@ -26,7 +26,7 @@ uv run python tests/golden/run_golden.py check  --fast
 # 手法を絞る
 uv run python tests/golden/run_golden.py check --methods simple,custom
 
-# v2: 5 条件を並列に実行（Apple Silicon で 3〜5 分）
+# v2: 5 条件を並列に実行（Apple Silicon で約 4 分）
 uv run python tests/golden/run_golden.py record --suite v2
 uv run python tests/golden/run_golden.py check  --suite v2
 uv run python tests/golden/run_golden.py check  --suite v2 --envs weave,weave2 --jobs 2
