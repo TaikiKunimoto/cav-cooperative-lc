@@ -1,0 +1,6 @@
+scenario,label,requests,completed,achievement_pct
+diverge,分流,10649,10649,100.0
+merge,合流,16028,16028,100.0
+straight_obs,障害物封鎖,2967,2967,100.0
+weave,weave,13442,13375,99.50156226751972
+weave2,weave2,15321,15196,99.18412636250898
