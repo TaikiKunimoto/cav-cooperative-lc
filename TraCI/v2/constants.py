@@ -14,6 +14,9 @@ MAX_ACCEL: float = 2.6  # [m/s^2] 最大加速度（vType accel と統一）
 MAX_DECEL: float = -5.0  # [m/s^2] 最大減速度（vType decel=5.0 と統一）
 MIN_GAP: float = 2.8  # [m] 最小車間距離（vType minGap と統一。提案は model_post_init で setMinGap）
 VEH_LENGTH: float = 5.0  # [m] 車長（vType length と統一）
+# SUMO の laneChangeMode 既定値（strategic/cooperative/speedGain/keepRight 有効・traci と衝突時は安全側）。
+# off-late が活性化窓進入で車線変更を解禁するときに戻す値（TraCI ドキュメントの default 0b011001010101）
+SUMO_DEFAULT_LC_MODE: int = 0b011001010101  # = 1621
 FRICTION_COEFFICIENT: float = 0.7  # 摩擦係数（制動距離計算用）
 TIME_STEP: float = 0.1  # [s] シミュレーション時間ステップ
 

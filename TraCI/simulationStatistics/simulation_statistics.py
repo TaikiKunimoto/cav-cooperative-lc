@@ -171,6 +171,20 @@ class SimulationStatistics:
             writer.writeheader()
             writer.writerows(rows)
 
+    def write_sidecar(self, suffix: str, rows: list[dict[str, Any]]) -> None:
+        """任意の追加計測を `<結果CSV名><suffix>` に書き出す（行ゼロなら作らない。柱B-2 の障害物指標など）。
+
+        メイン CSV に列を足すと全 run のスキーマが変わり既存結果とのバイト一致回帰が壊れるため、
+        追加計測は sidecar に分離する。suffix は `__obstacle_summary.csv` のように二重下線始まりで統一。
+        """
+        if not rows:
+            return
+        stem = self.filename[: -len(".csv")] if self.filename.endswith(".csv") else self.filename
+        with open(stem + suffix, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(rows)
+
     def _create_filename(self, filename: str) -> str:
         override = os.environ.get("EVAL_OUTPUT_NAME")
         if override:

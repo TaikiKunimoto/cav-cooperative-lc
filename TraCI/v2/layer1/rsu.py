@@ -54,6 +54,34 @@ class RSU:
         return assignments
 
     @staticmethod
+    def arbitrate_fcfs(keyed: list[KeyedRequest], snap: Snapshot) -> list[Assignment]:
+        """優先度なし（``--policy none``）の Phase B: 発生順に、目標車線の最近傍後続をそのまま提供車にする。
+
+        提案手法の調停要素をすべて外した素朴な協調ペア形成（アブレーション比較の対照条件）::
+
+            - 鍵劣位判定なし … 相手が自分より緊急でも譲らせる
+            - 占有印（claimed）なし … 同一提供車の二重割当（横取り）を許す
+            - 譲歩の伝播なし … 提供車に確保された要求車も自分のLCを見送らない（displacement なし）
+            - 対向スワップ相手の除外なし … 織込みの構造的ペアも最近傍なら提供車に選ぶ
+            - 停車中の2番目選択なし … 常に最近傍
+
+        障害物（停止車両）だけは除外する（gap を物理的に作れないため。優先度機構とは無関係）。
+        """
+        assignments: list[Assignment] = []
+        for _, req in keyed:
+            step = 1 if req.direction == CarAction.CHANGE_LEFT else -1
+            members = snap.lane_members.get(f"{snap.mainlane_edge}_{req.current_lane + step}", [])  # 縦位置降順
+            for vid in members:
+                o = snap.obs[vid]
+                if o.lane_pos is None or o.lane_pos >= req.current_pos:
+                    continue  # 後続（自分より後ろ）のみ
+                if o.is_obstacle:
+                    continue  # 障害物（停止車両）は gap を作れないので提供車にしない
+                assignments.append(Assignment(requester_id=req.veh_id, provider_id=vid))
+                break  # 縦位置降順の最初の後続＝最近傍
+        return assignments
+
+    @staticmethod
     def _is_swap_partner(req: LCRequest, other: LCRequest) -> bool:
         """互いに相手のレーンを目指し、縦位置が SWAP_WINDOW 内に重なる対向要求車か。
 

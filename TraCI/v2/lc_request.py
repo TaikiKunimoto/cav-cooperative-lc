@@ -77,22 +77,30 @@ class LCRequest(BaseModel):
         deadline_pos: float | None,
         lane: int | None,
         lane_pos: float | None,
+        margin: float = ACTIVATION_MARGIN,
     ) -> bool:
-        """必須LCの活性化窓内か（早め固定: 締切D − ACTIVATION_MARGIN 通過後、目標車線に未到達）。"""
+        """必須LCの活性化窓内か（早め固定: 締切D − margin 通過後、目標車線に未到達）。
+
+        margin は既定で ACTIVATION_MARGIN。柱B-2 の猶予距離比較（--activation-margin）でのみ変える。
+        """
         if road != mainlane_edge:
             return False
         if target_lane is None or deadline_pos is None or lane is None or lane_pos is None:
             return False
         if lane == target_lane:
             return False
-        return lane_pos >= deadline_pos - ACTIVATION_MARGIN
+        return lane_pos >= deadline_pos - margin
 
     @classmethod
-    def from_obs(cls, o: VehObs, sim_time: float, mainlane_edge: str) -> "LCRequest | None":
+    def from_obs(
+        cls, o: VehObs, sim_time: float, mainlane_edge: str, margin: float = ACTIVATION_MARGIN
+    ) -> "LCRequest | None":
         """観測値から活性な必須LC要求を構成する。障害物・窓外・目標到達済み・必須LCなしなら None。"""
         if o.is_obstacle:
             return None  # 障害物（停止車両）は要求を出さない（操作は締切達成率の母数として残るが調停対象外）
-        if not cls.in_activation_window(mainlane_edge, o.road, o.target_lane, o.deadline_pos, o.lane, o.lane_pos):
+        if not cls.in_activation_window(
+            mainlane_edge, o.road, o.target_lane, o.deadline_pos, o.lane, o.lane_pos, margin
+        ):
             return None
         # in_activation_window が True の時点で target_lane/deadline_pos/lane/lane_pos は非 None
         if o.target_lane is None or o.deadline_pos is None or o.lane is None or o.lane_pos is None:
@@ -112,11 +120,11 @@ class LCRequest(BaseModel):
         )
 
     @classmethod
-    def build_all(cls, snap: Snapshot) -> "list[LCRequest]":
+    def build_all(cls, snap: Snapshot, margin: float = ACTIVATION_MARGIN) -> "list[LCRequest]":
         """スナップショット中の全車から、活性な必須LC要求のリストを生成する。"""
         requests: list[LCRequest] = []
         for o in snap.obs.values():
-            req = cls.from_obs(o, snap.sim_time, snap.mainlane_edge)
+            req = cls.from_obs(o, snap.sim_time, snap.mainlane_edge, margin)
             if req is not None:
                 requests.append(req)
         return requests

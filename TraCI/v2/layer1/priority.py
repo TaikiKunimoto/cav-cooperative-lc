@@ -21,6 +21,26 @@ class KeyedRequest(NamedTuple):
     request: LCRequest
 
 
+class FCFS:
+    """発生順（早い者勝ち）ポリシー：``--policy none`` 用（状態を持たない静的ロジック）。
+
+    EDF の実効距離 dist を使わず、要求の活性化が早い順（wait_time 大が上位）に処理する。
+    同時活性化は投入順（veh_id 小）で一意に決める。締切の緊急度は順序に一切影響しない。
+    """
+
+    @staticmethod
+    def make_key(request: LCRequest) -> Key:
+        """調停の鍵。昇順ソートで「活性化が早い・ID小」が上位に来る（第2・3要素は Key 型合わせの 0 固定）。"""
+        return (-request.wait_time, 0.0, 0.0, int(request.veh_id))
+
+    @staticmethod
+    def order_requests(requests: list[LCRequest]) -> list[KeyedRequest]:
+        """全要求車の鍵を同一スナップショットで計算し、発生順（鍵昇順＝活性化が早い順）にソートして返す。"""
+        keyed = [KeyedRequest(FCFS.make_key(r), r) for r in requests]
+        keyed.sort(key=lambda kr: kr.key)
+        return keyed
+
+
 class EDF:
     """EDF 優先度ポリシー：実効距離 dist と調停の鍵を計算する（状態を持たない静的ロジック）。"""
 
