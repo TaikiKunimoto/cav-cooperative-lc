@@ -9,7 +9,7 @@ from datetime import datetime
 import os
 import random
 import sys
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from pydantic import BaseModel, Field
 
@@ -17,12 +17,14 @@ from simulationStatistics.simulation_statistics import SimulationStatistics
 from utils.traci_wrapper import (
     get_colliding_veh_id_list,
     get_edge_lane_number,
+    get_lane_length,
     get_sim_arrived_veh_id_list,
     get_sim_departed_veh_id_list,
     get_sim_time,
     get_veh_id_list,
 )
 from v2.constants import (
+    DRAIN_MAX,
     TC,
     TIME_STEP,
 )
@@ -83,6 +85,7 @@ class V2Simulation(BaseModel):
     exit_vehicles: list[str] = Field(default_factory=list)
     canceled_vehicles: list[str] = Field(default_factory=list)
     collision_history: list[CollisionEvent] = Field(default_factory=list)
+    collided_ids: set[str] = Field(default_factory=set)  # 衝突に一度でも関与した車両ID（達成率の未達成判定に使う）
     # 各車線の待ち行列（流入レーン選択の負荷分散に使う）。レーンは環境により可変なので動的に作る
     lane_queues: dict[str, list[str]] = Field(default_factory=dict)
 
@@ -97,6 +100,8 @@ class V2Simulation(BaseModel):
 
         running_list: list[str] = []
         tc_accumulator = 0.0
+        mandatory_failures: list[dict[str, Any]] = []  # 新定義で未達成となった必須LC要求の個票（run 終了時に CSV へ）
+        inflow_closed = False  # simulation_time 到達時に一度だけ未発進車を除去（ドレーン開始）
         last_request_log_sec = -1
         tie_events = 0  # Phase A の鍵に同点が出た Tc ラウンド数（デッドロックフリーなら 0）
         double_assign_events = 0  # 同一提供車が二重割当された Tc ラウンド数（横取り禁止なら 0）
@@ -116,6 +121,12 @@ class V2Simulation(BaseModel):
             current_time = get_sim_time()
             current_sec = int(current_time)
 
+            # --- 流入締切（ドレーン開始）。混雑で挿入待ちのままの車両を SUMO の挿入キューから除去する。
+            # 除去車は canceled（needs 未充足）として計上済みのまま残り、以降はネット上の車両だけを掃き出す ---
+            if not inflow_closed and current_time >= self.simulation_time:
+                inflow_closed = True
+                self._remove_pending_insertions(running_list, arrived_list)
+
             # --- 到着/未発進/出発処理 と 観測。全車を先に観測し、スナップショット S_t の一貫性を保つ ---
             poplist: list[int] = []  # このstepで到着し self.vehicles から削除する要素インデックス
             active: list[V2CAV] = []  # このstep走行中で観測・調停・制御の対象となる V2CAV
@@ -125,9 +136,14 @@ class V2Simulation(BaseModel):
                 # シミュレーション範囲を出た車両
                 if vid in arrived_list:
                     poplist.append(index)
+                    if veh.departure_time is None and vid not in departed_list:
+                        # 未発進のまま流入締切で remove した車の arrival 通知。退出ではないので統計に入れない
+                        # （canceled として計上済みのまま確定する）
+                        continue
                     self.exit_vehicles.append(vid)
                     veh.record_arrival_time()
-                    veh.accumulate_exit_stats(stats)
+                    veh.accumulate_exit_stats(stats, vid in self.collided_ids)
+                    mandatory_failures += veh.mandatory_failure_rows(self.env.name, vid in self.collided_ids, "exit")
                     continue
 
                 # 混雑で未発進の車両
@@ -186,7 +202,7 @@ class V2Simulation(BaseModel):
 
             # --- Layer2 実行。制御後に呼び、協調減速の slowDown と changeLane が最後の指令になるようにする ---
             if snap is not None:
-                total_lc += Layer2.execute_pairs(assignments, req_by_id, {veh.id: veh for veh in active})
+                total_lc += Layer2.execute_pairs(assignments, req_by_id, {veh.id: veh for veh in active}, snap)
 
             for i in sorted(poplist, reverse=True):
                 self.vehicles.pop(i)
@@ -207,12 +223,11 @@ class V2Simulation(BaseModel):
             if veh.id not in running_list:
                 continue
             stats.calculate_vehicle_average_speed("", veh.speed_history)
-            veh.record_deadline_outcome(stats)
+            veh.record_deadline_outcome(stats, veh.id in self.collided_ids)
+            mandatory_failures += veh.mandatory_failure_rows(self.env.name, veh.id in self.collided_ids, "end")
 
-        collided: set[str] = set()
-        for _, vehicles in self.collision_history:
-            collided.update(vehicles)
-        canceled_without_collision = [v for v in self.canceled_vehicles if v not in collided]
+        stats.write_mandatory_failures(mandatory_failures)
+        canceled_without_collision = [v for v in self.canceled_vehicles if v not in self.collided_ids]
 
         self._print_simulation_info(running_list)
         print(f"Phase A: Tc rounds with key ties (should be 0): {tie_events}")
@@ -238,6 +253,11 @@ class V2Simulation(BaseModel):
 
     def _set_environment(self) -> None:
         """環境のグループ別流入量（総流入 Q × 必須LC比率 f から展開）に従い、流入時刻を乱数で決定（seed で決定的）。"""
+        # 締切 D は「lane-drop 端＝本線エッジの終端」。公称値でなく net の実エッジ長を測って適用する
+        # （公称〜実長の数m の差で、物理的に成功した終端間際の必須LC が失敗誤計上されるのを防ぐ）。
+        actual_length = get_lane_length(f"{self.env.mainlane_edge}_0")
+        self.env = self.env.with_measured_length(actual_length)
+        print(f"[env] mainlane {self.env.mainlane_edge}: measured length {actual_length:.2f} m")
         for group, rate in self.env.group_rates(self.total_inflow, self.mlc_ratio):
             k = int((self.simulation_time / 3600) * rate)
 
@@ -305,15 +325,50 @@ class V2Simulation(BaseModel):
             if abs(time_val - collision_time) < 1.0 and set(vehicles) == set(colliding_ids):
                 return
         self.collision_history.append(CollisionEvent(collision_time, colliding_ids))
+        self.collided_ids.update(colliding_ids)
         print(f"Collision detected at {collision_time:.1f} between: {', '.join(colliding_ids)}")
 
     def _should_continue(self) -> bool:
+        """流入期間中は常に継続。以降は必須LC が残る間だけドレーン継続（上限 DRAIN_MAX）。
+
+        シミュ終了時刻で打ち切ると、終了直前にゾーンへ入った走行中の必須LC車が「失敗」として
+        誤計上される（打ち切りバイアス）。流入は simulation_time で締め切り、ネット上の
+        必須LC・回避操作が完了するまで掃き出してから終了する（障害物化した車の操作は対象外）。
+        """
         sumo_time = get_sim_time()
         if sumo_time % 10 == 0:
             print("====================================================")
             print("TIME:", sumo_time, " Now:", datetime.now().time())
             print("====================================================")
-        return sumo_time < self.simulation_time
+        if sumo_time < self.simulation_time:
+            return True
+        if sumo_time >= self.simulation_time + DRAIN_MAX:
+            return False
+        return self._has_pending_operations()
+
+    def _has_pending_operations(self) -> bool:
+        """発進済み・非障害物の車両に未完了の LC 操作（必須・回避）が残っているか（ドレーン終了判定）。"""
+        return any(
+            veh.departure_time is not None and not veh.is_obstacle and veh.active_operation() is not None
+            for veh in self.vehicles
+        )
+
+    def _remove_pending_insertions(self, running_list: list[str], arrived_list: list[str]) -> None:
+        """流入締切時点で SUMO の挿入キューに残る（未発進の）車両を除去する。
+
+        ドレーン中に遅延挿入されると需要期間（simulation_time）の外で流入が続いてしまうため、
+        締切時点で走行中でも到着済みでもない車両＝挿入待ちを SUMO から取り除く。該当車は
+        canceled（混雑で投入できなかった需要）として毎step の未発進処理で計上済みのまま確定する。
+        """
+        on_network = set(running_list) | set(arrived_list)
+        removed = 0
+        for veh in self.vehicles:
+            if veh.id in on_network:
+                continue
+            traci.vehicle.remove(veh.id)
+            removed += 1
+        if removed:
+            print(f"[drain] inflow closed at t={self.simulation_time:.0f}: removed {removed} pending insertions")
 
     def _print_simulation_info(self, running_list: list[str]) -> None:
         print("=====================================")

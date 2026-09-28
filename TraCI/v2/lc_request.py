@@ -31,6 +31,7 @@ class LCOperation(BaseModel):
     is_avoidance: bool = False  # True=突発障害物の回避（障害物 deadline_pos を通過したら完了）/ False=本来の目標
     activated: bool = False  # 活性化窓に初めて入ったら True（早め固定活性化、一度だけ）
     activation_time: float | None = None  # 活性化時刻（待ち時間の起点）
+    activation_pos: float | None = None  # 活性化時の縦位置（失敗個票の「発生位置」）
     completed_in_time: bool = False  # 締切位置までに目標レーンへ到達したら True（締切達成率 F3、一度だけ）
 
     def is_done(self, lane: int | None, lane_pos: float | None) -> bool:

@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from status.status import CarAction, CarStatus
+from v2.constants import SWAP_WINDOW
 from v2.layer1.priority import Key, KeyedRequest
 from v2.lc_request import LCRequest
 from v2.snapshot import Snapshot
@@ -38,13 +39,14 @@ class RSU:
     def arbitrate(keyed: list[KeyedRequest], snap: Snapshot) -> list[Assignment]:
         """Phase B。鍵昇順（dist小から）に提供車を占有印つきで確保し、割当のリストを返す。"""
         request_key: dict[str, Key] = {req.veh_id: key for key, req in keyed}
+        request_by_id: dict[str, LCRequest] = {req.veh_id: req for _, req in keyed}
         claimed: set[str] = set()
         assignments: list[Assignment] = []
         for key, req in keyed:
             if req.veh_id in claimed:
                 # 既に上位車の提供車として確保済み → 今Tc は譲る側。自分のLCは見送る（譲歩の伝播）
                 continue
-            provider = RSU._find_provider(req, key, snap, claimed, request_key)
+            provider = RSU._find_provider(req, key, snap, claimed, request_key, request_by_id)
             if provider is not None:
                 claimed.add(provider)  # 占有印（横取り禁止）
                 assignments.append(Assignment(requester_id=req.veh_id, provider_id=provider))
@@ -52,8 +54,27 @@ class RSU:
         return assignments
 
     @staticmethod
+    def _is_swap_partner(req: LCRequest, other: LCRequest) -> bool:
+        """互いに相手のレーンを目指し、縦位置が SWAP_WINDOW 内に重なる対向要求車か。
+
+        対向スワップ相手を提供車にすると、要求車と提供車の速度が結合して重なりが固定され、
+        lane-drop 終端まで並走→相互ブロックの永久デッドロックに陥る（織込み環境のグリッドロック起点）。
+        このペアは Layer2 の対向スワップで解消するため、提供車候補から除外する。
+        """
+        other_step = 1 if other.direction == CarAction.CHANGE_LEFT else -1
+        return (
+            other.current_lane + other_step == req.current_lane
+            and abs(other.current_pos - req.current_pos) <= SWAP_WINDOW
+        )
+
+    @staticmethod
     def _find_provider(
-        req: LCRequest, my_key: Key, snap: Snapshot, claimed: set[str], request_key: dict[str, Key]
+        req: LCRequest,
+        my_key: Key,
+        snap: Snapshot,
+        claimed: set[str],
+        request_key: dict[str, Key],
+        request_by_id: dict[str, LCRequest],
     ) -> str | None:
         """次の1段LCの目標車線の後続から、鍵劣位かつ未占有の最近傍（停車中は2番目）を選ぶ。"""
         step = 1 if req.direction == CarAction.CHANGE_LEFT else -1
@@ -72,6 +93,9 @@ class RSU:
             other_key = request_key.get(vid)
             if other_key is not None and other_key < my_key:
                 continue  # 相手が自分より緊急（鍵上位）→ 譲ってもらえない。要求なし車は常に譲れる
+            other_req = request_by_id.get(vid)
+            if other_req is not None and RSU._is_swap_partner(req, other_req):
+                continue  # 対向スワップ相手（Layer2 で交換により解消）は提供車にしない
             viable.append(vid)
 
         if not viable:

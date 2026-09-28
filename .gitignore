@@ -25,3 +25,4 @@ scripts/eval/out/figures_*/
 scripts/eval/out/*.zip
 scripts/eval/out/sweep_*.log
 scripts/eval/out/excel/
+scripts/eval/out/before_100pct/
