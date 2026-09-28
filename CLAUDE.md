@@ -22,7 +22,7 @@
 - `config/v2/<env>/` — 評価環境（diverge / merge / straight / weave / weave2）の net・rou
 - `scripts/eval/` — 評価スイープ・集計・作図・Excel（`/eval-sweep` スキル，運用ルールは `docs/評価運用SOP.md`）
 - `scripts/remote/` — sgnlab サーバでの実行（`/sgnlab-eval` スキル）
-- `tests/golden/` — v1 の挙動不変を確かめる golden-master
+- `tests/golden/` — 挙動不変を確かめる golden-master（v1・v2）
 - `docs/` — 実装計画（`実装計画_EDF統一調停_確定版.md` がアルゴリズム仕様），評価運用 SOP
 
 ## コマンド
@@ -34,11 +34,12 @@ uv run python scripts/eval/run_all.py --suite proposed --quick   # 評価の動�
 uv run ruff check TraCI && uv run ruff format TraCI              # lint / format
 uv run mypy                                                      # 型検査（strict）
 uv run pre-commit run --all-files
-uv run python tests/golden/run_golden.py check --fast            # 挙動不変の確認（軽量）
+uv run python tests/golden/run_golden.py check --fast            # v1 の挙動不変の確認（軽量）
+uv run python tests/golden/run_golden.py check --suite v2        # v2 の挙動不変の確認（5 条件・3〜5 分）
 ```
 
 - フルスイープ（数百 jobs）はユーザーに確認してから回す。
-- 挙動を変えないリファクタは，同じ seed で結果 CSV が一致すること（決定性）で確かめる。
+- 挙動を変えない v2 のリファクタは，`check --suite v2` が差分ゼロになることで確かめる。基準（`record --suite v2`）はリファクタ前に，同じマシンで採る。
 
 ## 規約
 
