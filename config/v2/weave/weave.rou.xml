@@ -1,9 +1,9 @@
 <routes>
     <vType id="CAV" accel="2.6" decel="5.0" minGap="2.8" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
     <!-- 直進（必須LCなし）: 独立区間の本線 → 織込み区間 → tail -->
-    <route id="r_main" edges="MainApproach WeaveZone MainLane"/>
+    <route id="r_main" edges="MainApproach WeaveZone MainLane" color="255,255,255"/>
     <!-- 合流: オンランプ → 織込み区間(補助車線) → 本線 tail -->
-    <route id="r_ramp" edges="OnRamp WeaveZone MainLane"/>
+    <route id="r_ramp" edges="OnRamp WeaveZone MainLane" color="0,255,255"/>
     <!-- 分流: 本線 → 織込み区間(補助車線へ降りる) → オフランプ(出口) -->
-    <route id="r_exit" edges="MainApproach WeaveZone ExitRamp"/>
+    <route id="r_exit" edges="MainApproach WeaveZone ExitRamp" color="255,140,0"/>
 </routes>

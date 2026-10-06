@@ -1,17 +1,17 @@
 <routes>
     <vType id="CAV" accel="2.6" decel="5.0" minGap="2.8" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
     <!-- 直進（必須LCなし）: 独立区間の本線 → 織込みゾーン本線 lane1,2 → tail -->
-    <route id="r_main" edges="MainApproach WeaveZone MainLane"/>
+    <route id="r_main" edges="MainApproach WeaveZone MainLane" color="255,255,255"/>
     <!-- 合流(下): 下側オンランプ → 加速車線 lane0 → tail（lane0→lane1 へ必須LC） -->
-    <route id="r_ramp_b" edges="OnRampBottom WeaveZone MainLane"/>
+    <route id="r_ramp_b" edges="OnRampBottom WeaveZone MainLane" color="0,255,255"/>
     <!-- 合流(上): 上側オンランプ → 加速車線 lane3 → tail（lane3→lane2 へ必須LC） -->
-    <route id="r_ramp_t" edges="OnRampTop WeaveZone MainLane"/>
+    <route id="r_ramp_t" edges="OnRampTop WeaveZone MainLane" color="50,120,255"/>
     <!-- 分流(下): 本線 → 織込みゾーン → 出口車線 lane0 → 下側オフランプ（本線→lane0 へ必須LC） -->
-    <route id="r_exit_b" edges="MainApproach WeaveZone OffRampBottom"/>
+    <route id="r_exit_b" edges="MainApproach WeaveZone OffRampBottom" color="255,140,0"/>
     <!-- 分流(上): 本線 → 織込みゾーン → 出口車線 lane3 → 上側オフランプ（本線→lane3 へ必須LC） -->
-    <route id="r_exit_t" edges="MainApproach WeaveZone OffRampTop"/>
+    <route id="r_exit_t" edges="MainApproach WeaveZone OffRampTop" color="255,255,0"/>
     <!-- 対角(下→上): 下側オンランプ → 加速車線 lane0 → 対角の出口車線 lane3 → 上側オフランプ（lane0→lane3 へ3車線必須LC＝織込みの本体） -->
-    <route id="r_cross_bt" edges="OnRampBottom WeaveZone OffRampTop"/>
+    <route id="r_cross_bt" edges="OnRampBottom WeaveZone OffRampTop" color="255,0,255"/>
     <!-- 対角(上→下): 上側オンランプ → 加速車線 lane3 → 対角の出口車線 lane0 → 下側オフランプ（lane3→lane0 へ3車線必須LC） -->
-    <route id="r_cross_tb" edges="OnRampTop WeaveZone OffRampBottom"/>
+    <route id="r_cross_tb" edges="OnRampTop WeaveZone OffRampBottom" color="255,0,0"/>
 </routes>

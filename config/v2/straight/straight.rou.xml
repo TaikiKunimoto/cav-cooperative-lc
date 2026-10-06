@@ -1,4 +1,4 @@
 <routes>
     <vType id="CAV" accel="2.6" decel="5.0" minGap="2.8" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
-    <route id="r_main" edges="Road"/>
+    <route id="r_main" edges="Road" color="255,255,255"/>
 </routes>
