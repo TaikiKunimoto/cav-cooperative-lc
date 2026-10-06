@@ -41,6 +41,7 @@ def run_once(
     obstacle: str | None,
     policy: str,
     following: str = "legacy",
+    timeout_s: float = PER_RUN_TIMEOUT_S,
 ) -> Path:
     """v2 を1回実行し、生成された CSV パスを返す。失敗時は SystemExit。"""
     name = f"det{idx}__{env_name}__Q{q}__f{f}__s{seed}"
@@ -58,7 +59,7 @@ def run_once(
     print(f"[determinism] run {idx}: {' '.join(cmd)}")
     with open(log_path, "w") as logf:
         proc = subprocess.run(
-            cmd, cwd=str(TRACI_DIR), env=env, stdout=logf, stderr=subprocess.STDOUT, timeout=PER_RUN_TIMEOUT_S
+            cmd, cwd=str(TRACI_DIR), env=env, stdout=logf, stderr=subprocess.STDOUT, timeout=timeout_s
         )
     csv_path = out_dir / f"{name}.csv"
     if proc.returncode != 0 or not csv_path.exists():
@@ -81,6 +82,12 @@ def main() -> None:
     ap.add_argument("--f", type=float, default=0.4, help="必須LC比率 f (0..1)")
     ap.add_argument("--seed", default="1")
     ap.add_argument("--runs", type=int, default=2, help="実行回数（2以上）")
+    ap.add_argument(
+        "--timeout",
+        type=float,
+        default=PER_RUN_TIMEOUT_S,
+        help=f"1回あたりの実行上限 [s]（既定 {PER_RUN_TIMEOUT_S}。渋滞で長引く条件は大きくする）",
+    )
     ap.add_argument("--obstacle", default=None, help="lane,pos,time（任意）")
     ap.add_argument("--policy", default="edf", choices=["edf", "none", "off", "off-late"], help="調停ポリシー（柱B）")
     ap.add_argument(
@@ -101,7 +108,18 @@ def main() -> None:
         for i in range(1, args.runs + 1):
             # 各回で EVAL_OUTPUT_NAME を変え、run間の上書き・スキップを防ぐ
             paths.append(
-                run_once(i, out_dir, args.env, args.q, args.f, args.seed, args.obstacle, args.policy, args.following)
+                run_once(
+                    i,
+                    out_dir,
+                    args.env,
+                    args.q,
+                    args.f,
+                    args.seed,
+                    args.obstacle,
+                    args.policy,
+                    args.following,
+                    args.timeout,
+                )
             )
 
         base = data_rows(paths[0])
