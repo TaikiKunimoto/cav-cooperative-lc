@@ -372,6 +372,7 @@ def write_manifest(results: list[Job], suite: str, quick: bool, elapsed: float) 
 
 
 def main() -> None:
+    global PER_RUN_TIMEOUT_S  # --timeout で上書きする（run_job は呼び出し時にモジュール変数を参照）
     ap = argparse.ArgumentParser(description="評価スイープ実行ランナー")
     ap.add_argument("--suite", choices=["proposed", "baseline", "all"], default="proposed")
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 4) - 2))
@@ -384,10 +385,19 @@ def main() -> None:
     )
     ap.add_argument("--force", action="store_true", help="既存 CSV を無視して再実行")
     ap.add_argument("--dry-run", action="store_true", help="ジョブ一覧だけ表示して終了")
+    ap.add_argument(
+        "--timeout",
+        type=float,
+        default=PER_RUN_TIMEOUT_S,
+        help=f"1 run の実行上限 [s]（既定 {PER_RUN_TIMEOUT_S}。渋滞で長引く変種は大きくする）",
+    )
     args = ap.parse_args()
 
     if "SUMO_HOME" not in os.environ:
         raise SystemExit("SUMO_HOME が未設定です。SUMO を有効化してから実行してください。")
+    if args.timeout <= 0:
+        raise SystemExit(f"--timeout は正の秒数を指定してください（受け取り: {args.timeout}）")
+    PER_RUN_TIMEOUT_S = int(args.timeout)
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -395,7 +405,7 @@ def main() -> None:
     jobs = build_jobs(args.suite, args.quick, args.following)
     print(
         f"[run_sweep] suite={args.suite} quick={args.quick} following={args.following} "
-        f"jobs={len(jobs)} workers={args.workers}"
+        f"jobs={len(jobs)} workers={args.workers} timeout={PER_RUN_TIMEOUT_S}s"
     )
     by_method: dict[str, int] = {}
     for j in jobs:

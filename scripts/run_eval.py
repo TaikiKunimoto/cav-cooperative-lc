@@ -131,6 +131,12 @@ def main() -> None:
     ap.add_argument("--force", action="store_true", help="既存 CSV を無視して再実行（旧CSVは .prev 退避）")
     ap.add_argument("--dry-run", action="store_true", help="ジョブ一覧だけ表示して終了")
     ap.add_argument(
+        "--timeout",
+        type=float,
+        default=rs.PER_RUN_TIMEOUT_S,
+        help=f"1 run の実行上限 [s]（既定 {rs.PER_RUN_TIMEOUT_S}。超えると timeout 扱いで CSV はヘッダのみ残る）",
+    )
+    ap.add_argument(
         "--out-dir",
         default=None,
         help="結果 CSV の出力先ディレクトリ（既定 scripts/eval/out/raw）。ログ・manifest は従来どおり out/ に残す",
@@ -140,6 +146,9 @@ def main() -> None:
     if "SUMO_HOME" not in os.environ:
         raise SystemExit("SUMO_HOME が未設定です。SUMO を有効化してから実行してください。")
 
+    if args.timeout <= 0:
+        raise SystemExit(f"--timeout は正の秒数を指定してください（受け取り: {args.timeout}）")
+    rs.PER_RUN_TIMEOUT_S = int(args.timeout)  # run_job は呼び出し時にモジュール変数を参照する
     if args.out_dir is not None:
         rs.RAW_DIR = Path(args.out_dir).resolve()
     rs.RAW_DIR.mkdir(parents=True, exist_ok=True)
@@ -148,7 +157,7 @@ def main() -> None:
     jobs = build_jobs(args)
     print(
         f"[run_eval] policy={args.policy} following={args.following} envs={args.env} "
-        f"jobs={len(jobs)} workers={args.workers} raw_dir={rs.RAW_DIR}"
+        f"jobs={len(jobs)} workers={args.workers} timeout={rs.PER_RUN_TIMEOUT_S}s raw_dir={rs.RAW_DIR}"
     )
 
     if args.dry_run:
