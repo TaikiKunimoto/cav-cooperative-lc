@@ -9,7 +9,7 @@ Layer2 の自車挙動・必須LC活性化・障害物化を持つ。Layer1 調�
 import math
 import os
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -130,34 +130,42 @@ class V2CAV(BaseModel):
         self.record_deadline_outcome(stats, collided)
 
     def record_deadline_outcome(self, stats: "SimulationStatistics", collided: bool) -> None:
-        """活性化した非回避必須LC操作について、締切達成（完了数/要求数）を統計へ記録する（F3）。
+        """活性化した必須LC操作について、締切達成（完了数/要求数）を統計へ記録する（F3）。
 
-        要求数＝活性化した非回避操作（spawn 時の本来の必須LC。回避操作・未活性は除く）、
-        完了数＝うち締切位置までに目標レーンへ到達したもの（達成率の分子。2指標分離方式のため
-        衝突は織り込まない）。衝突に関与した車の操作数は collided（安全性の参考列）として別掲する。
+        spawn 時の必須LC（非回避）と突発障害物の回避操作を別カウンタへ記録する（Bシナリオの達成率）。
+        要求数＝活性化した操作（未活性は除く）、完了数＝うち締切位置までに目標レーンへ到達
+        （回避は障害物位置を通過）したもの（達成率の分子。2指標分離方式のため衝突は織り込まない）。
+        衝突に関与した車の操作数は collided（安全性の参考列）として別掲する。
         stuck で running のまま終わった車は完了せず要求のみ計上＝未完了（incomplete）として現れる
         （テレポート無効方針 §2.4.1 と整合）。出口時とシミュレーション終了時の双方から呼ばれ、
         出口/残存いずれの車も一度だけ計上される。
         """
         requested = [op for op in self.operations if not op.is_avoidance and op.activated]
-        if not requested:
-            return
-        completed = sum(1 for op in requested if op.completed_in_time)
-        n_collided = len(requested) if collided else 0
-        stats.record_deadline_achievement(len(requested), completed, n_collided, len(requested) - completed)
+        if requested:
+            completed = sum(1 for op in requested if op.completed_in_time)
+            n_collided = len(requested) if collided else 0
+            stats.record_deadline_achievement(len(requested), completed, n_collided, len(requested) - completed)
+        avoid_requested = [op for op in self.operations if op.is_avoidance and op.activated]
+        if avoid_requested:
+            avoid_completed = sum(1 for op in avoid_requested if op.completed_in_time)
+            n_avoid_collided = len(avoid_requested) if collided else 0
+            stats.record_avoidance_achievement(
+                len(avoid_requested), avoid_completed, n_avoid_collided, len(avoid_requested) - avoid_completed
+            )
 
     def mandatory_failure_rows(self, env_name: str, collided: bool, phase: str) -> "list[dict[str, Any]]":
-        """未完了または衝突関与の活性化済み非回避操作の個票行を返す（該当なしなら空）。
+        """未完了または衝突関与の活性化済み操作（必須LC・回避）の個票行を返す（該当なしなら空）。
 
         個票の対象＝(a) 締切内に完了しなかった要求（達成率の失敗）と (b) 衝突関与車の要求
         （完了済みでも安全性の透明性のため記録。completed_in_time_raw 列で完了有無が分かる）。
+        回避操作（is_avoidance 列で判別）も同じ分類で記録する（Bシナリオの失敗の透明性）。
         phase: "exit"=範囲外へ退出した時点 / "end"=終了時に running のまま。分類は
         COLLIDED（衝突関与）／TIMEOUT_STUCK（終了時未完了＝立ち往生）／
         EXITED_INCOMPLETE（未完了のまま退出。通常起きない計測異常の検知用）。
         """
         rows: list[dict[str, Any]] = []
         for op in self.operations:
-            if op.is_avoidance or not op.activated:
+            if not op.activated:
                 continue
             if op.completed_in_time and not collided:
                 continue
@@ -174,6 +182,7 @@ class V2CAV(BaseModel):
                     "classification": classification,
                     "phase": phase,
                     "route": self.route,
+                    "is_avoidance": op.is_avoidance,
                     "target_lane": op.target_lane,
                     "deadline_pos": op.deadline_pos,
                     "activation_time": op.activation_time,
@@ -184,6 +193,60 @@ class V2CAV(BaseModel):
                     "final_lane": self.lane,
                     "final_lane_pos": self.lane_pos,
                     "final_speed": round(self.speed, 2),
+                }
+            )
+        return rows
+
+    # 全要求個票（__requests.csv）の列。空 run でもヘッダを書けるよう writer へ明示的に渡す
+    MANDATORY_REQUEST_FIELDS: ClassVar[list[str]] = [
+        "veh_id",
+        "env",
+        "phase",
+        "route",
+        "target_lane",
+        "deadline_pos",
+        "activation_time",
+        "activation_pos",
+        "completion_time",
+        "completion_pos",
+        "completed_in_time",
+        "collided",
+        "final_lane",
+        "final_lane_pos",
+    ]
+
+    def mandatory_request_rows(self, env_name: str, collided: bool, phase: str) -> "list[dict[str, Any]]":
+        """活性化済みの全非回避必須LC操作の個票行を返す（成功要求を含む。完了余裕 margin 評価用）。
+
+        失敗個票（mandatory_failure_rows）と異なり完了した要求も1行ずつ出す。集計側が
+        margin = deadline_pos − completion_pos [m]、所要時間 = completion_time − activation_time [s]
+        を計算できるよう生値のまま出力する。未完了要求は completion_* が空欄になる。
+        """
+        rows: list[dict[str, Any]] = []
+        for op in self.operations:
+            if op.is_avoidance or not op.activated:
+                continue
+            if op.completed_in_time and (op.completion_time is None or op.completion_pos is None):
+                raise ValueError(
+                    f"完了済み必須LC操作に完了時刻/位置が記録されていません: veh={self.id} "
+                    f"target_lane={op.target_lane} deadline_pos={op.deadline_pos}"
+                )
+            rows.append(
+                {
+                    "veh_id": self.id,
+                    "env": env_name,
+                    "phase": phase,
+                    "route": self.route,
+                    "target_lane": op.target_lane,
+                    "deadline_pos": op.deadline_pos,
+                    "activation_time": op.activation_time,
+                    "activation_pos": op.activation_pos,
+                    "completion_time": op.completion_time,
+                    "completion_pos": op.completion_pos,
+                    "completed_in_time": op.completed_in_time,
+                    "collided": collided,
+                    "final_lane": self.lane,
+                    "final_lane_pos": self.lane_pos,
                 }
             )
         return rows
@@ -216,8 +279,10 @@ class V2CAV(BaseModel):
             self.lc_unlocked = True
 
     def update_deadline_achievement(self, mainlane_edge: str) -> None:
-        """締切位置までに目標レーンへ到達した非回避操作を一度だけ記録する（締切達成率 F3 の分子判定）。
+        """締切位置までに目標へ到達した操作を一度だけ記録する（締切達成率 F3 の分子判定）。
 
+        非回避＝締切位置までに目標レーンへ到達（``reached_target_in_time``）。
+        回避＝障害物位置（=締切）の通過（``is_done``。障害物がレーンを塞ぐため通過＝回避完了）。
         本線上でのみ判定する（本線外は lane index が別 edge のもので target_lane と比較できない）。
         v2 の車線変更は活性化済み要求への調停実行（Layer2）でしか起きないため、到達は本線上で確定する。
         """
@@ -226,8 +291,13 @@ class V2CAV(BaseModel):
         for op in self.operations:
             if op.completed_in_time:
                 continue
-            if op.reached_target_in_time(self.lane, self.lane_pos):  # 回避操作は本メソッド内で False を返す
+            if op.is_avoidance:
+                if op.is_done(self.lane, self.lane_pos):
+                    op.completed_in_time = True
+            elif op.reached_target_in_time(self.lane, self.lane_pos):
                 op.completed_in_time = True
+                op.completion_time = self.sim_time
+                op.completion_pos = self.lane_pos
 
     def make_obstacle(self) -> None:
         """この車を障害物（突発）にする。停止し、is_obstacle で調停（要求・提供）から外れる。

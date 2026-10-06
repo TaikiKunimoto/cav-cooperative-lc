@@ -68,7 +68,7 @@
 | 生 run CSV / 実行ログ / manifest | `scripts/eval/out/{raw,logs}/`, `manifest.json` | しない（再生成可能） |
 | 集計サマリ（CSV/MD）・図・所見 | `scripts/eval/out/`（summary_* / figures/ / FINDINGS.md） | する（PRで更新） |
 | Excel ブック | `scripts/eval/out/excel/` | しない（都度生成） |
-| 論文用に確定した図 | `~/workspace/lab-workspace/tex/<論文>/figure/` へコピー | 論文側 |
+| 論文用に確定した図 | lab-workspace の `Lab/研究/<年度>/<イベント>/原稿/figure/` へコピー | 論文側（lab-workspace） |
 
 図を論文へ持っていくときは「summary_long.csv → make_figures.py → コピー」の経路のみ使う
 （手元で図をいじらない。体裁変更は make_figures.py を変更して再生成＝再現可能に保つ）。
