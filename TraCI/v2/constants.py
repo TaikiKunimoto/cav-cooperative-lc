@@ -14,6 +14,9 @@ MAX_ACCEL: float = 2.6  # [m/s^2] 最大加速度（vType accel と統一）
 MAX_DECEL: float = -5.0  # [m/s^2] 最大減速度（vType decel=5.0 と統一）
 MIN_GAP: float = 2.8  # [m] 最小車間距離（vType minGap と統一。提案は model_post_init で setMinGap）
 VEH_LENGTH: float = 5.0  # [m] 車長（vType length と統一）
+# SUMO の laneChangeMode 既定値（strategic/cooperative/speedGain/keepRight 有効・traci と衝突時は安全側）。
+# off-late が活性化窓進入で車線変更を解禁するときに戻す値（TraCI ドキュメントの default 0b011001010101）
+SUMO_DEFAULT_LC_MODE: int = 0b011001010101  # = 1621
 FRICTION_COEFFICIENT: float = 0.7  # 摩擦係数（制動距離計算用）
 TIME_STEP: float = 0.1  # [s] シミュレーション時間ステップ
 
@@ -56,3 +59,14 @@ LC_REACTION_LAG: float = 0.25  # [s]
 # する（流入は締切済みなので停止・詰まりが無い限り行列は単調に減り必ず終了する。健全runは残タスク完了で
 # 早期終了し、この上限に達するのは異常時のみ）。
 DRAIN_MAX: float = 900.0  # [s]
+
+# --- 追従則（--following relative。legacy の挙動には影響しない）---
+# 車間が安全車間を上回るときの目標速度 = min(制限速度, 前車速度 + FOLLOW_GAIN·(車間 − 安全車間))。
+# 余剰車間に比例して前車より速く詰め、安全車間で前車速度に連続接続する（段差のある目標が生む振動を避ける）。
+# 時定数 1/FOLLOW_GAIN = 2s。追従に必要な減速度は FOLLOW_GAIN²·余剰 で、余剰 20m でも |MAX_DECEL| 内に収まる。
+FOLLOW_GAIN: float = 0.5  # [1/s]
+# 車間が安全車間を割ったときに前車速度へ揃える減速度の下限。相対減速 Δv²/(2·(net車間 − minGap)) が
+# これより小さい（まだ余裕がある）ときも最低この減速度で揃え、だらだら接近しない。上限は |MAX_DECEL|。
+FOLLOW_MIN_DECEL: float = 1.0  # [m/s^2]
+# 目標速度との差がこれ以下なら速度指令を出さない（_provider_yield の 0.1 と同じ不感帯）
+SPEED_TRACK_EPS: float = 0.1  # [m/s]

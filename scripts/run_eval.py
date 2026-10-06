@@ -11,6 +11,10 @@
   - policy: edf（既定。現行実装＝フラグ省略）/ none / off。edf 以外は `--policy` を v2 CLI へ
     渡し（柱B のアブレーション実装が受け取る）、手法ラベルが v2-<policy> になるため
     既存の v2__ 結果と衝突しない
+  - following: legacy（既定。フラグ省略）/ sumo / relative。legacy 以外は `--following` を v2 CLI へ渡し、
+    手法ラベルが v2-sumo / v2-rel になる（policy と併用時は v2-<policy>-<following>）
+  - --out-dir: 結果 CSV の出力先だけを差し替える（ログ・manifest は従来の out/ のまま）。
+    別ツリーの比較用ディレクトリへ少数 run を出すときに使う
 
 使い方（リポジトリ直下から）::
 
@@ -24,6 +28,10 @@
 
     # アブレーション（優先度なし）を weave2 の一部条件で
     uv run python scripts/run_eval.py --policy none --env weave2 --q 3000 4000 --f 0.6 --seeds 1-5
+
+    # 追従を SUMO に委ねる変種のスモーク（CSV だけ別ディレクトリへ）
+    uv run python scripts/run_eval.py --following sumo --env weave weave2 merge --q 3000 --f 0.4 0.6 \
+        --seeds 1 --workers 2 --out-dir /path/to/raw
 """
 
 from __future__ import annotations
@@ -69,7 +77,7 @@ def parse_seeds(spec: str) -> list[int]:
 
 
 def build_jobs(args: argparse.Namespace) -> list[rs.Job]:
-    method = "v2" if args.policy == "edf" else f"v2-{args.policy}"
+    method = rs.method_label(args.policy, args.following)
     jobs: list[rs.Job] = []
     for env in args.env:
         scenario = env if args.obstacle is None else f"{env}_obs"
@@ -86,6 +94,7 @@ def build_jobs(args: argparse.Namespace) -> list[rs.Job]:
                             seed=s,
                             obstacle=args.obstacle,
                             policy=args.policy,
+                            following=args.following,
                         )
                     )
     return jobs
@@ -99,7 +108,15 @@ def append_run_manifest(lines: list[str]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="一括評価ランナー（policy×env×Q×f×seed×並列度）")
-    ap.add_argument("--policy", choices=["edf", "none", "off"], default="edf", help="調停ポリシー（既定 edf）")
+    ap.add_argument(
+        "--policy", choices=["edf", "none", "off", "off-late"], default="edf", help="調停ポリシー（既定 edf）"
+    )
+    ap.add_argument(
+        "--following",
+        choices=rs.FOLLOWING_CHOICES,
+        default="legacy",
+        help="v2 の縦方向追従（legacy=現行 / sumo=SUMO に委ねる / relative=相対制動の自前追従則）",
+    )
     ap.add_argument("--env", nargs="+", choices=KNOWN_ENVS, default=["diverge", "merge", "weave", "weave2"])
     ap.add_argument("--q", nargs="+", type=int, default=rs.Q_FULL, help="総流入 Q [veh/h] の水準")
     ap.add_argument("--f", nargs="+", type=float, default=rs.F_FULL, help="必須LC比率 f の水準")
@@ -113,16 +130,35 @@ def main() -> None:
     )
     ap.add_argument("--force", action="store_true", help="既存 CSV を無視して再実行（旧CSVは .prev 退避）")
     ap.add_argument("--dry-run", action="store_true", help="ジョブ一覧だけ表示して終了")
+    ap.add_argument(
+        "--timeout",
+        type=float,
+        default=rs.PER_RUN_TIMEOUT_S,
+        help=f"1 run の実行上限 [s]（既定 {rs.PER_RUN_TIMEOUT_S}。超えると timeout 扱いで CSV はヘッダのみ残る）",
+    )
+    ap.add_argument(
+        "--out-dir",
+        default=None,
+        help="結果 CSV の出力先ディレクトリ（既定 scripts/eval/out/raw）。ログ・manifest は従来どおり out/ に残す",
+    )
     args = ap.parse_args()
 
     if "SUMO_HOME" not in os.environ:
         raise SystemExit("SUMO_HOME が未設定です。SUMO を有効化してから実行してください。")
 
+    if args.timeout <= 0:
+        raise SystemExit(f"--timeout は正の秒数を指定してください（受け取り: {args.timeout}）")
+    rs.PER_RUN_TIMEOUT_S = int(args.timeout)  # run_job は呼び出し時にモジュール変数を参照する
+    if args.out_dir is not None:
+        rs.RAW_DIR = Path(args.out_dir).resolve()
     rs.RAW_DIR.mkdir(parents=True, exist_ok=True)
     rs.LOG_DIR.mkdir(parents=True, exist_ok=True)
 
     jobs = build_jobs(args)
-    print(f"[run_eval] policy={args.policy} envs={args.env} jobs={len(jobs)} workers={args.workers}")
+    print(
+        f"[run_eval] policy={args.policy} following={args.following} envs={args.env} "
+        f"jobs={len(jobs)} workers={args.workers} timeout={rs.PER_RUN_TIMEOUT_S}s raw_dir={rs.RAW_DIR}"
+    )
 
     if args.dry_run:
         for j in jobs:
@@ -150,7 +186,8 @@ def main() -> None:
             )
 
     elapsed = time.time() - t_start
-    rs.write_manifest(results, suite=f"run_eval:{args.policy}", quick=False, elapsed=elapsed)
+    suite = f"run_eval:{args.policy}" + ("" if args.following == "legacy" else f":{args.following}")
+    rs.write_manifest(results, suite=suite, quick=False, elapsed=elapsed)
 
     n_ok = sum(1 for j in results if j.status in ("ok", "skipped"))
     n_bad = len(results) - n_ok

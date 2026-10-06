@@ -13,6 +13,7 @@
     uv run python scripts/eval/run_sweep.py --suite baseline --workers 4
     uv run python scripts/eval/run_sweep.py --suite proposed --quick      # 小グリッドで動作確認
     uv run python scripts/eval/run_sweep.py --suite proposed --force       # 既存 CSV を無視して再実行
+    uv run python scripts/eval/run_sweep.py --suite proposed --following sumo   # 追従を SUMO に委ねる変種（ラベル v2-sumo）
 
 設計メモ:
   - v1 (custom/simple) の time-space 図出力は EVAL_NO_PLOT=1 で抑止（高速化）。
@@ -72,9 +73,26 @@ BASELINE_SLOW_Q = [1500, 2500, 3500]
 BASELINE_SLOW_SEEDS = [1, 2]
 
 
+# v2 の縦方向追従の方式（--following）。手法ラベルの接尾辞: legacy は空（従来どおり "v2"）、
+# sumo → "v2-sumo"、relative → "v2-rel"。既存の v2__ 結果と名前が衝突せず、aggregate.py は method 列で区別できる。
+FOLLOWING_LABEL: dict[str, str] = {"legacy": "", "sumo": "sumo", "relative": "rel"}
+FOLLOWING_CHOICES = list(FOLLOWING_LABEL)
+
+
+def method_label(policy: str | None, following: str | None) -> str:
+    """v2 の手法ラベル。policy（edf 以外）と following（legacy 以外）を "-" でつなぐ（例 v2 / v2-none / v2-sumo / v2-none-rel）。"""
+    label = "v2" if policy in (None, "edf") else f"v2-{policy}"
+    if following is not None and following not in FOLLOWING_LABEL:
+        raise ValueError(f"不明な following です（期待: {FOLLOWING_CHOICES} / 受け取り: {following!r}）")
+    suffix = FOLLOWING_LABEL.get(following or "legacy", "")
+    return f"{label}-{suffix}" if suffix else label
+
+
 @dataclass
 class Job:
-    method: str  # "v2" | "custom" | "default" | "simple"（v2 の policy 違いは "v2-none" 等のラベル）
+    method: (
+        str  # "v2" | "custom" | "default" | "simple"（v2 の policy/following 違いは "v2-none" / "v2-sumo" 等のラベル）
+    )
     scenario: str  # 表示・集計ラベル（例 diverge / straight_obs / diverge[baseline]）
     env: str  # v2 の --env 名（v1 では high-way 固定なので参考値）
     q: int  # 総流入量 Q [veh/h]
@@ -82,6 +100,9 @@ class Job:
     seed: int
     obstacle: str | None = None
     policy: str | None = None  # v2 の調停ポリシー（None/"edf"=既定でフラグ省略。"none"/"off" は --policy 付与）
+    following: str | None = (
+        None  # v2 の縦方向追従（None/"legacy"=既定でフラグ省略。"sumo"/"relative" は --following 付与）
+    )
     # 実行後に埋まる
     output_csv: str | None = None
     status: str = "pending"  # pending|ok|skipped|failed|timeout|error
@@ -115,6 +136,9 @@ class Job:
             if self.policy not in (None, "edf"):
                 # 既定 edf はフラグ省略（現行 CLI 互換）。none/off はアブレーション実装（柱B）が受け取る
                 cmd += ["--policy", str(self.policy)]
+            if self.following not in (None, "legacy"):
+                # 既定 legacy はフラグ省略（結果不変）。sumo/relative は縦方向追従の変種
+                cmd += ["--following", str(self.following)]
             return cmd
         # v1 系: 位置引数 (seed, inflow_pass, inflow_exit)
         inflow_exit = round(self.q * self.f)
@@ -174,31 +198,35 @@ def collect_metadata() -> dict[str, object]:
     return meta
 
 
-def build_jobs(suite: str, quick: bool) -> list[Job]:
+def build_jobs(suite: str, quick: bool, following: str = "legacy") -> list[Job]:
     qs = Q_QUICK if quick else Q_FULL
     fs = F_QUICK if quick else F_FULL
     seeds = SEEDS_QUICK if quick else SEEDS_FULL
     jobs: list[Job] = []
+    v2_method = method_label("edf", following)  # legacy → "v2"（従来どおり）、sumo → "v2-sumo"、relative → "v2-rel"
 
     if suite in ("proposed", "all"):
         for env in MLC_ENVS:
             for q in qs:
                 for f in fs:
                     for s in seeds:
-                        jobs.append(Job(method="v2", scenario=env, env=env, q=q, f=f, seed=s))
+                        jobs.append(
+                            Job(method=v2_method, scenario=env, env=env, q=q, f=f, seed=s, following=following)
+                        )
         # straight + 障害物（B）。f は無視されるので代表 f のみ。
         # straight は単一グループのため流入時刻のユニーク抽出上限（≈3600 veh/h）に当たる。Q は 3500 までに制限。
         for q in [q for q in qs if q <= 3500]:
             for s in seeds:
                 jobs.append(
                     Job(
-                        method="v2",
+                        method=v2_method,
                         scenario="straight_obs",
                         env="straight",
                         q=q,
                         f=0.0,
                         seed=s,
                         obstacle=STRAIGHT_OBSTACLE,
+                        following=following,
                     )
                 )
 
@@ -207,9 +235,22 @@ def build_jobs(suite: str, quick: bool) -> list[Job]:
         for method in BASELINE_FAST_METHODS:
             for q in qs:
                 for s in seeds:
-                    jobs.append(
-                        Job(method=method, scenario="diverge_baseline", env="diverge", q=q, f=BASELINE_F, seed=s)
-                    )
+                    if method == "v2":
+                        jobs.append(
+                            Job(
+                                method=v2_method,
+                                scenario="diverge_baseline",
+                                env="diverge",
+                                q=q,
+                                f=BASELINE_F,
+                                seed=s,
+                                following=following,
+                            )
+                        )
+                    else:
+                        jobs.append(
+                            Job(method=method, scenario="diverge_baseline", env="diverge", q=q, f=BASELINE_F, seed=s)
+                        )
         # custom（卒論・高コスト）は少数グリッド（quick 指定時はさらに縮小）
         slow_qs = Q_QUICK if quick else BASELINE_SLOW_Q
         slow_seeds = SEEDS_QUICK if quick else BASELINE_SLOW_SEEDS
@@ -250,8 +291,8 @@ def run_job(job: Job, force: bool) -> Job:
     env["EVAL_OUTPUT_DIR"] = str(RAW_DIR)
     env["EVAL_OUTPUT_NAME"] = job.name
     env["EVAL_NO_PLOT"] = "1"  # v1 の time-space 図を抑止（高速化）
-    if job.method != "v2":
-        env["EVAL_SUMOCFG"] = V1_FAST_SUMOCFG  # v1 は高速化版 net で実行
+    if not job.method.startswith("v2"):
+        env["EVAL_SUMOCFG"] = V1_FAST_SUMOCFG  # v1 は高速化版 net で実行（v2 系は読まない）
 
     t0 = time.time()
     try:
@@ -331,22 +372,41 @@ def write_manifest(results: list[Job], suite: str, quick: bool, elapsed: float) 
 
 
 def main() -> None:
+    global PER_RUN_TIMEOUT_S  # --timeout で上書きする（run_job は呼び出し時にモジュール変数を参照）
     ap = argparse.ArgumentParser(description="評価スイープ実行ランナー")
     ap.add_argument("--suite", choices=["proposed", "baseline", "all"], default="proposed")
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 4) - 2))
     ap.add_argument("--quick", action="store_true", help="小グリッドで動作確認")
+    ap.add_argument(
+        "--following",
+        choices=FOLLOWING_CHOICES,
+        default="legacy",
+        help="v2 の縦方向追従（legacy=現行・ラベル v2 / sumo=SUMO に委ねる・v2-sumo / relative=相対制動・v2-rel）",
+    )
     ap.add_argument("--force", action="store_true", help="既存 CSV を無視して再実行")
     ap.add_argument("--dry-run", action="store_true", help="ジョブ一覧だけ表示して終了")
+    ap.add_argument(
+        "--timeout",
+        type=float,
+        default=PER_RUN_TIMEOUT_S,
+        help=f"1 run の実行上限 [s]（既定 {PER_RUN_TIMEOUT_S}。渋滞で長引く変種は大きくする）",
+    )
     args = ap.parse_args()
 
     if "SUMO_HOME" not in os.environ:
         raise SystemExit("SUMO_HOME が未設定です。SUMO を有効化してから実行してください。")
+    if args.timeout <= 0:
+        raise SystemExit(f"--timeout は正の秒数を指定してください（受け取り: {args.timeout}）")
+    PER_RUN_TIMEOUT_S = int(args.timeout)
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-    jobs = build_jobs(args.suite, args.quick)
-    print(f"[run_sweep] suite={args.suite} quick={args.quick} jobs={len(jobs)} workers={args.workers}")
+    jobs = build_jobs(args.suite, args.quick, args.following)
+    print(
+        f"[run_sweep] suite={args.suite} quick={args.quick} following={args.following} "
+        f"jobs={len(jobs)} workers={args.workers} timeout={PER_RUN_TIMEOUT_S}s"
+    )
     by_method: dict[str, int] = {}
     for j in jobs:
         by_method[j.method] = by_method.get(j.method, 0) + 1
@@ -371,7 +431,8 @@ def main() -> None:
 
     # manifest 出力（aggregate.py が読む）
     elapsed = time.time() - t_start
-    write_manifest(results, suite=args.suite, quick=args.quick, elapsed=elapsed)
+    suite_label = args.suite if args.following == "legacy" else f"{args.suite}:{args.following}"
+    write_manifest(results, suite=suite_label, quick=args.quick, elapsed=elapsed)
 
     n_ok = sum(1 for j in results if j.status in ("ok", "skipped"))
     n_bad = len(results) - n_ok
