@@ -27,6 +27,7 @@ import traci
 
 from v2.constants import ACTIVATION_MARGIN
 from v2.environment import ENVIRONMENTS
+from v2.following import Following
 from v2.obstacle import Obstacle
 from v2.policy import Policy
 from v2.simulation import OUTPUT_DIR, V2Simulation
@@ -43,7 +44,7 @@ def _start_sim(sumo_binary: str, sumocfg: str) -> None:
 
 def _get_options() -> tuple[optparse.Values, list[str]]:
     parser = optparse.OptionParser(
-        usage="python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle L,P,T] [--policy P] [--nogui]"
+        usage="python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle L,P,T] [--policy P] [--following F] [--nogui]"
     )
     parser.add_option("--env", dest="env", default="diverge", help="evaluation environment name (default: diverge)")
     parser.add_option(
@@ -58,6 +59,14 @@ def _get_options() -> tuple[optparse.Values, list[str]]:
         help="arbitration policy: edf=提案 / none=優先度なし / off=非協調(LC2013) (default: edf)",
     )
     parser.add_option(
+        "--following",
+        dest="following",
+        type="choice",
+        choices=[f.value for f in Following],
+        default=Following.LEGACY.value,
+        help="car-following: legacy=現行の自前追従（既定） / sumo=追従を SUMO(Krauss) に委ねる / relative=相対制動の自前追従則",
+    )
+    parser.add_option(
         "--activation-margin",
         dest="activation_margin",
         type="float",
@@ -68,15 +77,19 @@ def _get_options() -> tuple[optparse.Values, list[str]]:
     return parser.parse_args()
 
 
-def _create_file_name(env_name: str, total_inflow: float, mlc_ratio: float, seed: str, policy: Policy) -> str:
-    """単体実行時の出力名（一括ラン時は EVAL_OUTPUT_NAME が優先）。edf 以外は policy を含めて区別する。"""
+def _create_file_name(
+    env_name: str, total_inflow: float, mlc_ratio: float, seed: str, policy: Policy, following: Following
+) -> str:
+    """単体実行時の出力名（一括ラン時は EVAL_OUTPUT_NAME が優先）。edf / legacy 以外は policy・following を含めて区別する。"""
     method = "v2" if policy is Policy.EDF else f"v2-{policy.value}"
+    if following.label:
+        method += f"-{following.label}"
     return f"{method}_{env_name}_inflow{int(total_inflow)}_mlc{mlc_ratio}_seed{seed}"
 
 
 if __name__ == "__main__":
     options, positional = _get_options()
-    usage = "usage: python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle L,P,T] [--policy P] [--nogui]"
+    usage = "usage: python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle L,P,T] [--policy P] [--following F] [--nogui]"
     if len(positional) < 3:
         sys.exit(f"位置引数が不足しています（必要3: seed inflow mlc_ratio／受け取り {len(positional)} 個）\n{usage}")
     seed = positional[0]  # 乱数シード
@@ -94,10 +107,11 @@ if __name__ == "__main__":
         sys.exit(f"不明な --env '{options.env}'（利用可能: {', '.join(ENVIRONMENTS)}）")
 
     policy = Policy(options.policy)
+    following = Following(options.following)
     if options.activation_margin <= 0:
         sys.exit(f"--activation-margin は正の値で指定してください（受け取り: {options.activation_margin}）")
 
-    filename = _create_file_name(env.name, total_inflow, mlc_ratio, seed, policy)
+    filename = _create_file_name(env.name, total_inflow, mlc_ratio, seed, policy, following)
     if options.activation_margin != ACTIVATION_MARGIN:
         filename += f"_am{int(options.activation_margin)}"
     # track_deadline_achievement=True: 提案手法は締切達成率（必須LC完了率）を中核指標としてCSV出力する
@@ -115,6 +129,7 @@ if __name__ == "__main__":
         seed=seed,
         obstacle=obstacle,
         policy=policy,
+        following=following,
         activation_margin=options.activation_margin,
     )
     sim.run(stats)

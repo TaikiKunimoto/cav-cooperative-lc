@@ -10,6 +10,7 @@ v2 は Python の `random` グローバル状態に依存しており、コー�
 
     uv run python scripts/eval/check_determinism.py                     # 既定: diverge Q1500 f0.4 seed1 ×2回
     uv run python scripts/eval/check_determinism.py --env weave --q 2000 --runs 3
+    uv run python scripts/eval/check_determinism.py --env weave --q 3000 --following sumo
 
 所要時間の目安: 1回 ≈ 100秒（Apple Silicon ローカル）× 回数。
 終了コード: 一致=0 / 不一致または実行失敗=1（CI・pre-push 組込み可能）。
@@ -31,7 +32,15 @@ PER_RUN_TIMEOUT_S = 900
 
 
 def run_once(
-    idx: int, out_dir: Path, env_name: str, q: float, f: float, seed: str, obstacle: str | None, policy: str
+    idx: int,
+    out_dir: Path,
+    env_name: str,
+    q: float,
+    f: float,
+    seed: str,
+    obstacle: str | None,
+    policy: str,
+    following: str = "legacy",
 ) -> Path:
     """v2 を1回実行し、生成された CSV パスを返す。失敗時は SystemExit。"""
     name = f"det{idx}__{env_name}__Q{q}__f{f}__s{seed}"
@@ -44,6 +53,8 @@ def run_once(
         cmd += ["--obstacle", obstacle]
     if policy != "edf":
         cmd += ["--policy", policy]
+    if following != "legacy":
+        cmd += ["--following", following]
     print(f"[determinism] run {idx}: {' '.join(cmd)}")
     with open(log_path, "w") as logf:
         proc = subprocess.run(
@@ -72,6 +83,12 @@ def main() -> None:
     ap.add_argument("--runs", type=int, default=2, help="実行回数（2以上）")
     ap.add_argument("--obstacle", default=None, help="lane,pos,time（任意）")
     ap.add_argument("--policy", default="edf", choices=["edf", "none", "off", "off-late"], help="調停ポリシー（柱B）")
+    ap.add_argument(
+        "--following",
+        default="legacy",
+        choices=["legacy", "sumo", "relative"],
+        help="縦方向追従の方式（legacy=現行 / sumo=SUMO に委ねる / relative=相対制動の自前追従則）",
+    )
     args = ap.parse_args()
     if args.runs < 2:
         raise SystemExit(f"--runs は2以上を指定してください: {args.runs}")
@@ -83,7 +100,9 @@ def main() -> None:
         paths = []
         for i in range(1, args.runs + 1):
             # 各回で EVAL_OUTPUT_NAME を変え、run間の上書き・スキップを防ぐ
-            paths.append(run_once(i, out_dir, args.env, args.q, args.f, args.seed, args.obstacle, args.policy))
+            paths.append(
+                run_once(i, out_dir, args.env, args.q, args.f, args.seed, args.obstacle, args.policy, args.following)
+            )
 
         base = data_rows(paths[0])
         ok = True
@@ -103,7 +122,10 @@ def main() -> None:
 
     if not ok:
         raise SystemExit(1)
-    print(f"[determinism] OK: {args.runs} 回とも同一結果（env={args.env} Q={args.q} f={args.f} seed={args.seed}）")
+    print(
+        f"[determinism] OK: {args.runs} 回とも同一結果（env={args.env} Q={args.q} f={args.f} seed={args.seed} "
+        f"policy={args.policy} following={args.following}）"
+    )
 
 
 if __name__ == "__main__":

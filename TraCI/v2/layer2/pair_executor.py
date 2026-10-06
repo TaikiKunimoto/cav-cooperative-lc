@@ -19,12 +19,10 @@ import math
 import os
 import sys
 
-from utils.traci_wrapper import get_lane_max_speed, get_veh_neighbors, get_veh_speed, slow_down
+from utils.traci_wrapper import get_lane_max_speed, get_veh_neighbors, get_veh_speed
 from v2.constants import (
     ALIGN_DELTA,
     HOLD_MARGIN,
-    LC_REACTION_LAG,
-    LC_SAFETY_MARGIN,
     MAX_ACCEL,
     MAX_DECEL,
     MAX_SPEED,
@@ -141,17 +139,12 @@ class Layer2:
 
     @staticmethod
     def _net_required(v_back: float, v_front: float) -> float:
-        """minGap 控除済みギャップに対する必要量 ＝ 相対制動項 ＋ 追跡遅れ ＋ 1step進化バッファ。
+        """minGap 控除済みギャップに対する必要量（相対制動モデル）。定義は ``Safety.net_required`` に1本化してある。
 
-        後続 v_back が前方 v_front へ最大減速で追突しない車間の minGap 超過分。相対制動モデルは
-        「後続の即時最大減速」を仮定するが、実際の追従制御は前車速度を 0.1s 刻みで追いかけるため、
-        挿入直後に前車（挿入した要求車）が減速し始めると数step 分のラグで食い込む。その分を
-        ``v_back × LC_REACTION_LAG`` として足す（rear-end グレーズの防止。停止・微速域では ~0 なので
-        詰まった車列への挿入可能性は保たれる）。判定と changeLane 反映の1stepズレに対する
-        ``LC_SAFETY_MARGIN`` も足す（境界挿入の側面衝突防止）。
+        挿入判定・スワップ（本クラス）と追従（``following=sumo/relative`` の ``V2CAV.safety_gap``）が
+        同じ式を使う（層の間で安全定義を食い違わせない）。
         """
-        braking = max(0.0, (v_back**2 - v_front**2) / (2 * abs(MAX_DECEL)))
-        return braking + v_back * LC_REACTION_LAG + LC_SAFETY_MARGIN
+        return Safety.net_required(v_back, v_front)
 
     # --- 対向スワップ（織込みデッドロックの解消）---
 
@@ -194,7 +187,9 @@ class Layer2:
                     Layer2._swap_gap_ok(snap, a_next, a.current_pos, a_obs.speed, ignore_id=b.veh_id)
                     and Layer2._swap_gap_ok(snap, a.current_lane, b.current_pos, b_obs.speed, ignore_id=a.veh_id)
                     and Layer2._swap_live_gap_ok(a.veh_id, a_obs.speed, a_next < a.current_lane, b.veh_id, at_wall)
-                    and Layer2._swap_live_gap_ok(b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id, at_wall)
+                    and Layer2._swap_live_gap_ok(
+                        b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id, at_wall
+                    )
                 ):
                     continue
                 traci.vehicle.changeLane(a.veh_id, a_next, 0)
@@ -342,9 +337,9 @@ class Layer2:
         if p.lane_id is not None:
             target = min(target, get_lane_max_speed(p.lane_id))
         if p.speed - target > 0.1:
-            slow_down(p.id, target, (p.speed - target) / abs(MAX_DECEL))
+            p.slow_down(target, (p.speed - target) / abs(MAX_DECEL))
         elif target - p.speed > 0.1 and (p.leader_distance is None or p.leader_distance >= p.safety_gap + VEH_LENGTH):
-            slow_down(p.id, target, (target - p.speed) / MAX_ACCEL)
+            p.slow_down(target, (target - p.speed) / MAX_ACCEL)
 
     @staticmethod
     def _hold_before_deadline(requester: V2CAV, req: LCRequest) -> None:
@@ -364,7 +359,7 @@ class Layer2:
             return  # 既に D を越えていれば SUMO トポロジーに任せる
         needed_decel = (requester.speed**2) / (2 * remaining)  # D で停止するのに要する減速
         decel = min(needed_decel, abs(MAX_DECEL))  # 物理上限内で滑らかに（超過時は最大減速で best-effort）
-        slow_down(requester.id, 0.0, requester.speed / decel)
+        requester.slow_down(0.0, requester.speed / decel)
 
     @staticmethod
     def _is_opposing(req: LCRequest, other: LCRequest | None) -> bool:
@@ -407,7 +402,7 @@ class Layer2:
             # 前方の対向要求車から相対的に下がって重なりを解消する
             target = max(front_opposing_speed - ALIGN_DELTA, 0.0)
             if requester.speed > target:
-                slow_down(requester.id, target, (requester.speed - target) / a)
+                requester.slow_down(target, (requester.speed - target) / a)
             return
         rear_opposing = False
         for nid, dist in get_veh_neighbors(requester.id, lat):  # 目標レーンの後続（bit2=0）
@@ -420,9 +415,9 @@ class Layer2:
             if front_speed is not None:
                 target = min(target, front_speed + ALIGN_DELTA)
             if target - requester.speed > 0.1:
-                slow_down(requester.id, target, (target - requester.speed) / MAX_ACCEL)
+                requester.slow_down(target, (target - requester.speed) / MAX_ACCEL)
             return
         # 通常の交通流にブロックされている: 目標レーン先行の流速へ合わせる（従来の自己減速）
         if front_speed is None or requester.speed <= front_speed:
             return
-        slow_down(requester.id, max(front_speed, 0.0), (requester.speed - front_speed) / a)
+        requester.slow_down(max(front_speed, 0.0), (requester.speed - front_speed) / a)

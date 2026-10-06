@@ -57,12 +57,14 @@ uv run python -m v1.simple  1 1700 1700
 ### v2（EDF統一調停）
 
 ```bash
-uv run python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle lane,pos,time] [--nogui]
+uv run python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle lane,pos,time] [--policy P] [--following F] [--nogui]
 ```
 
 - `inflow`：総流入量 Q [台/h]、`mlc_ratio`：必須LC車の比率 f（0〜1）
 - `--env`：評価環境（既定 `diverge`）
 - `--obstacle lane,pos,time`：突発障害物（走行中の1台を `lane`・`pos` で停止＝障害物化、`time` で発生）
+- `--policy {edf,none,off,off-late}`：調停ポリシー（既定 `edf`＝提案。`none`＝優先度なし、`off`/`off-late`＝非協調ベースライン）
+- `--following {legacy,sumo,relative}`：縦方向追従の方式（既定 `legacy`＝現行の自前追従。`sumo`＝追従を SUMO（Krauss）に委ね協調指令だけ TraCI で出す、`relative`＝相対制動の自前追従則）。調停・挿入判定は共通
 - `--nogui`：ヘッドレス実行
 - 流入は 600s で締め切り（挿入待ちの残りは canceled 確定）、その後ネット上の必須LC・回避操作が
   完了するまで最大 +900s ドレーン（掃き出し）してから終了する。終了時刻の打ち切りで走行途中の車を

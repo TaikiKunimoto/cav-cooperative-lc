@@ -30,6 +30,7 @@ from v2.constants import (
     TIME_STEP,
 )
 from v2.environment import Environment, Group
+from v2.following import Following
 from v2.layer1.priority import EDF, FCFS
 from v2.layer1.rsu import RSU, Assignment
 from v2.layer2.pair_executor import Layer2
@@ -78,6 +79,8 @@ class V2Simulation(BaseModel):
     seed: str  # 乱数シード（統計ラベル用。random.seed の実行はエントリ側）
     obstacle: Obstacle | None = None  # 突発障害物（指定レーン・位置・時刻）。None なら障害物なし
     policy: Policy = Policy.EDF  # 調停ポリシー（アブレーション比較の切替軸。柱B）
+    # 縦方向追従の方式（legacy=現行 / sumo=SUMO に委ねる / relative=相対制動の自前追従則）。調停・挿入判定は共通
+    following: Following = Following.LEGACY
     # 活性化窓 [m]（締切Dの何m手前から要求を活性化するか）。柱B-2 の猶予距離比較でのみ既定から変える。
     # off-late の車線変更解禁位置も本値に連動する
     activation_margin: float = ACTIVATION_MARGIN
@@ -232,6 +235,11 @@ class V2Simulation(BaseModel):
             if snap is not None:
                 total_lc += Layer2.execute_pairs(assignments, req_by_id, {veh.id: veh for veh in active}, snap)
 
+            # --- step 末尾: following=sumo で速度指令が途切れた車の制御を SUMO へ返す（legacy/relative はフラグ更新のみ）---
+            if not self.policy.is_noncooperative:
+                for veh in active:
+                    veh.finish_speed_step()
+
             for i in sorted(poplist, reverse=True):
                 self.vehicles.pop(i)
 
@@ -348,6 +356,7 @@ class V2Simulation(BaseModel):
                     operations=operations,
                     sumo_default_control=self.policy.is_noncooperative,
                     mlc_notice_at_activation=self.policy is Policy.OFF_LATE,
+                    following=self.following,
                 )
             )
             self.lane_queues.setdefault(depart_lane, []).append(str(self.veh_id))

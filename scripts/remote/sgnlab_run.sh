@@ -4,6 +4,8 @@
 # 使い方:  scripts/remote/sgnlab_run.sh [--yes] [run_sweep.py への引数...]
 #   例:    scripts/remote/sgnlab_run.sh --suite proposed --quick
 #          scripts/remote/sgnlab_run.sh --yes --suite proposed --workers 20
+#          scripts/remote/sgnlab_run.sh --suite proposed --following sumo --workers 20   # 追従を SUMO に委ねる変種
+#   run_sweep.py の引数（--suite/--quick/--force/--following/--workers）はそのまま透過する。
 #
 # 安全設計:
 #   - 実行前に --dry-run でジョブ数を表示し、確認プロンプトを出す（--yes でスキップ）。
