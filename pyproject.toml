@@ -1,5 +1,5 @@
 [project]
-name = "high-way-branch"
+name = "cav-cooperative-lc"
 version = "0.1.0"
 description = "2024 Research"
 authors = [{ name = "TaikiKunimoto", email = "taiki416avicii@gmail.com" }]
@@ -16,6 +16,7 @@ dependencies = [
     "matplotlib>=3.9.2,<4",
     "pandas>=3.0,<4",
     "pydantic>=2.10.6,<3",
+    "openpyxl>=3.1.5",
 ]
 
 [dependency-groups]

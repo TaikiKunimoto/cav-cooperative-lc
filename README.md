@@ -1,4 +1,4 @@
-# high-way-branch-v2
+# cav-cooperative-lc
 
 高速道路における CAV（Connected and Automated Vehicle）の**協調車線変更制御**を SUMO / TraCI で評価するシミュレータ。
 修士研究「通信遅延を考慮したCAVのための協調車線変更制御手法」の実装・評価環境。
@@ -64,6 +64,9 @@ uv run python -m v2 <seed> <inflow> <mlc_ratio> [--env NAME] [--obstacle lane,po
 - `--env`：評価環境（既定 `diverge`）
 - `--obstacle lane,pos,time`：突発障害物（走行中の1台を `lane`・`pos` で停止＝障害物化、`time` で発生）
 - `--nogui`：ヘッドレス実行
+- 流入は 600s で締め切り（挿入待ちの残りは canceled 確定）、その後ネット上の必須LC・回避操作が
+  完了するまで最大 +900s ドレーン（掃き出し）してから終了する。終了時刻の打ち切りで走行途中の車を
+  「締切未達」に誤計上しないための計測プロトコル（締切達成率の母数＝ゾーンに入って活性化した必須LC）。
 
 ```bash
 uv run python -m v2 1 3400 0.5 --nogui                          # 分流D・総流入3400・必須LC比率0.5
@@ -102,6 +105,21 @@ uv run python -m v2 1 3400 0.5 --env diverge --obstacle 1,1500,80 --nogui   # �
 4. **Layer2（実行）**：提供車が協調減速で gap を生成し、要求車は前後二方向の安全チェック合格で**瞬時LC**。
 
 突発障害物は走行中の CAV を1台停止させて障害物にし、後続車に必須LC（回避）を**エスカレーション**で動的付与します（障害物は停止車両として安全判定に自動で反映）。
+
+---
+
+## 評価実験（スイープ・集計・図表・Excel）
+
+評価実験は1条件ずつの手実行ではなく、`scripts/eval/` のパイプラインで回す。
+
+```bash
+uv run python scripts/eval/run_all.py --suite proposed --quick   # 動作確認（約5分）
+uv run python scripts/eval/run_all.py --suite proposed           # フルスイープ→集計→図→Excel
+```
+
+- 使い方の詳細：`scripts/eval/README.md`
+- sgnlab（リモート）実行：`scripts/remote/README.md`
+- 運用ルール・再現性・QAチェックリスト：`docs/評価運用SOP.md`
 
 ---
 

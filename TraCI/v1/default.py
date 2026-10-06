@@ -4,6 +4,7 @@ SUMOのデフォルトを使用したモデル
 
 from datetime import datetime
 import optparse
+import os
 import random
 import sys
 
@@ -143,7 +144,9 @@ def run(
 
 # シミュレーションを開始する
 def _startSim(sumoBinary: str) -> None:
-    traci.start([sumoBinary, "-c", "../config/v1/high-way.sumocfg"])
+    # EVAL_SUMOCFG（評価スイープ）で設定ファイルを差し替え可能（既定はオリジナルの high-way）。
+    cfg = os.environ.get("EVAL_SUMOCFG", "../config/v1/high-way.sumocfg")
+    traci.start([sumoBinary, "-c", cfg])
     print("Simulation started")
 
 

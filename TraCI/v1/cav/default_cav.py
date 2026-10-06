@@ -28,7 +28,6 @@ import traci
 MAX_SPEED = 27  # [m/s]
 MAX_ACCEL = 3.0  # [m/ss]
 MAX_DECEL = -5.0  # [m/ss]
-MIN_GAP = 2.5  # [m]
 LANE_WIDTH = 3.2  # [m]
 
 TIME_STEP = 0.1  # [s]
@@ -46,9 +45,6 @@ class DefaultCAVParams(BaseModel):
     status: Optional[str] = None
     distance: Optional[float] = None
     leader_speed: Optional[float] = None
-    reaction_distance: float = 0.0
-    breaking_distance: float = 0.0
-    safety_gap: float = MIN_GAP  # 初期値は MIN_GAP（reaction_distance + breaking_distance + MIN_GAP）
     pos_x: float = 0.0
     pos_y: float = 0.0
     speed: float = 0.0
@@ -80,9 +76,6 @@ class DefaultCAV:
 
         # 制御車両の速度は traci で管理する
         traci.vehicle.setSpeedMode(vehID=self.params.id, sm=0b000000)
-
-        # 安全ギャップは reaction_distance + breaking_distance + MIN_GAP で計算
-        self.params.safety_gap = self.params.reaction_distance + self.params.breaking_distance + MIN_GAP
 
     """ 車輌の実際の出発時刻を取得 """
 

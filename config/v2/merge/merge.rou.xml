@@ -1,5 +1,5 @@
 <routes>
-    <vType id="CAV" accel="10.0" decel="5.0" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
+    <vType id="CAV" accel="2.6" decel="5.0" minGap="2.8" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
     <!-- 直進（必須LCなし）: 独立区間の本線 → 合流ゾーン → tail -->
     <route id="r_main" edges="MainApproach MergeZone MainLane" color="255,255,255"/>
     <!-- 合流: 合流ランプ → 合流ゾーン(加速車線) → tail -->

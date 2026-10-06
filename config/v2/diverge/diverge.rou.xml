@@ -4,7 +4,7 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vType id="CAV" accel="10.0" decel="5.0" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
+    <vType id="CAV" accel="2.6" decel="5.0" minGap="2.8" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
 
     <!-- Routes -->
     <route id="r_pass" edges="DivergeZone MainLane" color="255,255,255"/>

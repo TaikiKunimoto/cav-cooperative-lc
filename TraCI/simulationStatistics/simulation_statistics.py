@@ -21,6 +21,14 @@ class SimulationStatsData(BaseModel):
     emergency_brake_count: int = 0  # 急ブレーキ回数
     mandatory_lc_total: int = 0  # 締切達成率の母数: 活性化した非回避必須LC操作の数（要求数）
     mandatory_lc_completed: int = 0  # 締切達成率の分子: うち締切までに目標レーンへ到達した数（完了数）
+    mandatory_lc_collided: int = 0  # うち衝突に関与した車の操作数（安全性の参考列。完了/未完了と重なり得る）
+    mandatory_lc_incomplete: int = 0  # うち締切内に完了できなかった操作数（立ち往生・締切超過。= total - completed）
+    # 突発障害物の回避操作（Bシナリオ）。母数=活性化した回避操作、完了=障害物位置（=締切）を通過した数。
+    # 必須LC（spawn時付与）と分けて記録し、集計側で統合達成率 (mandatory+avoidance) を計算できるようにする。
+    avoidance_lc_total: int = 0
+    avoidance_lc_completed: int = 0
+    avoidance_lc_collided: int = 0
+    avoidance_lc_incomplete: int = 0
 
 
 class SimulationStatistics:
@@ -33,9 +41,12 @@ class SimulationStatistics:
         # track_deadline_achievement: 締切達成率（必須LC完了率）の列をCSVに出すか。提案(v2)のみ True。
         # v1(default/simple/custom)は False のままで列を出さず、既存CSVスキーマ（golden基準）をバイト不変に保つ。
         self.data = SimulationStatsData()
-        self.output_dir = output_dir
+        # 評価スイープ用フック（環境変数）。未設定なら従来動作と完全一致（golden 不変）。
+        # EVAL_OUTPUT_DIR: 出力先を一括で別ディレクトリへ集約。EVAL_OUTPUT_NAME: ファイル名を決定的に固定
+        # （タイムスタンプを付けず一意名で上書き＝冪等・再開可能・並列でも衝突なし。run_sweep が解決に使う）。
+        self.output_dir = os.environ.get("EVAL_OUTPUT_DIR") or output_dir
         self.track_deadline_achievement = track_deadline_achievement
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
         self.filename = self._create_filename(filename)
         self._create_csv_with_headers()
 
@@ -120,10 +131,44 @@ class SimulationStatistics:
         """急ブレーキの回数をインクリメント"""
         self.data.emergency_brake_count += 1
 
-    def record_deadline_achievement(self, requested: int, completed: int) -> None:
-        """必須LC（非回避・活性化済み）の要求数と完了数を累積する（締切達成率の母数/分子）。"""
+    def record_deadline_achievement(self, requested: int, completed: int, collided: int, incomplete: int) -> None:
+        """必須LC（非回避・活性化済み）の要求数と結果内訳を累積する（締切達成率の母数/分子）。
+
+        達成率は completed（締切内に完了）/ requested の2指標分離方式（2026-07-24 ユーザー判断）:
+        衝突は達成率に織り込まず、collided（衝突関与車の操作数。完了済みでも数える参考列）として
+        別掲する。incomplete は締切内に完了できなかった数で、requested == completed + incomplete が
+        常に成り立つ（成り立たない呼び出しは拒否）。collided は completed/incomplete と重なり得る。
+        """
+        if requested != completed + incomplete:
+            raise ValueError(
+                f"deadline achievement の内訳が不整合です: requested={requested} != "
+                f"completed={completed} + incomplete={incomplete}"
+            )
+        if collided > requested:
+            raise ValueError(f"衝突関与数が要求数を超えています: collided={collided} > requested={requested}")
         self.data.mandatory_lc_total += requested
         self.data.mandatory_lc_completed += completed
+        self.data.mandatory_lc_collided += collided
+        self.data.mandatory_lc_incomplete += incomplete
+
+    def record_avoidance_achievement(self, requested: int, completed: int, collided: int, incomplete: int) -> None:
+        """回避操作（突発障害物・活性化済み）の要求数と結果内訳を累積する（Bシナリオの達成率の母数/分子）。
+
+        完了＝障害物位置（=締切）の通過。回避は締切位置=障害物位置のため「通過＝締切内完了」が定義から
+        成り立つ（通過できない車は立ち往生か衝突）。衝突の扱いは必須LCと同じ2指標分離方式で、
+        collided は参考列として別掲する。整合条件も ``record_deadline_achievement`` と同一。
+        """
+        if requested != completed + incomplete:
+            raise ValueError(
+                f"avoidance achievement の内訳が不整合です: requested={requested} != "
+                f"completed={completed} + incomplete={incomplete}"
+            )
+        if collided > requested:
+            raise ValueError(f"衝突関与数が要求数を超えています: collided={collided} > requested={requested}")
+        self.data.avoidance_lc_total += requested
+        self.data.avoidance_lc_completed += completed
+        self.data.avoidance_lc_collided += collided
+        self.data.avoidance_lc_incomplete += incomplete
 
     def _deadline_achievement_rate(self) -> Optional[float]:
         """締切達成率＝完了数/要求数（要求が無ければ None）。"""
@@ -131,13 +176,65 @@ class SimulationStatistics:
             return None
         return self.data.mandatory_lc_completed / self.data.mandatory_lc_total
 
+    def _avoidance_achievement_rate(self) -> Optional[float]:
+        """回避操作の達成率＝完了数/要求数（要求が無ければ None）。"""
+        if self.data.avoidance_lc_total == 0:
+            return None
+        return self.data.avoidance_lc_completed / self.data.avoidance_lc_total
+
     def deadline_summary(self) -> tuple[int, int, Optional[float]]:
         """締切達成の (要求数, 完了数, 達成率) を返す（達成率は要求が無ければ None）。表示・ログ用の公開アクセサ。"""
         return self.data.mandatory_lc_total, self.data.mandatory_lc_completed, self._deadline_achievement_rate()
 
+    def avoidance_summary(self) -> tuple[int, int, Optional[float]]:
+        """回避操作の (要求数, 完了数, 達成率) を返す（達成率は要求が無ければ None）。表示・ログ用の公開アクセサ。"""
+        return self.data.avoidance_lc_total, self.data.avoidance_lc_completed, self._avoidance_achievement_rate()
+
+    def write_mandatory_failures(self, rows: list[dict[str, Any]]) -> None:
+        """未完了または衝突関与の必須LC要求の個票を `<結果CSV名>__failures.csv` に書き出す（該当ゼロなら作らない）。
+
+        1行=1要求（車両ID・env・分類・発生/締切位置・最終状態）。ファイルが無い＝その run は
+        「完了100%かつ衝突関与LC 0」、を意味させるため空ファイルは作らない。列は行 dict のキー
+        （呼び出し側=V2CAV.mandatory_failure_rows が全行同一キーで構成する）。
+        """
+        if not rows:
+            return
+        stem = self.filename[: -len(".csv")] if self.filename.endswith(".csv") else self.filename
+        path = stem + "__failures.csv"
+        with open(path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(rows)
+
+    def write_mandatory_requests(self, rows: list[dict[str, Any]], fieldnames: list[str]) -> None:
+        """全必須LC要求（成功含む）の個票を `<結果CSV名>__requests.csv` に書き出す（完了余裕 margin 評価用）。
+
+        失敗個票（write_mandatory_failures）と異なり、該当ゼロでもヘッダのみのファイルを必ず作る:
+        「ファイルが無い＝margin ログ未実装の旧 run」と区別し、集計側が再実行要否を判定できるようにする。
+        fieldnames は呼び出し側（V2CAV.MANDATORY_REQUEST_FIELDS）が与える。行のキーと一致しなければ
+        DictWriter が例外を出す（黙って欠損させない）。
+        """
+        stem = self.filename[: -len(".csv")] if self.filename.endswith(".csv") else self.filename
+        path = stem + "__requests.csv"
+        with open(path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="raise")
+            writer.writeheader()
+            writer.writerows(rows)
+
     def _create_filename(self, filename: str) -> str:
+        override = os.environ.get("EVAL_OUTPUT_NAME")
+        if override:
+            # 決定的な一意名（タイムスタンプなし）。run_sweep がパラメータを符号化して渡し、出力を確実に解決する。
+            return f"{self.output_dir}/{override}.csv"
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        return f"{self.output_dir}/{filename}_{timestamp}.csv"
+        path = f"{self.output_dir}/{filename}_{timestamp}.csv"
+        # タイムスタンプは分単位のため、同一条件を同じ分内に再実行すると同名になり
+        # 既存結果を無警告で上書きしてしまう。衝突時のみ連番を付けて回避する（非衝突時は従来と同名）。
+        suffix = 2
+        while os.path.exists(path):
+            path = f"{self.output_dir}/{filename}_{timestamp}-{suffix}.csv"
+            suffix += 1
+        return path
 
     def _create_csv_with_headers(self) -> None:
         headers = [
@@ -169,8 +266,19 @@ class SimulationStatistics:
             "max_tail_position",
         ]
         if self.track_deadline_achievement:
-            # 提案(v2)のみ。締切達成率（必須LC完了率）= mandatory_lc_completed / mandatory_lc_total
-            headers += ["mandatory_lc_total", "mandatory_lc_completed", "deadline_achievement_rate"]
+            # 提案(v2)のみ。締切達成率（必須LC完了率）= mandatory_lc_completed（衝突なし完了）/ mandatory_lc_total
+            headers += [
+                "mandatory_lc_total",
+                "mandatory_lc_completed",
+                "mandatory_lc_collided",
+                "mandatory_lc_incomplete",
+                "deadline_achievement_rate",
+                "avoidance_lc_total",
+                "avoidance_lc_completed",
+                "avoidance_lc_collided",
+                "avoidance_lc_incomplete",
+                "avoidance_achievement_rate",
+            ]
         with open(self.filename, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(headers)
@@ -219,7 +327,14 @@ class SimulationStatistics:
             row += [
                 self.data.mandatory_lc_total,
                 self.data.mandatory_lc_completed,
+                self.data.mandatory_lc_collided,
+                self.data.mandatory_lc_incomplete,
                 self._deadline_achievement_rate(),
+                self.data.avoidance_lc_total,
+                self.data.avoidance_lc_completed,
+                self.data.avoidance_lc_collided,
+                self.data.avoidance_lc_incomplete,
+                self._avoidance_achievement_rate(),
             ]
         with open(self.filename, "a", newline="") as f:
             writer = csv.writer(f)

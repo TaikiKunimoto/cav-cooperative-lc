@@ -1,5 +1,5 @@
 <routes>
-    <vType id="CAV" accel="10.0" decel="5.0" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
+    <vType id="CAV" accel="2.6" decel="5.0" minGap="2.8" maxSpeed="27" length="5" speedFactor="1.0" speedDev="0.0"/>
     <!-- 直進（必須LCなし）: 独立区間の本線 → 織込みゾーン本線 lane1,2 → tail -->
     <route id="r_main" edges="MainApproach WeaveZone MainLane" color="255,255,255"/>
     <!-- 合流(下): 下側オンランプ → 加速車線 lane0 → tail（lane0→lane1 へ必須LC） -->
