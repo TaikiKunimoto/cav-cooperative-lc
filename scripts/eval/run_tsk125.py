@@ -131,6 +131,19 @@ EXPERIMENTS: dict[str, Grid] = {
         note="要素の除去（提案から 1 要素ずつ抜く）",
         variants=VARIANTS_E4,
     ),
+    # 要素の除去を，差が出た条件（片側織り込み・通知が遅い＝活性化 100 m）でも回す。edf/none/off-late の am100 は E2 にある
+    "E4b": Grid(
+        name="E4b",
+        envs=["weave"],
+        qs=[3000],
+        fs=[0.4, 0.6],
+        policies=["edf"],
+        margins=[100.0],
+        obstacle=None,
+        seeds="1",
+        note="要素の除去 × 通知が遅い条件（weave・am100）",
+        variants=VARIANTS_E4,
+    ),
 }
 
 
