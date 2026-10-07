@@ -103,6 +103,22 @@ ENV_TITLE = {"merge": "Merge (D≈194 m)", "weave": "Weave MD-1f (D≈197 m)", "
 def select(df: pd.DataFrame, f: float, q: int, seed: int) -> pd.DataFrame:
     d = df[(df["obstacle"].isna()) & (df["am"] == AM) & (df["q"] == q) & (df["f"] == f) & (df["seed"] == seed)]
     d = d[d["policy"].isin(VARIANT_ORDER)].copy()
+    d["status"] = "ok"
+    # 実時間上限で打ち切られた run（結果 CSV なし＝グリッドロック）も行として持つ（図では × 印，表では「打ち切り」）
+    to = tf.load_timeouts()
+    if not to.empty:
+        to = to[
+            (to["obstacle"].isna())
+            & (to["am"] == AM)
+            & (to["q"] == q)
+            & (to["f"] == f)
+            & (to["seed"] == seed)
+            & (to["policy"].isin(VARIANT_ORDER))
+            & (~to["name"].isin(set(d["name"])))
+        ].copy()
+        for c in ("deadline_pct", "avg_speed", "collisions", "canceled", "mlc_incomplete", "exit_throughput"):
+            to[c] = float("nan")
+        d = pd.concat([d, to], ignore_index=True)
     d["order"] = d["policy"].map({p: i for i, p in enumerate(VARIANT_ORDER)})
     return d.sort_values(["env", "order"])
 
@@ -130,6 +146,19 @@ def plot(df: pd.DataFrame, f: float, q: int, seed: int, out: Path) -> None:
                 if v == v:  # not NaN
                     txt = f"{v:.1f}" if col in ("avg_speed", "deadline_pct") else f"{v:.0f}"
                     ax.text(x, v, txt, ha="center", va="bottom", fontsize=7)
+            for x, p in zip(xs, present, strict=True):
+                if p in de.index and str(de["status"].get(p)) == "timeout":
+                    ax.text(
+                        x,
+                        0.04,
+                        "× gridlock",
+                        rotation=90,
+                        transform=ax.get_xaxis_transform(),
+                        ha="center",
+                        va="bottom",
+                        fontsize=7,
+                        color="#B00020",
+                    )
             if col == "deadline_pct":
                 lo = min([v for v in vals if v == v] + [100.0])
                 ax.set_ylim(max(0.0, lo - 5.0), 101.5)
@@ -212,7 +241,11 @@ def table(df: pd.DataFrame, fs: list[float], q: int, seed: int, out_csv: Path) -
                     "collisions": r["collisions"],
                     "avg_speed": round(float(r["avg_speed"]), 1),
                     "canceled": r["canceled"],
-                    "exit_throughput": round(float(r["exit_throughput"])),
+                    "exit_throughput": (
+                        round(float(r["exit_throughput"]))
+                        if r["exit_throughput"] == r["exit_throughput"]
+                        else float("nan")
+                    ),
                     "margin_median_m": round(float(med.get(r["name"], float("nan"))), 1),
                 }
             )
@@ -240,6 +273,9 @@ def table(df: pd.DataFrame, fs: list[float], q: int, seed: int, out_csv: Path) -
                     cells.append("—")
                 else:
                     e = te.iloc[0]
+                    if e["deadline_pct"] != e["deadline_pct"]:  # NaN ＝ 打ち切り
+                        cells.append("打ち切り（グリッドロック）")
+                        continue
                     cells.append(
                         f"{e['deadline_pct']:.1f} / {int(e['collisions'])} / {e['avg_speed']:.1f} / "
                         f"{int(e['canceled'])} / {e['margin_median_m']:.0f}"
