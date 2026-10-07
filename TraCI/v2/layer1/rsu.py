@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from status.status import CarAction, CarStatus
-from v2.constants import SWAP_WINDOW
+from v2.constants import COOP_YIELD, SWAP_WINDOW
 from v2.layer1.priority import Key, KeyedRequest
 from v2.lc_request import LCRequest
 from v2.snapshot import Snapshot
@@ -38,6 +38,8 @@ class RSU:
     @staticmethod
     def arbitrate(keyed: list[KeyedRequest], snap: Snapshot) -> list[Assignment]:
         """Phase B。鍵昇順（dist小から）に提供車を占有印つきで確保し、割当のリストを返す。"""
+        if COOP_YIELD <= 0:
+            return []  # 要素の除去: 提供車を割り当てない（要求車は自力挿入・スワップ・整列・保持のみ）
         request_key: dict[str, Key] = {req.veh_id: key for key, req in keyed}
         request_by_id: dict[str, LCRequest] = {req.veh_id: req for _, req in keyed}
         claimed: set[str] = set()
@@ -67,6 +69,8 @@ class RSU:
 
         障害物（停止車両）だけは除外する（gap を物理的に作れないため。優先度機構とは無関係）。
         """
+        if COOP_YIELD <= 0:
+            return []
         assignments: list[Assignment] = []
         for _, req in keyed:
             step = 1 if req.direction == CarAction.CHANGE_LEFT else -1

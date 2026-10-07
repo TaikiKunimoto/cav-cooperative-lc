@@ -25,11 +25,44 @@ else:
 from sumolib import checkBinary
 import traci
 
-from v2.constants import ACTIVATION_MARGIN
-from v2.environment import ENVIRONMENTS
-from v2.obstacle import Obstacle
-from v2.policy import Policy
-from v2.simulation import OUTPUT_DIR, V2Simulation
+import v2.constants as _constants
+
+
+def _apply_constant_overrides(argv: list[str]) -> dict[str, float]:
+    """``--set NAME=VALUE[,NAME=VALUE...]`` を v2.constants に適用する（要素の除去・感度分析用）。
+
+    他モジュールは ``from v2.constants import X`` で import 時に値を束縛するため、それらを import する前に呼ぶ。
+    constants.py 内で他の定数から導出される値（SWAP_WINDOW など）は再計算しないので、必要なら直接指定する。
+    """
+    overrides: dict[str, float] = {}
+    i = 0
+    while i < len(argv):
+        arg = argv[i]
+        spec: str | None = None
+        if arg == "--set" and i + 1 < len(argv):
+            spec = argv[i + 1]
+            i += 1
+        elif arg.startswith("--set="):
+            spec = arg[len("--set=") :]
+        if spec:
+            for item in spec.split(","):
+                name, sep, value = item.partition("=")
+                name = name.strip()
+                if not sep or name.startswith("_") or not name.isupper() or not hasattr(_constants, name):
+                    sys.exit(f"--set: 不明な定数 '{name}'（v2/constants.py の大文字名を NAME=VALUE で指定）")
+                overrides[name] = float(value)
+                setattr(_constants, name, float(value))
+        i += 1
+    return overrides
+
+
+CONSTANT_OVERRIDES = _apply_constant_overrides(sys.argv[1:])
+
+from v2.constants import ACTIVATION_MARGIN  # noqa: E402  上書き後に束縛する
+from v2.environment import ENVIRONMENTS  # noqa: E402
+from v2.obstacle import Obstacle  # noqa: E402
+from v2.policy import Policy  # noqa: E402
+from v2.simulation import OUTPUT_DIR, V2Simulation  # noqa: E402
 
 SIMULATION_TIME: float = 600.0  # シミュレーション時間[s]
 
@@ -63,6 +96,12 @@ def _get_options() -> tuple[optparse.Values, list[str]]:
         type="float",
         default=ACTIVATION_MARGIN,
         help=f"要求の活性化位置 [m]（締切Dの何m手前で活性化するか。既定 {ACTIVATION_MARGIN:.0f}。柱B-2の猶予距離比較用）",
+    )
+    parser.add_option(
+        "--set",
+        dest="set_spec",
+        default=None,
+        help="定数の上書き NAME=VALUE[,NAME=VALUE]（起動時に v2.constants へ適用済み。例 HOLD_MARGIN=0,COOP_YIELD=0）",
     )
     parser.add_option("--nogui", action="store_true", default=False, help="run the commandline version of sumo")
     return parser.parse_args()
@@ -100,6 +139,9 @@ if __name__ == "__main__":
     filename = _create_file_name(env.name, total_inflow, mlc_ratio, seed, policy)
     if options.activation_margin != ACTIVATION_MARGIN:
         filename += f"_am{int(options.activation_margin)}"
+    if CONSTANT_OVERRIDES:
+        filename += "_set-" + "-".join(f"{k}{v:g}" for k, v in CONSTANT_OVERRIDES.items())
+        print(f"[v2] constant overrides: {CONSTANT_OVERRIDES}")
     # track_deadline_achievement=True: 提案手法は締切達成率（必須LC完了率）を中核指標としてCSV出力する
     stats = SimulationStatistics(filename=filename, output_dir=OUTPUT_DIR, track_deadline_achievement=True)
 

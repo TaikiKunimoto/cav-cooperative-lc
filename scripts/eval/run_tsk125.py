@@ -55,7 +55,19 @@ class Grid:
     obstacle: str | None
     seeds: str
     note: str
+    # 提案から要素を抜いた変種 [(tag, --set の指定)]。指定時は policies は edf のみを想定し、method は v2-<tag>
+    variants: list[tuple[str, str]] | None = None
 
+
+# E4: 提案（edf）から 1 要素ずつ抜いた／1 パラメータだけ変えた変種。値は v2/constants.py の定数を --set で上書きする
+VARIANTS_E4: list[tuple[str, str]] = [
+    ("noyield", "COOP_YIELD=0"),  # 提供車の協調減速（Phase B の割当）を抜く
+    ("nohold", "HOLD_MARGIN=0"),  # 締切前の保持を抜く
+    ("noalign", "ALIGN_DELTA=0"),  # スロット整列を抜く（同速追従に戻す）
+    ("noswap", "SWAP_WINDOW=-1"),  # 対向スワップを抜く
+    ("r0", "R=0"),  # 多段 LC の実効距離補正を抜く
+    ("tc1", "TC=1.0"),  # 調停周期 0.1 → 1.0 s
+]
 
 EXPERIMENTS: dict[str, Grid] = {
     # 既定条件の 3 手法対比（完了余裕 CDF・速度・衝突の基準点。E2 の am=400 の参照点を兼ねる）
@@ -106,6 +118,19 @@ EXPERIMENTS: dict[str, Grid] = {
         seeds="1-3",
         note="複合（必須LC＋突発封鎖 lane1・120m・t=60s）",
     ),
+    # 要素の除去: 提案から 1 要素ずつ抜いた変種を既定条件（E0 と同じ Q3000・am400）で比較する
+    "E4": Grid(
+        name="E4",
+        envs=["weave", "weave2", "merge"],
+        qs=[3000],
+        fs=[0.4, 0.6],
+        policies=["edf"],
+        margins=[AM_DEFAULT],
+        obstacle=None,
+        seeds="1",
+        note="要素の除去（提案から 1 要素ずつ抜く）",
+        variants=VARIANTS_E4,
+    ),
 }
 
 
@@ -114,6 +139,7 @@ class TJob(rs.Job):
     """run_sweep.Job に活性化位置を足した探索用ジョブ。"""
 
     activation_margin: float = AM_DEFAULT
+    set_spec: str | None = None  # --set NAME=VALUE[,...]（要素の除去）
 
     @property
     def name(self) -> str:  # type: ignore[override]
@@ -126,6 +152,8 @@ class TJob(rs.Job):
         cmd = super().command()
         if self.activation_margin != AM_DEFAULT:
             cmd += ["--activation-margin", str(self.activation_margin)]
+        if self.set_spec:
+            cmd += ["--set", self.set_spec]
         return cmd
 
 
@@ -138,21 +166,26 @@ def build_jobs(grid: Grid, seeds_override: str | None) -> list[TJob]:
             for f in grid.fs:
                 for policy in grid.policies:
                     for am in grid.margins:
-                        for s in seeds:
-                            method = "v2" if policy == "edf" else f"v2-{policy}"
-                            jobs.append(
-                                TJob(
-                                    method=method,
-                                    scenario=scenario,
-                                    env=env,
-                                    q=q,
-                                    f=f,
-                                    seed=s,
-                                    obstacle=grid.obstacle,
-                                    policy=policy,
-                                    activation_margin=am,
+                        for variant in grid.variants or [None]:
+                            for s in seeds:
+                                if variant is not None:
+                                    method, set_spec = f"v2-{variant[0]}", variant[1]
+                                else:
+                                    method, set_spec = ("v2" if policy == "edf" else f"v2-{policy}"), None
+                                jobs.append(
+                                    TJob(
+                                        method=method,
+                                        scenario=scenario,
+                                        env=env,
+                                        q=q,
+                                        f=f,
+                                        seed=s,
+                                        obstacle=grid.obstacle,
+                                        policy=policy,
+                                        activation_margin=am,
+                                        set_spec=set_spec,
+                                    )
                                 )
-                            )
     return jobs
 
 

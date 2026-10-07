@@ -39,7 +39,7 @@ ENV_LABEL = {"weave": "Weave MD-1f\n(D≈197 m)", "weave2": "Weave MD-2\n(D≈39
 ENV_ORDER = ["merge", "weave", "weave2"]
 
 NAME_RE = re.compile(
-    r"^(?P<method>v2(?:-[a-z-]+)?)__(?P<scenario>[a-z0-9_]+)__Q(?P<q>\d+)__f(?P<f>[\d.]+)__s(?P<seed>\d+)"
+    r"^(?P<method>v2(?:-[a-z0-9-]+)?)__(?P<scenario>[a-z0-9_]+)__Q(?P<q>\d+)__f(?P<f>[\d.]+)__s(?P<seed>\d+)"
     r"(?:__obs(?P<obs>[\d.-]+))?(?:__am(?P<am>\d+))?$"
 )
 
