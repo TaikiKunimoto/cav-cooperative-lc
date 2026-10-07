@@ -196,3 +196,7 @@
 2026-10-07T11:12:51	ok	v2-tc1__merge__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env merge --nogui --set TC=1.0
 2026-10-07T11:20:29	timeout	v2-noalign__merge__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env merge --nogui --set ALIGN_DELTA=0
 2026-10-07T11:20:41	ok	v2-nohold__weave__Q3000__f0.6__s1__am100	uv run python -m v2 1 3000 0.6 --env weave --nogui --activation-margin 100.0 --set HOLD_MARGIN=0
+2026-10-07T11:39:01	timeout	v2-noalign__weave__Q3000__f0.6__s1__am100	uv run python -m v2 1 3000 0.6 --env weave --nogui --activation-margin 100.0 --set ALIGN_DELTA=0
+2026-10-07T11:50:41	timeout	v2-noswap__weave__Q3000__f0.6__s1__am100	uv run python -m v2 1 3000 0.6 --env weave --nogui --activation-margin 100.0 --set SWAP_WINDOW=-1
+2026-10-07T11:55:34	ok	v2-r0__weave__Q3000__f0.6__s1__am100	uv run python -m v2 1 3000 0.6 --env weave --nogui --activation-margin 100.0 --set R=0
+2026-10-07T12:02:04	ok	v2-tc1__weave__Q3000__f0.6__s1__am100	uv run python -m v2 1 3000 0.6 --env weave --nogui --activation-margin 100.0 --set TC=1.0

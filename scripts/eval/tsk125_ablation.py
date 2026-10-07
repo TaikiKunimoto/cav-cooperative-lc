@@ -147,11 +147,11 @@ def plot(df: pd.DataFrame, f: float, q: int, seed: int, out: Path) -> None:
                     txt = f"{v:.1f}" if col in ("avg_speed", "deadline_pct") else f"{v:.0f}"
                     ax.text(x, v, txt, ha="center", va="bottom", fontsize=7)
             for x, p in zip(xs, present, strict=True):
-                if p in de.index and str(de["status"].get(p)) == "timeout":
+                if p in de.index and str(de["status"].get(p)) in ("timeout", "failed"):
                     ax.text(
                         x,
                         0.04,
-                        "× gridlock",
+                        "× gridlock" if str(de["status"].get(p)) == "timeout" else "× error",
                         rotation=90,
                         transform=ax.get_xaxis_transform(),
                         ha="center",
@@ -235,6 +235,7 @@ def table(df: pd.DataFrame, fs: list[float], q: int, seed: int, out_csv: Path) -
                     "f": f,
                     "env": r["env"],
                     "variant": r["policy"],
+                    "status": r["status"],
                     "variant_ja": VARIANT_LABEL_JA.get(str(r["policy"]), r["policy"]),
                     "deadline_pct": round(float(r["deadline_pct"]), 2),
                     "mlc_incomplete": r["mlc_incomplete"],
@@ -274,7 +275,7 @@ def table(df: pd.DataFrame, fs: list[float], q: int, seed: int, out_csv: Path) -
                 else:
                     e = te.iloc[0]
                     if e["deadline_pct"] != e["deadline_pct"]:  # NaN ＝ 打ち切り
-                        cells.append("打ち切り（グリッドロック）")
+                        cells.append("打ち切り（実時間上限）" if e["status"] == "timeout" else "失敗（例外）")
                         continue
                     cells.append(
                         f"{e['deadline_pct']:.1f} / {int(e['collisions'])} / {e['avg_speed']:.1f} / "
@@ -289,9 +290,12 @@ def main() -> None:
     ap.add_argument("--q", type=int, default=3000)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--am", type=int, default=400, help="活性化位置 [m]（既定 400。E4b は 100）")
+    ap.add_argument("--envs", nargs="+", default=None, help="描く環境（既定 merge weave weave2。E4b は weave だけ）")
     args = ap.parse_args()
     global AM
     AM = args.am
+    if args.envs:
+        ENV_ORDER[:] = args.envs
     sfx = "" if AM == 400 else f"_am{AM}"
     df = tf.load_runs()
     for f in args.f:
