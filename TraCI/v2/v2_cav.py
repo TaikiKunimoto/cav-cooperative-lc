@@ -95,6 +95,9 @@ class V2CAV(BaseModel):
     speed_next: float | None = None  # 指令した次 step の速度
     # Layer1 調停の役割（毎Tc フル再構築）。提供車↔要求車の対応を保持する。
     providing_to_id: str | None = None  # 自分が gap を提供している相手（要求車）
+    yield_for: str | None = None  # いま譲っている要求車（譲りの継続時間の対象）
+    yield_time: float = 0.0  # 同じ要求車に譲り続けている時間 [s]（上限 YIELD_MAX_DURATION）
+    yield_cooldown_until: float = 0.0  # この時刻までは提供車に選ばれない
     receiving_from_id: str | None = None  # 自分に gap を提供してくれる相手（提供車）
     sim_time: float = 0.0
     departure_time: float | None = None

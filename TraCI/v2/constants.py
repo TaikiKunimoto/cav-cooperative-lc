@@ -32,6 +32,14 @@ ACTIVATION_MARGIN: float = 400.0  # [m] 早め固定活性化: 締切Dの何m手
 # 「Dからの距離マージン」で、分岐直前まで巡航→SUMOトポロジ（lane-drop）で急停止、を避ける挙動品質用（EDF鍵には載せない）。
 # 暫定100m（評価で確定）。停止距離 v_max²/(2|MAX_DECEL|)≈73m 以上かつ各環境の D 未満で機能する（現行 D: merge194/weave196/weave2392/diverge1000 はいずれも成立）。
 HOLD_MARGIN: float = 100.0  # [m]（暫定・評価で確定）
+# --- 提供車の譲り（必要なときだけ・有界に）。要求車の自力挿入が後続側の隙間不足で落ちたときだけ、
+# 挿入判定と同じ相対制動の必要量（Safety.net_required）が満たされるまで、減速だけで譲る ---
+YIELD_DELTA: float = 3.0  # [m/s] 要求車に対して下げる相対速度（譲りの目標 = 要求車速度 − YIELD_DELTA）
+YIELD_MIN_RATIO: float = 0.7  # 譲りの目標速度の下限（要求車速度に対する比）
+YIELD_DECEL: float = 2.0  # [m/s^2] 譲りの減速度上限（快適減速。安全側の追従は別に |MAX_DECEL| まで効く）
+YIELD_MIN_SPEED: float = 1.0  # [m/s] これ未満の要求車は停止扱い（減速で合わせず、通過か締切直前の停止で対応）
+YIELD_MAX_DURATION: float = 5.0  # [s] 同じ要求車に譲り続ける時間の上限（超えたら譲りをやめ次の後続に交代）
+YIELD_COOLDOWN: float = 5.0  # [s] 譲りをやめた提供車が再び提供車に選ばれない時間
 # 提供車の協調減速（Layer1 の提供車割当 → Layer2 の _provider_yield）を使うか。0 で Phase B の割当を行わず、
 # 要求車は自力挿入・対向スワップ・スロット整列・締切前保持だけで車線変更する（要素の除去による比較用。既定 1）。
 COOP_YIELD: float = 1.0
