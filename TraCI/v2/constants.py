@@ -14,6 +14,9 @@ MAX_ACCEL: float = 2.6  # [m/s^2] 最大加速度（vType accel と統一）
 MAX_DECEL: float = -5.0  # [m/s^2] 最大減速度（vType decel=5.0 と統一）
 MIN_GAP: float = 2.8  # [m] 最小車間距離（vType minGap と統一。提案は model_post_init で setMinGap）
 VEH_LENGTH: float = 5.0  # [m] 車長（vType length と統一）
+# SUMO の laneChangeMode 既定値（strategic/cooperative/speedGain/keepRight 有効・traci と衝突時は安全側）。
+# off-late が活性化窓進入で車線変更を解禁するときに戻す値（TraCI ドキュメントの default 0b011001010101）
+SUMO_DEFAULT_LC_MODE: int = 0b011001010101  # = 1621
 FRICTION_COEFFICIENT: float = 0.7  # 摩擦係数（制動距離計算用）
 TIME_STEP: float = 0.1  # [s] シミュレーション時間ステップ
 
@@ -26,6 +29,9 @@ ACTIVATION_MARGIN: float = 400.0  # [m] 早め固定活性化: 締切Dの何m手
 # 「Dからの距離マージン」で、分岐直前まで巡航→SUMOトポロジ（lane-drop）で急停止、を避ける挙動品質用（EDF鍵には載せない）。
 # 暫定100m（評価で確定）。停止距離 v_max²/(2|MAX_DECEL|)≈73m 以上かつ各環境の D 未満で機能する（現行 D: merge194/weave196/weave2392/diverge1000 はいずれも成立）。
 HOLD_MARGIN: float = 100.0  # [m]（暫定・評価で確定）
+# 提供車の協調減速（Layer1 の提供車割当 → Layer2 の _provider_yield）を使うか。0 で Phase B の割当を行わず、
+# 要求車は自力挿入・対向スワップ・スロット整列・締切前保持だけで車線変更する（要素の除去による比較用。既定 1）。
+COOP_YIELD: float = 1.0
 # 要求車のスロット整列（Layer2）: 目標車線の前方隣接車にブロックされている時に付ける相対速度差。
 # 同速追従（旧 _requester_match_target_speed）は横並びの重なりを固定してしまい、織込みで対向要求車と
 # 速度同調したまま lane-drop 終端に2台並んで到達→相互ブロックの永久デッドロックを生んだ。
