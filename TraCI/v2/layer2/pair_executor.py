@@ -8,22 +8,26 @@
        どちらも通常挿入が幾何学的に不可能。同一stepの相互 changeLane で原子的に交換する。
     2. 提供車の譲り … 後続側の隙間不足で入れなかった要求にだけ、Phase B の割当提供車が挿入判定と同じ必要量まで
        減速だけで（有界に）下がる。要求車が停止していれば通過して後方を空けるか、締切直前に限り停止して守る。
-    3. 要求車のスロット整列 … 前方隣接車にブロックされていれば「前方 − ALIGN_DELTA」まで下げて
-       相対的に後ろへずれ、後方だけ未充足なら前方余地の範囲でわずかに前へ出る。旧実装の
-       「前方と同速に合わせる」は重なりを固定し、lane-drop 終端に並んで到達→相互ブロックの
-       永久デッドロック（織込み環境のグリッドロック起点）を生んでいた。
+    3. 要求車のスロット整列 … 前方の隙間が足りなければ前方隣接車より ALIGN_DELTA 遅く走って後ろへずれ、
+       後方だけ足りなければ前方余地の範囲で ALIGN_DELTA 速く走って前へずれる（提供車の譲りと対称）。
+       「前方と同速に合わせる」は横並びを固定し（lane-drop 終端に並んで到達→相互ブロック）、整列しないと
+       進入時に横並びになった車が最後まで入れない。
+    4. 締切前の保持 … 締切 D までの実距離が HOLD_MARGIN 以下の要求車に「D で止まれる速度」を上限として与える。
 
 速度は ``V2CAV.propose`` の候補として出し、``V2CAV.apply_speed_command`` が追従の候補と合わせて毎 step 1 回だけ指令する
 （最も遅い候補が勝つ。前車が近いときは追従の最大減速が、譲り・整列・保持より優先される）。
 """
 
 from dataclasses import dataclass
+import math
 import os
 import sys
 
 from utils.traci_wrapper import get_lane_max_speed, get_veh_neighbors, get_veh_speed
 from v2.constants import (
+    ALIGN_DECEL,
     ALIGN_DELTA,
+    HOLD_DECEL,
     HOLD_MARGIN,
     MAX_DECEL,
     MIN_GAP,
@@ -38,7 +42,6 @@ from v2.constants import (
     YIELD_MIN_RATIO,
     YIELD_MIN_SPEED,
 )
-from v2.layer1.priority import EDF
 from v2.layer1.rsu import Assignment
 from v2.layer2.safety import Safety
 from v2.lc_request import LCRequest
@@ -111,15 +114,15 @@ class Layer2:
             requester = by_id[req.veh_id]
             provider_id = provider_of.get(req.veh_id)
             provider = by_id.get(provider_id) if provider_id is not None else None
-            if provider is not None and not checks[req.veh_id].rear_ok:
+            check = checks[req.veh_id]
+            if provider is not None and not check.rear_ok:
                 # 必要なときだけ譲る: 後続側の隙間不足で入れなかった要求にだけ提供車が下がる
                 Layer2._provider_yield(provider, requester, req, snap.sim_time)
-            if EDF.effective_distance(req) <= HOLD_MARGIN:
-                # 締切間近でなお挿入不可: D手前で滑らかに停止し行き止まり(lane-drop)の急停止を防ぐ（F5・最終手段）
+            # 目標レーンのスロットに自分を縦方向で整列させ、挿入成功率を上げる
+            Layer2._requester_align_to_slot(requester, req, check)
+            if req.deadline_pos - req.current_pos <= HOLD_MARGIN:
+                # 締切間近でなお挿入不可: D で止まれる速度を上限にして lane-drop 端の急停止を防ぐ（整列は続ける）
                 Layer2._hold_before_deadline(requester, req)
-            else:
-                # それ以前: 目標レーンのスロットに自分を縦方向で整列させ、挿入成功率を上げる
-                Layer2._requester_align_to_slot(requester, req, req_by_id)
         return lc_count
 
     @staticmethod
@@ -344,76 +347,46 @@ class Layer2:
 
     @staticmethod
     def _hold_before_deadline(requester: V2CAV, req: LCRequest) -> None:
-        """挿入できず提供車も無い要求車を、締切位置 D の手前で滑らかに減速・保持する（要求車自身の committed-wait, F5）。
+        """挿入できていない要求車に、締切位置 D で HOLD_DECEL の減速で止まれる速度 √(2·HOLD_DECEL·残距離) を上限として与える。
 
-        分岐直前まで巡航して SUMO トポロジー（teleport無効の lane-drop）で急停止するのを避ける挙動品質。EDF の鍵
-        には載せない。D で停止する減速を MAX_DECEL 上限で slowDown する（dist ≤ HOLD_MARGIN の判定は呼び出し側）。
-        候補として出すので、前車が近いときは追従の候補（最大減速）が調停で勝ち、hold が緊急減速を上書きすることは無い。
+        分岐直前まで巡航して SUMO トポロジー（teleport 無効の lane-drop）で急停止するのを避ける挙動品質（F5）。
+        旧実装の「D で停止する減速で目標 0 を指令」は、100 m 手前から全車が止まる計画で減速して流れを落とし、
+        減速した要求車と後続の速度差が開いて後続側の必要車間が広がる（かえって入れなくなる）副作用があった。
+        上限なので、整列・挿入はそのまま続く。候補として出すので前車が近ければ追従の最大減速が勝つ。
         """
-        if requester.speed <= 0:
-            return
         remaining = req.deadline_pos - req.current_pos  # D までの残距離（要求は road==mainlane の同一フレームで生成）
         if remaining <= 0:
             return  # 既に D を越えていれば SUMO トポロジーに任せる
-        needed_decel = (requester.speed**2) / (2 * remaining)  # D で停止するのに要する減速
-        decel = min(needed_decel, abs(MAX_DECEL))  # 物理上限内で滑らかに（超過時は最大減速で best-effort）
-        requester.propose("hold", 0.0, decel)
+        v_hold = math.sqrt(2 * HOLD_DECEL * remaining)
+        requester.propose("hold", v_hold, abs(MAX_DECEL))
 
     @staticmethod
-    def _is_opposing(req: LCRequest, other: LCRequest | None) -> bool:
-        """相手が「自分の現在レーンを次の1段の目標とする対向要求車」か（ロックステップ・デッドロックの相手方）。"""
-        return other is not None and Safety.next_lane(other) == req.current_lane
-
-    @staticmethod
-    def _requester_align_to_slot(requester: V2CAV, req: LCRequest, req_by_id: dict[str, LCRequest]) -> None:
+    def _requester_align_to_slot(requester: V2CAV, req: LCRequest, check: InsertionCheck) -> None:
         """要求車自身を目標レーンのスロットに縦方向で整列させる（合流のための自己速度調整）。
 
-        隣接ブロッカーの種別で挙動を分ける::
+        自力挿入の判定でどちら側が足りなかったかで挙動を分ける::
 
-            前方ブロッカーが対向要求車 … 「前方 − ALIGN_DELTA」まで減速して相対的に後ろへずれる。
-                同速追従では対向要求車と重なったまま速度同調し、lane-drop 終端に並んで到達して
-                相互ブロックする（織込みデッドロックの起点）。積極的に縦位置をずらして解消する。
-            後方ブロッカーが対向要求車 … 前方余地・制限速度の範囲でわずかに増速して前へずれる
-                （前方へずれる側と減速側で対称に離れ、SWAP_WINDOW 外へ出れば通常挿入が可能になる）。
-            通常の交通流にブロックされている … 目標レーン先行の流速に自分を合わせ、速度差を縮めて
-                挿入成功率を上げる（従来挙動）。流れ相手に相対後退しても次の車が隙間を埋めるだけで
-                後退が止まらなくなるため、フォールバックは対向要求車限定とする。
+            前方が足りない … 足りない前方隣接車（対向要求車か通常の流れかを問わない）のうち最も遅いものより
+                ALIGN_DELTA 遅く走って相対的に後ろへずれる。同速で並走すると横並びが固定され、進入時に横並びに
+                なった車は最後まで入れない（lane-drop 終端に並んで到達→相互ブロック）。
+            後方だけ足りない … 前方余地と制限速度の範囲で ALIGN_DELTA 速く走って前へずれる（提供車の譲りと対称。
+                後続より速くなれば相対制動の必要量も縮む）。
 
-        候補として出すので、own leader が近いときは追従の候補（最大減速）が調停で勝つ（緊急減速を上書きしない）。
+        減速度は ALIGN_DECEL 以下（快適減速）。候補として出すので own leader が近ければ追従の最大減速が勝つ。
         """
         if requester.speed <= 0:
             return
-        a = abs(MAX_DECEL)
         going_right = Safety.next_lane(req) < req.current_lane
         lat = 1 if going_right else 0
-        front_speed: float | None = None
-        front_opposing_speed: float | None = None
-        for nid, dist in get_veh_neighbors(requester.id, lat | 2):  # 目標レーンの先行（bit2=1）
-            speed = get_veh_speed(nid)
-            front_speed = speed if front_speed is None else min(front_speed, speed)
-            # dist は minGap 控除済み（_insertion_safe_live と同じ相対制動モデルの閾値）
-            if dist < Safety.net_required(requester.speed, speed) and Layer2._is_opposing(req, req_by_id.get(nid)):
-                front_opposing_speed = speed if front_opposing_speed is None else min(front_opposing_speed, speed)
-        if front_opposing_speed is not None:
-            # 前方の対向要求車から相対的に下がって重なりを解消する
-            target = max(front_opposing_speed - ALIGN_DELTA, 0.0)
-            if requester.speed > target:
-                requester.propose("align", target, a)
+        fronts = [(nid, dist, get_veh_speed(nid)) for nid, dist in get_veh_neighbors(requester.id, lat | 2)]
+        if not check.front_ok:
+            blocking = [v for _, dist, v in fronts if dist < Safety.net_required(requester.speed, v)]
+            if blocking:
+                requester.propose("align", max(min(blocking) - ALIGN_DELTA, 0.0), ALIGN_DECEL)
             return
-        rear_opposing = False
-        for nid, dist in get_veh_neighbors(requester.id, lat):  # 目標レーンの後続（bit2=0）
-            speed = get_veh_speed(nid)
-            if dist < Safety.net_required(speed, requester.speed) and Layer2._is_opposing(req, req_by_id.get(nid)):
-                rear_opposing = True
-        if rear_opposing and requester.lane_id is not None:
-            # 後方の対向要求車から前へずれて重なりを解消する（減速側と対称）。前方車には近づきすぎない
+        if not check.rear_ok and requester.lane_id is not None:
             target = min(requester.speed + ALIGN_DELTA, get_lane_max_speed(requester.lane_id))
-            if front_speed is not None:
-                target = min(target, front_speed + ALIGN_DELTA)
-            if target - requester.speed > 0.1:
-                requester.propose("align", target, a)  # 加速側: 追従の候補が上限になる
-            return
-        # 通常の交通流にブロックされている: 目標レーン先行の流速へ合わせる（従来の自己減速）
-        if front_speed is None or requester.speed <= front_speed:
-            return
-        requester.propose("align", max(front_speed, 0.0), a)
+            if fronts:
+                target = min(target, min(v for _, _, v in fronts) + ALIGN_DELTA)
+            if target > requester.speed:
+                requester.propose("align", target, ALIGN_DECEL)
