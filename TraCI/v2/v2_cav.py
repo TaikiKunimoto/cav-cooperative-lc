@@ -31,10 +31,12 @@ from utils.traci_wrapper import (
 )
 from v2.constants import (
     ACTIVATION_MARGIN,
+    EMERGENCY_DECEL,
     MAX_ACCEL,
     MAX_DECEL,
     MIN_GAP,
     SUMO_DEFAULT_LC_MODE,
+    TIME_STEP,
 )
 from v2.layer2.safety import Safety
 from v2.lc_request import LCOperation, LCRequest
@@ -339,10 +341,17 @@ class V2CAV(BaseModel):
         if self.is_obstacle:
             traci.vehicle.setSpeed(self.id, 0.0)  # 障害物は停止し続ける
             return
-        if self.leader_distance is not None and self.leader_distance < MIN_GAP:
-            if self.leader_speed is not None:
-                self._emergency_brake(self.leader_speed)
-            return
+        if self.leader_distance is not None and self.leader_speed is not None and self.speed > self.leader_speed:
+            # 緊急制動（最後の砦）: 前車速度へ揃える前にバンパー間が minGap を割る（控除済み距離 leader_distance が
+            # 0 を切る）とき、最大減速 |MAX_DECEL| で足りなければ EMERGENCY_DECEL までの減速を許す。
+            # 旧実装は「控除済み距離 < minGap（＝バンパー間 < 2·minGap）」で setSpeed(≤1 m/s) を瞬時に適用しており、
+            # 低速の車列で毎 step 発動して 1 step に数 m/s の速度の飛びを量産していた。
+            speed_diff = self.speed - self.leader_speed
+            room = self.leader_distance - speed_diff * TIME_STEP  # 1 step 後の控除済み距離
+            needed = speed_diff**2 / (2 * room) if room > 0 else math.inf
+            if needed > abs(MAX_DECEL):
+                self._emergency_brake(self.leader_speed, min(needed, EMERGENCY_DECEL))
+                return
 
         # 臨界制動バンド: 相対制動（最大減速で前車に追突しない）に必要な距離を割り込んだら、
         # 「前車速度 − 1 を追いかける」通常追従をやめ、最大減速で前車速度へ合わせにいく。通常追従は
@@ -391,10 +400,11 @@ class V2CAV(BaseModel):
         elif not self.do_not_speed_up:
             slow_down(self.id, speed_limit, self._safe_accel_duration(speed_limit - self.speed))
 
-    def _emergency_brake(self, target_speed: float) -> None:
-        """衝突回避の緊急減速。"""
+    def _emergency_brake(self, target_speed: float, decel: float) -> None:
+        """衝突回避の緊急減速: 次 step の速度を「最大 decel で落とした値（前車速度を下回らない）」に固定する。"""
         self.emergency_brake_counter += 1
-        traci.vehicle.setSpeed(self.id, min(target_speed, self.speed, 1.0))
+        next_speed = max(target_speed, self.speed - decel * TIME_STEP, 0.0)
+        traci.vehicle.setSpeed(self.id, next_speed)
 
     # --- 計算ヘルパ ---
     def _calculate_safety_gap(self) -> None:

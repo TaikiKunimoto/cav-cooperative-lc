@@ -93,6 +93,7 @@ class V2Simulation(BaseModel):
     canceled_vehicles: list[str] = Field(default_factory=list)
     collision_history: list[CollisionEvent] = Field(default_factory=list)
     collided_ids: set[str] = Field(default_factory=set)  # 衝突に一度でも関与した車両ID（達成率の未達成判定に使う）
+    emergency_brake_total: int = 0  # 緊急制動（|MAX_DECEL| 超の減速）の発動回数の合計（退出車＋終了時の残車）
     # 各車線の待ち行列（流入レーン選択の負荷分散に使う）。レーンは環境により可変なので動的に作る
     lane_queues: dict[str, list[str]] = Field(default_factory=dict)
 
@@ -155,6 +156,7 @@ class V2Simulation(BaseModel):
                         # （canceled として計上済みのまま確定する）
                         continue
                     self.exit_vehicles.append(vid)
+                    self.emergency_brake_total += veh.emergency_brake_counter
                     veh.record_arrival_time()
                     veh.accumulate_exit_stats(stats, vid in self.collided_ids)
                     mandatory_failures += veh.mandatory_failure_rows(self.env.name, vid in self.collided_ids, "exit")
@@ -251,6 +253,7 @@ class V2Simulation(BaseModel):
             if veh.id not in running_list:
                 continue
             stats.calculate_vehicle_average_speed("", veh.speed_history)
+            self.emergency_brake_total += veh.emergency_brake_counter
             veh.record_deadline_outcome(stats, veh.id in self.collided_ids)
             mandatory_failures += veh.mandatory_failure_rows(self.env.name, veh.id in self.collided_ids, "end")
             mandatory_requests += veh.mandatory_request_rows(self.env.name, veh.id in self.collided_ids, "end")
@@ -267,6 +270,7 @@ class V2Simulation(BaseModel):
         print(f"Phase A: Tc rounds with key ties (should be 0): {tie_events}")
         print(f"Phase B: Tc rounds with double-assigned providers (should be 0): {double_assign_events}")
         print(f"Layer2: total instant lane changes executed: {total_lc}")
+        print(f"Speed: emergency brake events (decel above |MAX_DECEL|): {self.emergency_brake_total}")
         requested, completed, rate = stats.deadline_summary()
         rate_str = f"{rate:.3f}" if rate is not None else "-"
         print(f"Deadline: mandatory-LC completed/requested = {completed}/{requested} (rate {rate_str})")

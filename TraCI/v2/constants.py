@@ -12,6 +12,9 @@ MAX_SPEED: float = 27  # [m/s] 最高速度
 # IDM 現実レンジ（Treiber&Kesting 0.8–2.5）に基づく文献値（旧 10.0 は物理限界超の非現実値）。評価で 2.0/2.6/3.0 を感度分析。
 MAX_ACCEL: float = 2.6  # [m/s^2] 最大加速度（vType accel と統一）
 MAX_DECEL: float = -5.0  # [m/s^2] 最大減速度（vType decel=5.0 と統一）
+# 緊急制動の上限減速度。最大減速 |MAX_DECEL| では前車速度へ揃える前にバンパー間が minGap を割るときだけ、
+# ここまでの減速を許す（SUMO vType の emergencyDecel 既定値と同じ）。発動回数は結果に出力する。
+EMERGENCY_DECEL: float = 9.0  # [m/s^2]
 MIN_GAP: float = 2.8  # [m] 最小車間距離（vType minGap と統一。提案は model_post_init で setMinGap）
 VEH_LENGTH: float = 5.0  # [m] 車長（vType length と統一）
 # SUMO の laneChangeMode 既定値（strategic/cooperative/speedGain/keepRight 有効・traci と衝突時は安全側）。
