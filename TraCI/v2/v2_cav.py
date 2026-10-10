@@ -3,7 +3,7 @@
 ``cav.base_cav`` / ``cav.custom_cav`` からは継承・import しない。縦方向追従（control_speed）と状態観測、
 Layer2 の自車挙動・必須LC活性化・障害物化を持つ。Layer1 調停は ``rsu`` が外側で行う。
 データ（状態）と振る舞いを1つの pydantic BaseModel にまとめる（``V2Simulation`` と同じ流儀）。
-縦方向の追従ロジックは ``custom_cav`` の挙動を踏襲した自己完結実装。
+縦方向の追従は相対制動の自前実装（speedMode 0）。速度指令は候補として積み、``apply_speed_command`` が毎 step 1 回だけ出す。
 """
 
 import math
@@ -27,11 +27,12 @@ from utils.traci_wrapper import (
     get_veh_route_id,
     get_veh_speed,
     get_veh_type,
-    slow_down,
 )
 from v2.constants import (
     ACTIVATION_MARGIN,
     EMERGENCY_DECEL,
+    FOLLOW_GAIN,
+    FOLLOW_MIN_DECEL,
     MAX_ACCEL,
     MAX_DECEL,
     MIN_GAP,
@@ -40,6 +41,7 @@ from v2.constants import (
 )
 from v2.layer2.safety import Safety
 from v2.lc_request import LCOperation, LCRequest
+from v2.speed import SpeedArbiter, SpeedCandidate
 
 if TYPE_CHECKING:
     from simulationStatistics.simulation_statistics import SimulationStatistics
@@ -85,9 +87,12 @@ class V2CAV(BaseModel):
     leader_distance: float | None = None
     leader_speed: float | None = None
     length: float = 5.0
-    safety_gap: float = MIN_GAP
     status: CarStatus = CarStatus.NORMAL
-    do_not_speed_up: bool = False
+    # この step の速度候補（追従 control_speed と Layer2 が積み、apply_speed_command が 1 つに決めて消費する）
+    speed_candidates: list[SpeedCandidate] = Field(default_factory=list)
+    speed_rule: str | None = None  # 直近 step に採用した規則名（由来ログ・集計用）
+    speed_target: float | None = None  # 採用候補の目標速度
+    speed_next: float | None = None  # 指令した次 step の速度
     # Layer1 調停の役割（毎Tc フル再構築）。提供車↔要求車の対応を保持する。
     providing_to_id: str | None = None  # 自分が gap を提供している相手（要求車）
     receiving_from_id: str | None = None  # 自分に gap を提供してくれる相手（提供車）
@@ -333,100 +338,78 @@ class V2CAV(BaseModel):
         self.leader = get_veh_leader(self.id, 0)
         self.leader_distance = self.leader[1] if self.leader is not None else None
         self.leader_speed = get_veh_speed(self.leader[0]) if self.leader is not None else None
-        self._calculate_safety_gap()
+        self.speed_candidates.clear()
 
-    # --- 縦方向制御（car-following）---
+    # --- 縦方向制御（car-following）: 候補を出すだけ。指令は apply_speed_command が 1 回だけ出す ---
+    def propose(self, rule: str, target: float, decel: float, accel: float = MAX_ACCEL) -> None:
+        """この step の速度候補を 1 つ足す（規則名・目標速度・そこへ向かうときに許す減速度／加速度）。"""
+        self.speed_candidates.append(SpeedCandidate(rule=rule, target=target, decel=decel, accel=accel))
+
     def control_speed(self) -> None:
-        """前方車両との車間に応じた速度制御。SUMO の安全制御は無効化済みのため自前で行う。"""
+        """前方車両との車間に応じた追従の候補（緊急・臨界・追従・制限速度）を出す。SUMO の安全制御は無効化済み。
+
+        安全車間は挿入判定と同じ相対制動 ``Safety.net_required(自車速, 前車速) + MIN_GAP``（``leader_distance`` は
+        minGap 控除済みギャップ）。車間がその内側なら目標は前車速度（前車より遅ければ今の速度を保ち、車間が開くのを
+        待つ）、外側なら余剰車間に比例して詰める（FOLLOW_GAIN）。役割（YIELDING / LANE_CHANGING）による加速禁止は
+        無い: 譲り・整列・保持が要るときは Layer2 が候補を足し、調停で最も遅い候補が勝つ。
+        """
         if self.is_obstacle:
-            traci.vehicle.setSpeed(self.id, 0.0)  # 障害物は停止し続ける
+            traci.vehicle.setSpeed(self.id, 0.0)  # 障害物は停止し続ける（速度調停の対象外）
             return
-        if self.leader_distance is not None and self.leader_speed is not None and self.speed > self.leader_speed:
-            # 緊急制動（最後の砦）: 前車速度へ揃える前にバンパー間が minGap を割る（控除済み距離 leader_distance が
-            # 0 を切る）とき、最大減速 |MAX_DECEL| で足りなければ EMERGENCY_DECEL までの減速を許す。
-            # 旧実装は「控除済み距離 < minGap（＝バンパー間 < 2·minGap）」で setSpeed(≤1 m/s) を瞬時に適用しており、
-            # 低速の車列で毎 step 発動して 1 step に数 m/s の速度の飛びを量産していた。
-            speed_diff = self.speed - self.leader_speed
-            room = self.leader_distance - speed_diff * TIME_STEP  # 1 step 後の控除済み距離
-            needed = speed_diff**2 / (2 * room) if room > 0 else math.inf
-            if needed > abs(MAX_DECEL):
-                self._emergency_brake(self.leader_speed, min(needed, EMERGENCY_DECEL))
-                return
-
-        # 臨界制動バンド: 相対制動（最大減速で前車に追突しない）に必要な距離を割り込んだら、
-        # 「前車速度 − 1 を追いかける」通常追従をやめ、最大減速で前車速度へ合わせにいく。通常追従は
-        # 前車が強く減速し続けると 1〜2step 分の追跡遅れで車間を食い込み、rear-end グレーズ
-        # （gap −0.0〜−1m の接触）になる。目標を 0 でなく前車速度にするのが重要: 全停止プロファイルは
-        # 行列末尾への接近で過剰な早期停止（standoff）となり、衝撃波を増幅して織込み環境の流入を
-        # 崩壊させる。余裕は固定 1m ＋ 離散制御ラグ分（自車速度×0.2s）。
-        if self.leader_distance is not None and self.leader_speed is not None and self.speed > self.leader_speed:
-            speed_diff = self.speed - self.leader_speed
-            braking_needed = (self.speed**2 - self.leader_speed**2) / (2 * abs(MAX_DECEL)) + 1.0 + 0.2 * self.speed
-            if self.leader_distance < braking_needed:
-                slow_down(self.id, self.leader_speed, speed_diff / abs(MAX_DECEL))
-                return
-
-        # 協調・車線変更中は加速しない
-        self.do_not_speed_up = self.status in (CarStatus.YIELDING, CarStatus.LANE_CHANGING)
-
         if self.lane_id is None:
             return
         speed_limit = get_lane_max_speed(self.lane_id)
-
+        self.propose("limit", speed_limit, abs(MAX_DECEL))
         if self.leader is None or self.leader_speed is None or self.leader_distance is None:
-            self._control_speed_by_speed_limit(speed_limit)
             return
-
-        speed_diff = self.speed - self.leader_speed
-        min_duration = self._safe_decel_duration(speed_diff)
-        ttc = self._ttc(self.leader_distance, speed_diff)
-
-        if self.leader_distance >= self.safety_gap:
-            if speed_diff <= 0 or min_duration < ttc:
-                self._control_speed_by_speed_limit(speed_limit)
-            else:
-                slow_down(self.id, self.leader_speed, min(ttc, min_duration))
-        else:
-            if self.do_not_speed_up:
+        gap, v, v_lead = self.leader_distance, self.speed, self.leader_speed
+        speed_diff = v - v_lead
+        if speed_diff > 0:
+            # 緊急制動（最後の砦）: 前車速度へ揃える前にバンパー間が minGap を割る（控除済み距離が 0 を切る）とき、
+            # 最大減速 |MAX_DECEL| で足りなければ EMERGENCY_DECEL までの減速を許す。発動回数は結果に出力する。
+            room = gap - speed_diff * TIME_STEP  # 1 step 後の控除済み距離
+            needed = speed_diff**2 / (2 * room) if room > 0 else math.inf
+            if needed > abs(MAX_DECEL):
+                self.emergency_brake_counter += 1
+                self.propose(SpeedArbiter.EMERGENCY, v_lead, min(needed, EMERGENCY_DECEL))
                 return
-            if speed_diff >= 0:
-                target_speed = self.leader_speed - 1 if self.leader_speed > 1 else 0.0
-                slow_down(self.id, target_speed, min(ttc, min_duration))
+            # 臨界制動バンド: 相対制動に必要な距離（＋固定 1 m ＋ 離散制御ラグ 0.2 s 分）を割り込んだら最大減速で前車速度へ
+            braking_needed = (v**2 - v_lead**2) / (2 * abs(MAX_DECEL)) + 1.0 + 0.2 * v
+            if gap < braking_needed:
+                self.propose("critical", v_lead, abs(MAX_DECEL))
+                return
+        safety_gap = Safety.net_required(v, v_lead) + MIN_GAP
+        if gap < safety_gap:
+            if speed_diff > 0:
+                self.propose("follow", v_lead, self._relative_decel(speed_diff, gap))
+            else:
+                self.propose("follow", v, abs(MAX_DECEL))  # 前車より遅い: 加速せず車間が開くのを待つ
+            return
+        target = min(speed_limit, v_lead + FOLLOW_GAIN * (gap - safety_gap))
+        self.propose("follow", target, abs(MAX_DECEL))
 
-    def _control_speed_by_speed_limit(self, speed_limit: float) -> None:
-        """制限速度に合わせて加減速する。"""
-        if self.speed > speed_limit:
-            slow_down(self.id, speed_limit, self._safe_decel_duration(self.speed - speed_limit))
-        elif not self.do_not_speed_up:
-            slow_down(self.id, speed_limit, self._safe_accel_duration(speed_limit - self.speed))
+    def apply_speed_command(self) -> str:
+        """この step の候補から次 step の速度を 1 つ決めて setSpeed し、採用した規則名を返す（候補は消費する）。
 
-    def _emergency_brake(self, target_speed: float, decel: float) -> None:
-        """衝突回避の緊急減速: 次 step の速度を「最大 decel で落とした値（前車速度を下回らない）」に固定する。"""
-        self.emergency_brake_counter += 1
-        next_speed = max(target_speed, self.speed - decel * TIME_STEP, 0.0)
+        障害物は control_speed で停止固定済み。候補が無い（走行レーン未確定など）ときは指令を出さない。
+        """
+        if self.is_obstacle:
+            self.speed_candidates.clear()
+            return "obstacle"
+        if not self.speed_candidates:
+            self.speed_rule = None
+            return "none"
+        next_speed, chosen = SpeedArbiter.choose(self.speed, self.speed_candidates)
         traci.vehicle.setSpeed(self.id, next_speed)
+        self.speed_rule, self.speed_target, self.speed_next = chosen.rule, chosen.target, next_speed
+        self.speed_candidates.clear()
+        return chosen.rule
 
     # --- 計算ヘルパ ---
-    def _calculate_safety_gap(self) -> None:
-        """追従の安全車間 ＝ 挿入と同一の安全ギャップ G_req（空走 v×δ + 制動距離 + minGap）。
-
-        旧実装は空走項に人間の反応時間 REACTION_TIME(0.75s) を使い、挿入側 ``Safety.g_req``（δ系）と
-        二系統に分裂していた。追従側も δ（通信遅延 DELAY）に統一し、安全車間の定義を1本化する
-        （δ=0 の理想通信では空走項ゼロ。計画 T4「REACTION_TIME 依存を除去」の達成）。
-        """
-        self.safety_gap = Safety.g_req(self.speed)
-
     @staticmethod
-    def _safe_decel_duration(speed_diff: float) -> float:
-        """最大減速で速度差を0にするのに要する時間。"""
-        return speed_diff / abs(MAX_DECEL) if speed_diff > 0 else 0.0
-
-    @staticmethod
-    def _safe_accel_duration(speed_diff: float) -> float:
-        """最大加速で速度差を0にするのに要する時間。"""
-        return speed_diff / abs(MAX_ACCEL) if speed_diff > 0 else 0.0
-
-    @staticmethod
-    def _ttc(distance: float, speed_diff: float) -> float:
-        """現在の速度差で進んだ際の衝突までの時間（TTC）。"""
-        return distance / speed_diff if speed_diff > 0 else math.inf
+    def _relative_decel(speed_diff: float, net_gap: float) -> float:
+        """前車速度へ揃える減速度: 控除済み車間が MIN_GAP に達する時点で速度差が 0 になる値を
+        FOLLOW_MIN_DECEL〜|MAX_DECEL| にクランプする。余地が無ければ最大減速。"""
+        room = net_gap - MIN_GAP
+        needed = speed_diff**2 / (2 * room) if room > 0 else abs(MAX_DECEL)
+        return min(max(needed, FOLLOW_MIN_DECEL), abs(MAX_DECEL))

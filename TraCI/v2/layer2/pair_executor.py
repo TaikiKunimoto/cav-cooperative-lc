@@ -12,20 +12,18 @@
        「前方と同速に合わせる」は重なりを固定し、lane-drop 終端に並んで到達→相互ブロックの
        永久デッドロック（織込み環境のグリッドロック起点）を生んでいた。
 
-本処理は control_speed の後に呼び、協調減速の slowDown と changeLane が最後の指令になるようにする。
+速度は ``V2CAV.propose`` の候補として出し、``V2CAV.apply_speed_command`` が追従の候補と合わせて毎 step 1 回だけ指令する
+（最も遅い候補が勝つ。前車が近いときは追従の最大減速が、譲り・整列・保持より優先される）。
 """
 
 import math
 import os
 import sys
 
-from utils.traci_wrapper import get_lane_max_speed, get_veh_neighbors, get_veh_speed, slow_down
+from utils.traci_wrapper import get_lane_max_speed, get_veh_neighbors, get_veh_speed
 from v2.constants import (
     ALIGN_DELTA,
     HOLD_MARGIN,
-    LC_REACTION_LAG,
-    LC_SAFETY_MARGIN,
-    MAX_ACCEL,
     MAX_DECEL,
     MAX_SPEED,
     MIN_GAP,
@@ -132,26 +130,12 @@ class Layer2:
         """
         lat = 1 if going_right else 0  # bit1: 左=0 / 右=1
         for nid, dist in get_veh_neighbors(veh_id, lat):  # 後続（bit2=0）: ego が止まっても後続が止まれる車間
-            if dist < Layer2._net_required(get_veh_speed(nid), ego_speed):
+            if dist < Safety.net_required(get_veh_speed(nid), ego_speed):
                 return False
         for nid, dist in get_veh_neighbors(veh_id, lat | 2):  # 先行（bit2=1）: ego が先行へ追突しない車間
-            if dist < Layer2._net_required(ego_speed, get_veh_speed(nid)):
+            if dist < Safety.net_required(ego_speed, get_veh_speed(nid)):
                 return False
         return True
-
-    @staticmethod
-    def _net_required(v_back: float, v_front: float) -> float:
-        """minGap 控除済みギャップに対する必要量 ＝ 相対制動項 ＋ 追跡遅れ ＋ 1step進化バッファ。
-
-        後続 v_back が前方 v_front へ最大減速で追突しない車間の minGap 超過分。相対制動モデルは
-        「後続の即時最大減速」を仮定するが、実際の追従制御は前車速度を 0.1s 刻みで追いかけるため、
-        挿入直後に前車（挿入した要求車）が減速し始めると数step 分のラグで食い込む。その分を
-        ``v_back × LC_REACTION_LAG`` として足す（rear-end グレーズの防止。停止・微速域では ~0 なので
-        詰まった車列への挿入可能性は保たれる）。判定と changeLane 反映の1stepズレに対する
-        ``LC_SAFETY_MARGIN`` も足す（境界挿入の側面衝突防止）。
-        """
-        braking = max(0.0, (v_back**2 - v_front**2) / (2 * abs(MAX_DECEL)))
-        return braking + v_back * LC_REACTION_LAG + LC_SAFETY_MARGIN
 
     # --- 対向スワップ（織込みデッドロックの解消）---
 
@@ -194,7 +178,9 @@ class Layer2:
                     Layer2._swap_gap_ok(snap, a_next, a.current_pos, a_obs.speed, ignore_id=b.veh_id)
                     and Layer2._swap_gap_ok(snap, a.current_lane, b.current_pos, b_obs.speed, ignore_id=a.veh_id)
                     and Layer2._swap_live_gap_ok(a.veh_id, a_obs.speed, a_next < a.current_lane, b.veh_id, at_wall)
-                    and Layer2._swap_live_gap_ok(b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id, at_wall)
+                    and Layer2._swap_live_gap_ok(
+                        b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id, at_wall
+                    )
                 ):
                     continue
                 traci.vehicle.changeLane(a.veh_id, a_next, 0)
@@ -234,7 +220,7 @@ class Layer2:
             if nid == partner_id:
                 continue
             v_n = get_veh_speed(nid)
-            required = Layer2._net_required(v_n, ego_speed)
+            required = Safety.net_required(v_n, ego_speed)
             if at_wall and max(ego_speed, v_n) < SWAP_STOPPED_EPS:
                 required -= MIN_GAP
             if dist < required:
@@ -243,7 +229,7 @@ class Layer2:
             if nid == partner_id:
                 continue
             v_n = get_veh_speed(nid)
-            required = Layer2._net_required(ego_speed, v_n)
+            required = Safety.net_required(ego_speed, v_n)
             if at_wall and max(ego_speed, v_n) < SWAP_STOPPED_EPS:
                 required -= MIN_GAP
             if dist < required:
@@ -275,11 +261,11 @@ class Layer2:
                 break
         if leader is not None and leader.lane_pos is not None:
             gap = (leader.lane_pos - VEH_LENGTH) - pos
-            if gap < Layer2._net_required(speed, leader.speed):
+            if gap < Safety.net_required(speed, leader.speed):
                 return False
         if follower is not None and follower.lane_pos is not None:
             gap = (pos - VEH_LENGTH) - follower.lane_pos
-            if gap < Layer2._net_required(follower.speed, speed):
+            if gap < Safety.net_required(follower.speed, speed):
                 return False
         return True
 
@@ -309,8 +295,8 @@ class Layer2:
           後続 through 車を長時間塞ぐ）。接近速度は半分の減速度で吸収できる範囲＋制御遅延バッファに
           抑えて、スロットへの食い込み（横並び固着）を防ぐ。
         - それ以外（required〜2×required）: 要求車と同速で維持。
-        加速方向の指令は自レーン前方に安全車間＋車長の余裕があるときのみ出す（control_speed の緊急減速を
-        上書きせず、密な creep 中に前車へ突っ込まない）。
+        指令は候補（``propose``）として出す。減速側はそのまま効き、加速側（通過・詰め）は追従の候補が上限になる
+        （調停で最も遅い候補が勝つので、前車が近ければ追従の減速が優先される）。
         """
         p = provider
         r = requester
@@ -341,10 +327,7 @@ class Layer2:
             target = r.speed  # 充足: 同速で維持（それ以上減速して車線を塞がない）
         if p.lane_id is not None:
             target = min(target, get_lane_max_speed(p.lane_id))
-        if p.speed - target > 0.1:
-            slow_down(p.id, target, (p.speed - target) / abs(MAX_DECEL))
-        elif target - p.speed > 0.1 and (p.leader_distance is None or p.leader_distance >= p.safety_gap + VEH_LENGTH):
-            slow_down(p.id, target, (target - p.speed) / MAX_ACCEL)
+        p.propose("yield", max(target, 0.0), abs(MAX_DECEL))
 
     @staticmethod
     def _hold_before_deadline(requester: V2CAV, req: LCRequest) -> None:
@@ -352,19 +335,16 @@ class Layer2:
 
         分岐直前まで巡航して SUMO トポロジー（teleport無効の lane-drop）で急停止するのを避ける挙動品質。EDF の鍵
         には載せない。D で停止する減速を MAX_DECEL 上限で slowDown する（dist ≤ HOLD_MARGIN の判定は呼び出し側）。
-        leader が安全車間内に居る場合は control_speed の追従・緊急減速に委ねてスキップする：hold の弱い減速が
-        緊急ブレーキを上書きすると hold 車列で後続が前車へ追突しうるため、先頭車（leader 遠い/無し）だけが hold する。
+        候補として出すので、前車が近いときは追従の候補（最大減速）が調停で勝ち、hold が緊急減速を上書きすることは無い。
         """
         if requester.speed <= 0:
             return
-        if requester.leader_distance is not None and requester.leader_distance < requester.safety_gap:
-            return  # leader 近接: control_speed（追従・緊急ブレーキ）に委ねる
         remaining = req.deadline_pos - req.current_pos  # D までの残距離（要求は road==mainlane の同一フレームで生成）
         if remaining <= 0:
             return  # 既に D を越えていれば SUMO トポロジーに任せる
         needed_decel = (requester.speed**2) / (2 * remaining)  # D で停止するのに要する減速
         decel = min(needed_decel, abs(MAX_DECEL))  # 物理上限内で滑らかに（超過時は最大減速で best-effort）
-        slow_down(requester.id, 0.0, requester.speed / decel)
+        requester.propose("hold", 0.0, decel)
 
     @staticmethod
     def _is_opposing(req: LCRequest, other: LCRequest | None) -> bool:
@@ -386,11 +366,9 @@ class Layer2:
                 挿入成功率を上げる（従来挙動）。流れ相手に相対後退しても次の車が隙間を埋めるだけで
                 後退が止まらなくなるため、フォールバックは対向要求車限定とする。
 
-        own leader が安全車間内なら control_speed の追従・緊急減速に委ねてスキップする（緊急ブレーキ上書き防止）。
+        候補として出すので、own leader が近いときは追従の候補（最大減速）が調停で勝つ（緊急減速を上書きしない）。
         """
         if requester.speed <= 0:
-            return
-        if requester.leader_distance is not None and requester.leader_distance < requester.safety_gap:
             return
         a = abs(MAX_DECEL)
         going_right = Safety.next_lane(req) < req.current_lane
@@ -401,18 +379,18 @@ class Layer2:
             speed = get_veh_speed(nid)
             front_speed = speed if front_speed is None else min(front_speed, speed)
             # dist は minGap 控除済み（_insertion_safe_live と同じ相対制動モデルの閾値）
-            if dist < Layer2._net_required(requester.speed, speed) and Layer2._is_opposing(req, req_by_id.get(nid)):
+            if dist < Safety.net_required(requester.speed, speed) and Layer2._is_opposing(req, req_by_id.get(nid)):
                 front_opposing_speed = speed if front_opposing_speed is None else min(front_opposing_speed, speed)
         if front_opposing_speed is not None:
             # 前方の対向要求車から相対的に下がって重なりを解消する
             target = max(front_opposing_speed - ALIGN_DELTA, 0.0)
             if requester.speed > target:
-                slow_down(requester.id, target, (requester.speed - target) / a)
+                requester.propose("align", target, a)
             return
         rear_opposing = False
         for nid, dist in get_veh_neighbors(requester.id, lat):  # 目標レーンの後続（bit2=0）
             speed = get_veh_speed(nid)
-            if dist < Layer2._net_required(speed, requester.speed) and Layer2._is_opposing(req, req_by_id.get(nid)):
+            if dist < Safety.net_required(speed, requester.speed) and Layer2._is_opposing(req, req_by_id.get(nid)):
                 rear_opposing = True
         if rear_opposing and requester.lane_id is not None:
             # 後方の対向要求車から前へずれて重なりを解消する（減速側と対称）。前方車には近づきすぎない
@@ -420,9 +398,9 @@ class Layer2:
             if front_speed is not None:
                 target = min(target, front_speed + ALIGN_DELTA)
             if target - requester.speed > 0.1:
-                slow_down(requester.id, target, (target - requester.speed) / MAX_ACCEL)
+                requester.propose("align", target, a)  # 加速側: 追従の候補が上限になる
             return
         # 通常の交通流にブロックされている: 目標レーン先行の流速へ合わせる（従来の自己減速）
         if front_speed is None or requester.speed <= front_speed:
             return
-        slow_down(requester.id, max(front_speed, 0.0), (requester.speed - front_speed) / a)
+        requester.propose("align", max(front_speed, 0.0), a)
