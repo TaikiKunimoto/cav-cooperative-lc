@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 from pathlib import Path
@@ -98,13 +99,22 @@ def _is_stale(job: dict) -> bool:
     return _resolve_csv(job) is None
 
 
-def load_long() -> tuple[pd.DataFrame, list[dict]]:
-    """manifest から (集計対象の long DataFrame, 除外された run 一覧) を返す。"""
+def load_long(methods: tuple[str, ...] | None = None) -> tuple[pd.DataFrame, list[dict]]:
+    """manifest から (集計対象の long DataFrame, 除外された run 一覧) を返す。
+
+    ``methods`` を与えると、その方式（manifest の ``method``）の run だけを集計する。それ以外の方式の run は
+    「このスイートの run ではない」として集計・excluded の双方から外す（例: 要素除去の試走 ``v2-none`` が
+    同じ out/raw に残っているとき）。
+    """
     manifest = json.loads(MANIFEST.read_text())
     rows: list[dict] = []
     excluded: list[dict] = []
     stale = 0
+    other_method = 0
     for job in manifest.get("jobs", []):
+        if methods is not None and job.get("method") not in methods:
+            other_method += 1
+            continue
         if _is_stale(job):
             stale += 1
             continue
@@ -127,14 +137,19 @@ def load_long() -> tuple[pd.DataFrame, list[dict]]:
         rows.append(row)
     if stale:
         print(f"[aggregate] 旧リポジトリ由来の manifest 遺物 {stale} 件を集計対象外にしました（manifest は非破壊）")
+    if other_method:
+        print(f"[aggregate] --methods {list(methods or ())} 以外の方式の run {other_method} 件を集計対象外にしました")
     df = pd.DataFrame(rows)
     return df, excluded
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser(description="manifest と out/raw から summary_*.csv|md を作る")
+    ap.add_argument("--methods", nargs="+", default=None, help="集計する方式（例: v2）。省略時は manifest の全方式")
+    args = ap.parse_args()
     if not MANIFEST.exists():
         raise SystemExit(f"manifest が見つかりません: {MANIFEST}（先に run_sweep.py を実行）")
-    df, excluded = load_long()
+    df, excluded = load_long(tuple(args.methods) if args.methods else None)
 
     # 除外 run は「無言で消す」と生存バイアスになる（例: 衝突でクラッシュした run が安全性集計から
     # 消える）ため、必ずファイルに残して件数を目立たせる。
