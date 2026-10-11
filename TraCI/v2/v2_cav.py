@@ -33,6 +33,7 @@ from v2.constants import (
     EMERGENCY_DECEL,
     FOLLOW_GAIN,
     FOLLOW_MIN_DECEL,
+    FOLLOW_TAU,
     MAX_ACCEL,
     MAX_DECEL,
     MIN_GAP,
@@ -351,9 +352,11 @@ class V2CAV(BaseModel):
     def control_speed(self) -> None:
         """前方車両との車間に応じた追従の候補（緊急・臨界・追従・制限速度）を出す。SUMO の安全制御は無効化済み。
 
-        安全車間は挿入判定と同じ相対制動 ``Safety.net_required(自車速, 前車速) + MIN_GAP``（``leader_distance`` は
-        minGap 控除済みギャップ）。車間がその内側なら目標は前車速度（前車より遅ければ今の速度を保ち、車間が開くのを
-        待つ）、外側なら余剰車間に比例して詰める（FOLLOW_GAIN）。役割（YIELDING / LANE_CHANGING）による加速禁止は
+        安全車間は ``max(Safety.net_required(自車速, 前車速), 自車速·FOLLOW_TAU) + MIN_GAP``（相対制動の必要量と
+        時間車頭 1.0 s の大きい方。``leader_distance`` は minGap 控除済みギャップ）。車間の過不足に比例して前車速度の
+        前後に目標を取る線形則（目標 = 前車速度 + FOLLOW_GAIN·(車間 − 安全車間)）。車間が不足し前車より速いときは
+        相対制動で決まる減速度（``_relative_decel``）で前車速度へ、遅いか同速なら FOLLOW_MIN_DECEL 以下で緩く下げて
+        車間を戻す。余裕があれば余剰に比例して詰める。役割（YIELDING / LANE_CHANGING）による加速禁止は
         無い: 譲り・整列・保持が要るときは Layer2 が候補を足し、調停で最も遅い候補が勝つ。
         """
         if self.is_obstacle:
@@ -381,15 +384,14 @@ class V2CAV(BaseModel):
             if gap < braking_needed:
                 self.propose("critical", v_lead, abs(MAX_DECEL))
                 return
-        safety_gap = Safety.net_required(v, v_lead) + MIN_GAP
-        if gap < safety_gap:
-            if speed_diff > 0:
-                self.propose("follow", v_lead, self._relative_decel(speed_diff, gap))
-            else:
-                self.propose("follow", v, abs(MAX_DECEL))  # 前車より遅い: 加速せず車間が開くのを待つ
-            return
-        target = min(speed_limit, v_lead + FOLLOW_GAIN * (gap - safety_gap))
-        self.propose("follow", target, abs(MAX_DECEL))
+        safety_gap = max(Safety.net_required(v, v_lead), v * FOLLOW_TAU) + MIN_GAP
+        target = max(0.0, min(speed_limit, v_lead + FOLLOW_GAIN * (gap - safety_gap)))
+        if gap >= safety_gap:
+            self.propose("follow", target, abs(MAX_DECEL))
+        elif speed_diff > 0:
+            self.propose("follow", min(target, v_lead), self._relative_decel(speed_diff, gap))
+        else:
+            self.propose("follow", target, FOLLOW_MIN_DECEL)  # 前車より遅い／同速: 緩く下げて車間を戻す
 
     def apply_speed_command(self) -> str:
         """この step の候補から次 step の速度を 1 つ決めて setSpeed し、採用した規則名を返す（候補は消費する）。
