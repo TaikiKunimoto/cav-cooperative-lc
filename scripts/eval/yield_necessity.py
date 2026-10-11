@@ -51,7 +51,8 @@ class YieldNecessity:
         yielding = speedlog[speedlog["rule"].isin(["yield", "pass"]) & speedlog["yield_for"].notna()]
         yield_times = {k: g["time"].to_numpy() for k, g in yielding.groupby("yield_for")}
         own = speedlog[speedlog["rule"].isin(["align", "hold"])]
-        own_by_veh = dict(own.groupby("veh"))
+        # DataFrameGroupBy は .keys が属性（グループ列名）なので dict(groupby) は使えない。内包表記で辞書にする
+        own_by_veh = {k: g for k, g in own.groupby("veh")}  # noqa: C416
         immediate = yield_before = yield_any = align_before = hold_before = both = 0
         durations: list[float] = []
         for _, r in done.iterrows():
