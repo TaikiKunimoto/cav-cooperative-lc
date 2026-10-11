@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from status.status import CarAction, CarStatus
-from v2.constants import SWAP_WINDOW
+from v2.constants import COOP_YIELD, SWAP_WINDOW
 from v2.layer1.priority import Key, KeyedRequest
 from v2.lc_request import LCRequest
 from v2.snapshot import Snapshot
@@ -38,6 +38,8 @@ class RSU:
     @staticmethod
     def arbitrate(keyed: list[KeyedRequest], snap: Snapshot) -> list[Assignment]:
         """Phase B。鍵昇順（dist小から）に提供車を占有印つきで確保し、割当のリストを返す。"""
+        if COOP_YIELD <= 0:
+            return []  # 要素の除去: 提供車を割り当てない（要求車は自力挿入・スワップ・整列・保持のみ）
         request_key: dict[str, Key] = {req.veh_id: key for key, req in keyed}
         request_by_id: dict[str, LCRequest] = {req.veh_id: req for _, req in keyed}
         claimed: set[str] = set()
@@ -51,6 +53,36 @@ class RSU:
                 claimed.add(provider)  # 占有印（横取り禁止）
                 assignments.append(Assignment(requester_id=req.veh_id, provider_id=provider))
             # provider が無い＝譲れる枠なし（今Tc は割当なし。次Tc 再試行）
+        return assignments
+
+    @staticmethod
+    def arbitrate_fcfs(keyed: list[KeyedRequest], snap: Snapshot) -> list[Assignment]:
+        """優先度なし（``--policy none``）の Phase B: 発生順に、目標車線の最近傍後続をそのまま提供車にする。
+
+        提案手法の調停要素をすべて外した素朴な協調ペア形成（アブレーション比較の対照条件）::
+
+            - 鍵劣位判定なし … 相手が自分より緊急でも譲らせる
+            - 占有印（claimed）なし … 同一提供車の二重割当（横取り）を許す
+            - 譲歩の伝播なし … 提供車に確保された要求車も自分のLCを見送らない（displacement なし）
+            - 対向スワップ相手の除外なし … 織込みの構造的ペアも最近傍なら提供車に選ぶ
+            - 停車中の2番目選択なし … 常に最近傍
+
+        障害物（停止車両）だけは除外する（gap を物理的に作れないため。優先度機構とは無関係）。
+        """
+        if COOP_YIELD <= 0:
+            return []
+        assignments: list[Assignment] = []
+        for _, req in keyed:
+            step = 1 if req.direction == CarAction.CHANGE_LEFT else -1
+            members = snap.lane_members.get(f"{snap.mainlane_edge}_{req.current_lane + step}", [])  # 縦位置降順
+            for vid in members:
+                o = snap.obs[vid]
+                if o.lane_pos is None or o.lane_pos >= req.current_pos:
+                    continue  # 後続（自分より後ろ）のみ
+                if o.is_obstacle:
+                    continue  # 障害物（停止車両）は gap を作れないので提供車にしない
+                assignments.append(Assignment(requester_id=req.veh_id, provider_id=vid))
+                break  # 縦位置降順の最初の後続＝最近傍
         return assignments
 
     @staticmethod

@@ -1,0 +1,10 @@
+veh_id,env,classification,phase,route,target_lane,deadline_pos,activation_time,activation_pos,completed_in_time_raw,collided,final_road,final_lane,final_lane_pos,final_speed
+37,weave,TIMEOUT_STUCK,end,r_exit,0,197.4,49.8,99.14529410369599,False,False,WeaveZone,1,197.39899992862368,0.0
+39,weave,TIMEOUT_STUCK,end,r_ramp,1,197.4,50.5,99.32926863099131,False,False,WeaveZone,0,197.39899926196796,0.0
+60,weave,TIMEOUT_STUCK,end,r_exit,0,197.4,77.4,97.57353299113272,False,False,WeaveZone,1,181.70375154872005,0.0
+86,weave,TIMEOUT_STUCK,end,r_exit,0,197.4,120.9,98.81668537918644,False,False,WeaveZone,2,177.29899999999998,0.0
+89,weave,TIMEOUT_STUCK,end,r_ramp,1,197.4,123.0,98.21090573116832,False,False,WeaveZone,0,142.69193363667776,0.0
+95,weave,TIMEOUT_STUCK,end,r_exit,0,197.4,131.4,98.7908921941017,False,False,WeaveZone,2,146.0949622667209,0.0
+103,weave,TIMEOUT_STUCK,end,r_ramp,1,197.4,140.4,98.35763249471084,False,False,WeaveZone,0,127.08991506191998,0.0
+107,weave,TIMEOUT_STUCK,end,r_ramp,1,197.4,149.8,97.49818435545451,False,False,WeaveZone,0,103.68688576331735,0.0
+108,weave,TIMEOUT_STUCK,end,r_exit,0,197.4,166.4,97.42801935050524,False,False,WeaveZone,2,99.2889060550114,0.0
