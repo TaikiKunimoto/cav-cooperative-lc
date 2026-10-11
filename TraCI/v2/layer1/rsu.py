@@ -120,6 +120,8 @@ class RSU:
                 continue  # 後続（自分より後ろ）のみ
             if o.is_obstacle:
                 continue  # 障害物（停止車両）は gap を作れないので提供車にしない
+            if o.yield_cooldown_until > snap.sim_time:
+                continue  # 譲りの時間上限を超えて交代した直後（次の後続に回す）
             if vid in claimed:
                 continue  # 占有印（横取り禁止）
             other_key = request_key.get(vid)
@@ -154,6 +156,10 @@ class RSU:
             requester.receiving_from_id = a.provider_id
             provider.status = CarStatus.YIELDING
             provider.providing_to_id = a.requester_id
+        for veh in active:
+            if veh.status is not CarStatus.YIELDING:
+                veh.yield_for = None  # 提供車でなくなったら譲りの継続時間をリセット
+                veh.yield_time = 0.0
 
     @staticmethod
     def keys_unique(keyed: list[KeyedRequest]) -> bool:

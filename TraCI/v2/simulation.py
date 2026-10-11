@@ -38,6 +38,7 @@ from v2.obstacle import Obstacle
 from v2.obstacle_metrics import ObstacleMetrics
 from v2.policy import Policy
 from v2.snapshot import Snapshot
+from v2.speed import SpeedLog
 from v2.v2_cav import V2CAV
 
 if "SUMO_HOME" in os.environ:
@@ -93,6 +94,8 @@ class V2Simulation(BaseModel):
     canceled_vehicles: list[str] = Field(default_factory=list)
     collision_history: list[CollisionEvent] = Field(default_factory=list)
     collided_ids: set[str] = Field(default_factory=set)  # 衝突に一度でも関与した車両ID（達成率の未達成判定に使う）
+    emergency_brake_total: int = 0  # 緊急制動（|MAX_DECEL| 超の減速）の発動回数の合計（退出車＋終了時の残車）
+    speed_rule_counts: dict[str, int] = Field(default_factory=dict)  # 速度指令で採用した規則名 → 車両・step 数
     # 各車線の待ち行列（流入レーン選択の負荷分散に使う）。レーンは環境により可変なので動的に作る
     lane_queues: dict[str, list[str]] = Field(default_factory=dict)
 
@@ -123,6 +126,7 @@ class V2Simulation(BaseModel):
         snap: Snapshot | None = None  # 直近 Tc のスナップショット（Layer2 実行で参照）
         assignments: list[Assignment] = []  # 直近 Tc の割当（Layer2 で実行）
         req_by_id: dict[str, LCRequest] = {}  # 直近 Tc の要求（id 引き）
+        speed_log = SpeedLog.from_env()  # V2_SPEED_LOG=<path> のときだけ全車の速度指令を記録する
 
         while self._should_continue():
             traci.simulationStep()
@@ -155,6 +159,7 @@ class V2Simulation(BaseModel):
                         # （canceled として計上済みのまま確定する）
                         continue
                     self.exit_vehicles.append(vid)
+                    self.emergency_brake_total += veh.emergency_brake_counter
                     veh.record_arrival_time()
                     veh.accumulate_exit_stats(stats, vid in self.collided_ids)
                     mandatory_failures += veh.mandatory_failure_rows(self.env.name, vid in self.collided_ids, "exit")
@@ -195,7 +200,14 @@ class V2Simulation(BaseModel):
                     obstacle_metrics.on_placed(obstacle_placed_pos, current_time)
             # 障害物より後方・同一レーンの through 車に必須LC（回避）を動的付与＝エスカレーション（コア機構 §4）
             if self.obstacle is not None and obstacle_placed_pos is not None:
-                self.obstacle.escalate(active, self.env.mainlane_edge, obstacle_placed_pos, obstacle_num_lanes)
+                self.obstacle.escalate(
+                    active,
+                    self.env.mainlane_edge,
+                    obstacle_placed_pos,
+                    obstacle_num_lanes,
+                    self.env.through_lanes,
+                    self.env.mainlane_length,
+                )
             if obstacle_metrics is not None:
                 obstacle_metrics.step(active, self.env.mainlane_edge)
 
@@ -223,14 +235,22 @@ class V2Simulation(BaseModel):
                     RSU.log_assignments(current_time, keyed, assignments)
                     last_request_log_sec = current_sec
 
-            # --- 制御（速度）。traci の速度指令は次 step に反映されるため観測順と独立 ---
+            # --- 制御（速度）: 追従の候補を積む。traci の速度指令は次 step に反映されるため観測順と独立 ---
             if not self.policy.is_noncooperative:
                 for veh in active:
                     veh.control_speed()
 
-            # --- Layer2 実行。制御後に呼び、協調減速の slowDown と changeLane が最後の指令になるようにする ---
+            # --- Layer2 実行。changeLane と、入れないときの速度候補（譲り・整列・保持）を積む ---
             if snap is not None:
                 total_lc += Layer2.execute_pairs(assignments, req_by_id, {veh.id: veh for veh in active}, snap)
+
+            # --- 速度指令の確定: 追従と Layer2 の候補から次 step の速度を 1 つ決め、全車 1 回だけ setSpeed する ---
+            if not self.policy.is_noncooperative:
+                for veh in active:
+                    rule = veh.apply_speed_command()
+                    self.speed_rule_counts[rule] = self.speed_rule_counts.get(rule, 0) + 1
+                    if speed_log is not None:
+                        speed_log.write(current_time, veh)
 
             for i in sorted(poplist, reverse=True):
                 self.vehicles.pop(i)
@@ -251,6 +271,7 @@ class V2Simulation(BaseModel):
             if veh.id not in running_list:
                 continue
             stats.calculate_vehicle_average_speed("", veh.speed_history)
+            self.emergency_brake_total += veh.emergency_brake_counter
             veh.record_deadline_outcome(stats, veh.id in self.collided_ids)
             mandatory_failures += veh.mandatory_failure_rows(self.env.name, veh.id in self.collided_ids, "end")
             mandatory_requests += veh.mandatory_request_rows(self.env.name, veh.id in self.collided_ids, "end")
@@ -267,6 +288,11 @@ class V2Simulation(BaseModel):
         print(f"Phase A: Tc rounds with key ties (should be 0): {tie_events}")
         print(f"Phase B: Tc rounds with double-assigned providers (should be 0): {double_assign_events}")
         print(f"Layer2: total instant lane changes executed: {total_lc}")
+        print(f"Speed: emergency brake events (decel above |MAX_DECEL|): {self.emergency_brake_total}")
+        rule_summary = ", ".join(f"{k}={v}" for k, v in sorted(self.speed_rule_counts.items()))
+        print(f"Speed: rule counts (vehicle-steps): {rule_summary}")
+        if speed_log is not None:
+            speed_log.close()
         requested, completed, rate = stats.deadline_summary()
         rate_str = f"{rate:.3f}" if rate is not None else "-"
         print(f"Deadline: mandatory-LC completed/requested = {completed}/{requested} (rate {rate_str})")

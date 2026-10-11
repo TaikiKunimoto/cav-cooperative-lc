@@ -44,6 +44,9 @@ class Environment(BaseModel):
     mainlane_edge: str  # 本線 edge（pos・締切の基準・lane_members のキー）
     mainlane_length: float  # 本線長
     groups: tuple[Group, ...]
+    # 本線 edge のうち終端で本線へ続くレーン（through 車が走り続けてよいレーン）。突発障害物の回避先の選択と、
+    # 回避後に本線へ戻る操作の目標に使う（出口車線・加速車線は含めない）
+    through_lanes: tuple[int, ...]
 
     def with_measured_length(self, actual_length: float) -> "Environment":
         """本線の実測エッジ長を反映した Environment を返す（シミュレーション開始後に net から取得して適用）。
@@ -89,6 +92,7 @@ DIVERGE = Environment(
     sumocfg="../config/v2/diverge/diverge.sumocfg",
     mainlane_edge="DivergeZone",  # 本線3車線の調停区間（lane0=右端=出口側。DivergeStart で lane0→ExitRamp 分岐）
     mainlane_length=1000.0,  # DivergeStart（lane0 がオフランプ車線へ分岐する位置）＝ 締切
+    through_lanes=(0, 1, 2),  # lane0 も MainLane へ続く（ExitRamp への分岐と並列）
     groups=(
         # 直進（必須LCなし）。本線3車線（DivergeZone → MainLane）
         Group(name="through", route="r_pass", weight=1.0),
@@ -105,6 +109,7 @@ MERGE = Environment(
     sumocfg="../config/v2/merge/merge.sumocfg",
     mainlane_edge="MergeZone",  # 加速車線を含む3車線の連結区間（調停対象）
     mainlane_length=194.0,  # 加速車線(MergeZone lane0)が drop する位置 ＝ 締切
+    through_lanes=(1, 2),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach lane0/1 → MergeZone lane1/2）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
@@ -120,6 +125,7 @@ STRAIGHT = Environment(
     sumocfg="../config/v2/straight/straight.sumocfg",
     mainlane_edge="Road",
     mainlane_length=1000.0,
+    through_lanes=(0, 1, 2),
     groups=(Group(name="through", route="r_main", weight=1.0),),  # 全車 through（必須LCは障害物で動的付与）
 )
 
@@ -133,6 +139,7 @@ WEAVE2 = Environment(
     sumocfg="../config/v2/weave2/weave2.sumocfg",
     mainlane_edge="WeaveZone",  # 加速/出口車線を含む4車線の織込みゾーン（調停対象, 1:2:1）
     mainlane_length=392.0,  # 加速車線drop＝出口分岐位置＝締切（WeaveZone 実net長）
+    through_lanes=(1, 2),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
@@ -202,6 +209,7 @@ WEAVE = Environment(
     sumocfg="../config/v2/weave/weave.sumocfg",
     mainlane_edge="WeaveZone",  # 補助車線を含む3車線の織込み区間（調停対象）
     mainlane_length=196.0,  # 補助車線(WeaveZone lane0)が出口へ抜ける位置 ＝ 締切
+    through_lanes=(1, 2),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),

@@ -1,0 +1,5 @@
+veh_id,env,classification,phase,route,is_avoidance,target_lane,deadline_pos,activation_time,activation_pos,completed_in_time_raw,collided,final_road,final_lane,final_lane_pos,final_speed
+191,merge,COLLIDED,exit,r_ramp,False,1,194.51,269.4,0.025187407785606464,True,True,MainLane,0,44.664076573419266,27.2
+195,merge,COLLIDED,exit,r_ramp,False,1,194.51,285.5,0.07736731277178022,True,True,MainLane,0,44.25385446379356,27.11
+497,merge,COLLIDED,exit,r_ramp,False,1,194.51,619.0,5.0,True,True,MainLane,0,44.95609607085025,27.33
+495,merge,COLLIDED,end,r_ramp,False,1,194.51,622.6,0.09290525435677077,True,True,MergeZone,1,130.24110182601277,9.07

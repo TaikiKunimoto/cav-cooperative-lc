@@ -1,0 +1,2 @@
+placed_pos,placed_time,window_start_s,window_end_s,throughput_post_vph,passages_post,avg_speed_post_ms,max_queue_m,hard_brake_events,avoid_requests,avoid_lane_left,avoid_stuck_at_end
+120.20600000000015,64.0,60.0,622.8,2955.2,462,19.839,26.5,12845,207,207,0

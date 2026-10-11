@@ -1,0 +1,3 @@
+# 2026-10-11T15:24:53 起動: /private/tmp/claude-501/-Users-taiki-workspace-lab-workspace/f50a9304-13b1-485d-93eb-95818da62df1/scratchpad/wt-smoke/scripts/eval/run_tsk143.py --label f11-obs --envs weave weave2 --fs 0.4 --obstacle 1,120,60 --workers 2 git=19876e0 dirty=True sumo=Eclipse SUMO sumo 1.27.0
+2026-10-11T15:28:03	ok	v2__weave2_obs__Q3000__f0.4__s1__obs1-120-60	uv run python -m v2 1 3000 0.4 --env weave2 --nogui --obstacle 1,120,60
+2026-10-11T15:28:34	ok	v2__weave_obs__Q3000__f0.4__s1__obs1-120-60	uv run python -m v2 1 3000 0.4 --env weave --nogui --obstacle 1,120,60

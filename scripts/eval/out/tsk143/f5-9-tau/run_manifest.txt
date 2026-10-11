@@ -1,0 +1,7 @@
+# 2026-10-11T15:27:00 起動: /private/tmp/claude-501/-Users-taiki-workspace-lab-workspace/f50a9304-13b1-485d-93eb-95818da62df1/scratchpad/wt-smoke2/scripts/eval/run_tsk143.py --label f5-9-tau --workers 6 git=2c0560a dirty=True sumo=Eclipse SUMO sumo 1.27.0
+2026-10-11T15:30:19	ok	v2__merge__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env merge --nogui
+2026-10-11T15:30:35	ok	v2__weave__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env weave --nogui
+2026-10-11T15:30:39	ok	v2__merge__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env merge --nogui
+2026-10-11T15:30:45	ok	v2__weave__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env weave --nogui
+2026-10-11T15:31:18	ok	v2__weave2__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env weave2 --nogui
+2026-10-11T15:31:19	ok	v2__weave2__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env weave2 --nogui

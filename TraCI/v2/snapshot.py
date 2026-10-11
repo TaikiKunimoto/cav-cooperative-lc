@@ -29,6 +29,7 @@ class VehObs(BaseModel):
     speed: float
     activation_time: float | None
     is_obstacle: bool  # 障害物（停止車両）。安全判定では回避対象だが、提供車には選ばない
+    yield_cooldown_until: float = 0.0  # この時刻までは提供車に選ばない（譲りの時間上限を超えて交代した直後）
 
 
 class Snapshot(BaseModel):
@@ -63,6 +64,7 @@ class Snapshot(BaseModel):
                 speed=veh.speed,
                 activation_time=op.activation_time if op is not None else None,
                 is_obstacle=veh.is_obstacle,
+                yield_cooldown_until=veh.yield_cooldown_until,
             )
             if veh.road == mainlane_edge and veh.lane is not None:
                 lane_members.setdefault(f"{veh.road}_{veh.lane}", []).append(veh.id)

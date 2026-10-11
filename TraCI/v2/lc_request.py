@@ -29,6 +29,8 @@ class LCOperation(BaseModel):
     target_lane: int
     deadline_pos: float  # 締切位置 D（回避操作では＝障害物位置）
     is_avoidance: bool = False  # True=突発障害物の回避（障害物 deadline_pos を通過したら完了）/ False=本来の目標
+    # True=障害物を回避した through 車が本線へ続くレーンへ戻る操作（締切＝本線 edge の終端）。達成率の統計には数えない
+    is_return: bool = False
     activated: bool = False  # 活性化窓に初めて入ったら True（早め固定活性化、一度だけ）
     activation_time: float | None = None  # 活性化時刻（待ち時間の起点）
     activation_pos: float | None = None  # 活性化時の縦位置（失敗個票の「発生位置」）
