@@ -29,6 +29,8 @@ class LCOperation(BaseModel):
     target_lane: int
     deadline_pos: float  # 締切位置 D（回避操作では＝障害物位置）
     is_avoidance: bool = False  # True=突発障害物の回避（障害物 deadline_pos を通過したら完了）/ False=本来の目標
+    # True=障害物を回避した through 車が本線へ続くレーンへ戻る操作（締切＝本線 edge の終端）。達成率の統計には数えない
+    is_return: bool = False
     activated: bool = False  # 活性化窓に初めて入ったら True（早め固定活性化、一度だけ）
     activation_time: float | None = None  # 活性化時刻（待ち時間の起点）
     activation_pos: float | None = None  # 活性化時の縦位置（失敗個票の「発生位置」）
@@ -80,22 +82,30 @@ class LCRequest(BaseModel):
         deadline_pos: float | None,
         lane: int | None,
         lane_pos: float | None,
+        margin: float = ACTIVATION_MARGIN,
     ) -> bool:
-        """必須LCの活性化窓内か（早め固定: 締切D − ACTIVATION_MARGIN 通過後、目標車線に未到達）。"""
+        """必須LCの活性化窓内か（早め固定: 締切D − margin 通過後、目標車線に未到達）。
+
+        margin は既定で ACTIVATION_MARGIN。柱B-2 の猶予距離比較（--activation-margin）でのみ変える。
+        """
         if road != mainlane_edge:
             return False
         if target_lane is None or deadline_pos is None or lane is None or lane_pos is None:
             return False
         if lane == target_lane:
             return False
-        return lane_pos >= deadline_pos - ACTIVATION_MARGIN
+        return lane_pos >= deadline_pos - margin
 
     @classmethod
-    def from_obs(cls, o: VehObs, sim_time: float, mainlane_edge: str) -> "LCRequest | None":
+    def from_obs(
+        cls, o: VehObs, sim_time: float, mainlane_edge: str, margin: float = ACTIVATION_MARGIN
+    ) -> "LCRequest | None":
         """観測値から活性な必須LC要求を構成する。障害物・窓外・目標到達済み・必須LCなしなら None。"""
         if o.is_obstacle:
             return None  # 障害物（停止車両）は要求を出さない（操作は締切達成率の母数として残るが調停対象外）
-        if not cls.in_activation_window(mainlane_edge, o.road, o.target_lane, o.deadline_pos, o.lane, o.lane_pos):
+        if not cls.in_activation_window(
+            mainlane_edge, o.road, o.target_lane, o.deadline_pos, o.lane, o.lane_pos, margin
+        ):
             return None
         # in_activation_window が True の時点で target_lane/deadline_pos/lane/lane_pos は非 None
         if o.target_lane is None or o.deadline_pos is None or o.lane is None or o.lane_pos is None:
@@ -115,11 +125,11 @@ class LCRequest(BaseModel):
         )
 
     @classmethod
-    def build_all(cls, snap: Snapshot) -> "list[LCRequest]":
+    def build_all(cls, snap: Snapshot, margin: float = ACTIVATION_MARGIN) -> "list[LCRequest]":
         """スナップショット中の全車から、活性な必須LC要求のリストを生成する。"""
         requests: list[LCRequest] = []
         for o in snap.obs.values():
-            req = cls.from_obs(o, snap.sim_time, snap.mainlane_edge)
+            req = cls.from_obs(o, snap.sim_time, snap.mainlane_edge, margin)
             if req is not None:
                 requests.append(req)
         return requests

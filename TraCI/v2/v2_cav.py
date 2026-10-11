@@ -3,7 +3,7 @@
 ``cav.base_cav`` / ``cav.custom_cav`` からは継承・import しない。縦方向追従（control_speed）と状態観測、
 Layer2 の自車挙動・必須LC活性化・障害物化を持つ。Layer1 調停は ``rsu`` が外側で行う。
 データ（状態）と振る舞いを1つの pydantic BaseModel にまとめる（``V2Simulation`` と同じ流儀）。
-縦方向の追従ロジックは ``custom_cav`` の挙動を踏襲した自己完結実装。
+縦方向の追従は相対制動の自前実装（speedMode 0）。速度指令は候補として積み、``apply_speed_command`` が毎 step 1 回だけ出す。
 """
 
 import math
@@ -27,15 +27,22 @@ from utils.traci_wrapper import (
     get_veh_route_id,
     get_veh_speed,
     get_veh_type,
-    slow_down,
 )
 from v2.constants import (
+    ACTIVATION_MARGIN,
+    EMERGENCY_DECEL,
+    FOLLOW_GAIN,
+    FOLLOW_MIN_DECEL,
+    FOLLOW_TAU,
     MAX_ACCEL,
     MAX_DECEL,
     MIN_GAP,
+    SUMO_DEFAULT_LC_MODE,
+    TIME_STEP,
 )
 from v2.layer2.safety import Safety
 from v2.lc_request import LCOperation, LCRequest
+from v2.speed import SpeedArbiter, SpeedCandidate
 
 if TYPE_CHECKING:
     from simulationStatistics.simulation_statistics import SimulationStatistics
@@ -63,6 +70,13 @@ class V2CAV(BaseModel):
     operations: list[LCOperation] = Field(default_factory=list)
     # 障害物（突発）: True の車は停止し続け、調停（要求・提供）から除外される。snapshot には載る（安全判定で回避）。
     is_obstacle: bool = False
+    # 非協調モード（--policy off / off-late）: True なら SUMO 標準制御（LC2013・Krauss）を無効化せず残す。
+    # traci からの車線変更・速度指令は一切行わない前提（観測・締切判定の計測だけが動く）。
+    sumo_default_control: bool = False
+    # 遅通知（--policy off-late）: 必須LC車は活性化窓に入るまで車線変更を凍結し、窓進入時に解禁する。
+    # 提案と同じ「締切付き要求が発生してから行動を開始する」情報タイミングに揃えるための制約。
+    mlc_notice_at_activation: bool = False
+    lc_unlocked: bool = False  # off-late の解禁を一度だけ行うためのフラグ
     road: str | None = None
     lane_id: str | None = None
     lane: int | None = None
@@ -74,11 +88,17 @@ class V2CAV(BaseModel):
     leader_distance: float | None = None
     leader_speed: float | None = None
     length: float = 5.0
-    safety_gap: float = MIN_GAP
     status: CarStatus = CarStatus.NORMAL
-    do_not_speed_up: bool = False
+    # この step の速度候補（追従 control_speed と Layer2 が積み、apply_speed_command が 1 つに決めて消費する）
+    speed_candidates: list[SpeedCandidate] = Field(default_factory=list)
+    speed_rule: str | None = None  # 直近 step に採用した規則名（由来ログ・集計用）
+    speed_target: float | None = None  # 採用候補の目標速度
+    speed_next: float | None = None  # 指令した次 step の速度
     # Layer1 調停の役割（毎Tc フル再構築）。提供車↔要求車の対応を保持する。
     providing_to_id: str | None = None  # 自分が gap を提供している相手（要求車）
+    yield_for: str | None = None  # いま譲っている要求車（譲りの継続時間の対象）
+    yield_time: float = 0.0  # 同じ要求車に譲り続けている時間 [s]（上限 YIELD_MAX_DURATION）
+    yield_cooldown_until: float = 0.0  # この時刻までは提供車に選ばれない
     receiving_from_id: str | None = None  # 自分に gap を提供してくれる相手（提供車）
     sim_time: float = 0.0
     departure_time: float | None = None
@@ -94,8 +114,13 @@ class V2CAV(BaseModel):
         self.type_id = get_veh_type(self.id)
         self.route = get_veh_route_id(self.id)
         self.lane_id = get_veh_lane_id(self.id)
-        traci.vehicle.setLaneChangeMode(self.id, 0)
-        traci.vehicle.setSpeedMode(self.id, 0)
+        if not self.sumo_default_control:
+            traci.vehicle.setLaneChangeMode(self.id, 0)
+            traci.vehicle.setSpeedMode(self.id, 0)
+        elif self.mlc_notice_at_activation and self.operations:
+            # off-late: 必須LC車は要求（活性化）を知るまで車線変更を凍結。速度は SUMO 標準のまま
+            traci.vehicle.setLaneChangeMode(self.id, 0)
+        # minGap・tau は車両物理の統一（提案/ベースライン共通、F4）なのでポリシーに依らず揃える
         traci.vehicle.setMinGap(self.id, MIN_GAP)
         traci.vehicle.setTau(self.id, 1.0)
 
@@ -126,7 +151,7 @@ class V2CAV(BaseModel):
         （テレポート無効方針 §2.4.1 と整合）。出口時とシミュレーション終了時の双方から呼ばれ、
         出口/残存いずれの車も一度だけ計上される。
         """
-        requested = [op for op in self.operations if not op.is_avoidance and op.activated]
+        requested = [op for op in self.operations if not op.is_avoidance and not op.is_return and op.activated]
         if requested:
             completed = sum(1 for op in requested if op.completed_in_time)
             n_collided = len(requested) if collided else 0
@@ -151,7 +176,7 @@ class V2CAV(BaseModel):
         """
         rows: list[dict[str, Any]] = []
         for op in self.operations:
-            if not op.activated:
+            if not op.activated or op.is_return:
                 continue
             if op.completed_in_time and not collided:
                 continue
@@ -210,7 +235,7 @@ class V2CAV(BaseModel):
         """
         rows: list[dict[str, Any]] = []
         for op in self.operations:
-            if op.is_avoidance or not op.activated:
+            if op.is_avoidance or op.is_return or not op.activated:
                 continue
             if op.completed_in_time and (op.completion_time is None or op.completion_pos is None):
                 raise ValueError(
@@ -244,17 +269,25 @@ class V2CAV(BaseModel):
             return None
         return min(pending, key=lambda op: op.deadline_pos)
 
-    def update_activation(self, mainlane_edge: str) -> None:
-        """各未達成操作が活性化窓に初めて入った時刻を記録する（早め固定活性化、操作ごとに一度だけ）。"""
+    def update_activation(self, mainlane_edge: str, margin: float = ACTIVATION_MARGIN) -> None:
+        """各未達成操作が活性化窓に初めて入った時刻を記録する（早め固定活性化、操作ごとに一度だけ）。
+
+        off-late（遅通知の非協調）はここが「要求を知る」瞬間: 凍結していた車線変更を SUMO 標準
+        （LC2013 の既定モード）へ解禁し、以降の完遂は LC2013 に委ねる。
+        margin は既定で ACTIVATION_MARGIN（柱B-2 の猶予距離比較でのみ変える。解禁位置も連動する）。
+        """
         for op in self.operations:
             if op.activated:
                 continue
             if LCRequest.in_activation_window(
-                mainlane_edge, self.road, op.target_lane, op.deadline_pos, self.lane, self.lane_pos
+                mainlane_edge, self.road, op.target_lane, op.deadline_pos, self.lane, self.lane_pos, margin
             ):
                 op.activated = True
                 op.activation_time = self.sim_time
                 op.activation_pos = self.lane_pos
+        if self.mlc_notice_at_activation and not self.lc_unlocked and any(op.activated for op in self.operations):
+            traci.vehicle.setLaneChangeMode(self.id, SUMO_DEFAULT_LC_MODE)
+            self.lc_unlocked = True
 
     def update_deadline_achievement(self, mainlane_edge: str) -> None:
         """締切位置までに目標へ到達した操作を一度だけ記録する（締切達成率 F3 の分子判定）。
@@ -267,7 +300,7 @@ class V2CAV(BaseModel):
         if self.road != mainlane_edge:
             return
         for op in self.operations:
-            if op.completed_in_time:
+            if op.completed_in_time or op.is_return:
                 continue
             if op.is_avoidance:
                 if op.is_done(self.lane, self.lane_pos):
@@ -283,8 +316,15 @@ class V2CAV(BaseModel):
         操作リストは捨てない（締切達成率 F3 の母数のため保持）。本来の必須LCが活性化済みのまま障害物化
         された車は、停止して目標へ到達できず終了時に未完了＝失敗として計上される（テレポート無効方針 §2.4.1）。
         要求生成側 ``LCRequest.from_obs`` が is_obstacle を除外するため、操作を残しても障害物が要求を出すことはない。
+
+        非協調ポリシー（SUMO 標準制御が生きている車）でも障害物という摂動を提案と同一にするため、
+        速度モード・車線変更を明示的に無効化してから停止させる: 既定 speedMode のままでは緩減速で
+        指定位置より先に止まり、LC2013 が生きていると停止車が自力で車線変更して封鎖が解けてしまう。
+        edf/none では生成時に設定済みの値の再設定（冪等・挙動不変）。
         """
         self.is_obstacle = True
+        traci.vehicle.setSpeedMode(self.id, 0)
+        traci.vehicle.setLaneChangeMode(self.id, 0)
         traci.vehicle.setSpeed(self.id, 0.0)
 
     # --- 状態観測 ---
@@ -302,92 +342,79 @@ class V2CAV(BaseModel):
         self.leader = get_veh_leader(self.id, 0)
         self.leader_distance = self.leader[1] if self.leader is not None else None
         self.leader_speed = get_veh_speed(self.leader[0]) if self.leader is not None else None
-        self._calculate_safety_gap()
+        self.speed_candidates.clear()
 
-    # --- 縦方向制御（car-following）---
+    # --- 縦方向制御（car-following）: 候補を出すだけ。指令は apply_speed_command が 1 回だけ出す ---
+    def propose(self, rule: str, target: float, decel: float, accel: float = MAX_ACCEL) -> None:
+        """この step の速度候補を 1 つ足す（規則名・目標速度・そこへ向かうときに許す減速度／加速度）。"""
+        self.speed_candidates.append(SpeedCandidate(rule=rule, target=target, decel=decel, accel=accel))
+
     def control_speed(self) -> None:
-        """前方車両との車間に応じた速度制御。SUMO の安全制御は無効化済みのため自前で行う。"""
+        """前方車両との車間に応じた追従の候補（緊急・臨界・追従・制限速度）を出す。SUMO の安全制御は無効化済み。
+
+        安全車間は ``max(Safety.net_required(自車速, 前車速), 自車速·FOLLOW_TAU) + MIN_GAP``（相対制動の必要量と
+        時間車頭 1.0 s の大きい方。``leader_distance`` は minGap 控除済みギャップ）。車間の過不足に比例して前車速度の
+        前後に目標を取る線形則（目標 = 前車速度 + FOLLOW_GAIN·(車間 − 安全車間)）。車間が不足し前車より速いときは
+        相対制動で決まる減速度（``_relative_decel``）で前車速度へ、遅いか同速なら FOLLOW_MIN_DECEL 以下で緩く下げて
+        車間を戻す。余裕があれば余剰に比例して詰める。役割（YIELDING / LANE_CHANGING）による加速禁止は
+        無い: 譲り・整列・保持が要るときは Layer2 が候補を足し、調停で最も遅い候補が勝つ。
+        """
         if self.is_obstacle:
-            traci.vehicle.setSpeed(self.id, 0.0)  # 障害物は停止し続ける
+            traci.vehicle.setSpeed(self.id, 0.0)  # 障害物は停止し続ける（速度調停の対象外）
             return
-        if self.leader_distance is not None and self.leader_distance < MIN_GAP:
-            if self.leader_speed is not None:
-                self._emergency_brake(self.leader_speed)
-            return
-
-        # 臨界制動バンド: 相対制動（最大減速で前車に追突しない）に必要な距離を割り込んだら、
-        # 「前車速度 − 1 を追いかける」通常追従をやめ、最大減速で前車速度へ合わせにいく。通常追従は
-        # 前車が強く減速し続けると 1〜2step 分の追跡遅れで車間を食い込み、rear-end グレーズ
-        # （gap −0.0〜−1m の接触）になる。目標を 0 でなく前車速度にするのが重要: 全停止プロファイルは
-        # 行列末尾への接近で過剰な早期停止（standoff）となり、衝撃波を増幅して織込み環境の流入を
-        # 崩壊させる。余裕は固定 1m ＋ 離散制御ラグ分（自車速度×0.2s）。
-        if self.leader_distance is not None and self.leader_speed is not None and self.speed > self.leader_speed:
-            speed_diff = self.speed - self.leader_speed
-            braking_needed = (self.speed**2 - self.leader_speed**2) / (2 * abs(MAX_DECEL)) + 1.0 + 0.2 * self.speed
-            if self.leader_distance < braking_needed:
-                slow_down(self.id, self.leader_speed, speed_diff / abs(MAX_DECEL))
-                return
-
-        # 協調・車線変更中は加速しない
-        self.do_not_speed_up = self.status in (CarStatus.YIELDING, CarStatus.LANE_CHANGING)
-
         if self.lane_id is None:
             return
         speed_limit = get_lane_max_speed(self.lane_id)
-
+        self.propose("limit", speed_limit, abs(MAX_DECEL))
         if self.leader is None or self.leader_speed is None or self.leader_distance is None:
-            self._control_speed_by_speed_limit(speed_limit)
             return
-
-        speed_diff = self.speed - self.leader_speed
-        min_duration = self._safe_decel_duration(speed_diff)
-        ttc = self._ttc(self.leader_distance, speed_diff)
-
-        if self.leader_distance >= self.safety_gap:
-            if speed_diff <= 0 or min_duration < ttc:
-                self._control_speed_by_speed_limit(speed_limit)
-            else:
-                slow_down(self.id, self.leader_speed, min(ttc, min_duration))
-        else:
-            if self.do_not_speed_up:
+        gap, v, v_lead = self.leader_distance, self.speed, self.leader_speed
+        speed_diff = v - v_lead
+        if speed_diff > 0:
+            # 緊急制動（最後の砦）: 前車速度へ揃える前にバンパー間が minGap を割る（控除済み距離が 0 を切る）とき、
+            # 最大減速 |MAX_DECEL| で足りなければ EMERGENCY_DECEL までの減速を許す。発動回数は結果に出力する。
+            room = gap - speed_diff * TIME_STEP  # 1 step 後の控除済み距離
+            needed = speed_diff**2 / (2 * room) if room > 0 else math.inf
+            if needed > abs(MAX_DECEL):
+                self.emergency_brake_counter += 1
+                self.propose(SpeedArbiter.EMERGENCY, v_lead, min(needed, EMERGENCY_DECEL))
                 return
-            if speed_diff >= 0:
-                target_speed = self.leader_speed - 1 if self.leader_speed > 1 else 0.0
-                slow_down(self.id, target_speed, min(ttc, min_duration))
+            # 臨界制動バンド: 相対制動に必要な距離（＋固定 1 m ＋ 離散制御ラグ 0.2 s 分）を割り込んだら最大減速で前車速度へ
+            braking_needed = (v**2 - v_lead**2) / (2 * abs(MAX_DECEL)) + 1.0 + 0.2 * v
+            if gap < braking_needed:
+                self.propose("critical", v_lead, abs(MAX_DECEL))
+                return
+        safety_gap = max(Safety.net_required(v, v_lead), v * FOLLOW_TAU) + MIN_GAP
+        target = max(0.0, min(speed_limit, v_lead + FOLLOW_GAIN * (gap - safety_gap)))
+        if gap >= safety_gap:
+            self.propose("follow", target, abs(MAX_DECEL))
+        elif speed_diff > 0:
+            self.propose("follow", min(target, v_lead), self._relative_decel(speed_diff, gap))
+        else:
+            self.propose("follow", target, FOLLOW_MIN_DECEL)  # 前車より遅い／同速: 緩く下げて車間を戻す
 
-    def _control_speed_by_speed_limit(self, speed_limit: float) -> None:
-        """制限速度に合わせて加減速する。"""
-        if self.speed > speed_limit:
-            slow_down(self.id, speed_limit, self._safe_decel_duration(self.speed - speed_limit))
-        elif not self.do_not_speed_up:
-            slow_down(self.id, speed_limit, self._safe_accel_duration(speed_limit - self.speed))
+    def apply_speed_command(self) -> str:
+        """この step の候補から次 step の速度を 1 つ決めて setSpeed し、採用した規則名を返す（候補は消費する）。
 
-    def _emergency_brake(self, target_speed: float) -> None:
-        """衝突回避の緊急減速。"""
-        self.emergency_brake_counter += 1
-        traci.vehicle.setSpeed(self.id, min(target_speed, self.speed, 1.0))
+        障害物は control_speed で停止固定済み。候補が無い（走行レーン未確定など）ときは指令を出さない。
+        """
+        if self.is_obstacle:
+            self.speed_candidates.clear()
+            return "obstacle"
+        if not self.speed_candidates:
+            self.speed_rule = None
+            return "none"
+        next_speed, chosen = SpeedArbiter.choose(self.speed, self.speed_candidates)
+        traci.vehicle.setSpeed(self.id, next_speed)
+        self.speed_rule, self.speed_target, self.speed_next = chosen.rule, chosen.target, next_speed
+        self.speed_candidates.clear()
+        return chosen.rule
 
     # --- 計算ヘルパ ---
-    def _calculate_safety_gap(self) -> None:
-        """追従の安全車間 ＝ 挿入と同一の安全ギャップ G_req（空走 v×δ + 制動距離 + minGap）。
-
-        旧実装は空走項に人間の反応時間 REACTION_TIME(0.75s) を使い、挿入側 ``Safety.g_req``（δ系）と
-        二系統に分裂していた。追従側も δ（通信遅延 DELAY）に統一し、安全車間の定義を1本化する
-        （δ=0 の理想通信では空走項ゼロ。計画 T4「REACTION_TIME 依存を除去」の達成）。
-        """
-        self.safety_gap = Safety.g_req(self.speed)
-
     @staticmethod
-    def _safe_decel_duration(speed_diff: float) -> float:
-        """最大減速で速度差を0にするのに要する時間。"""
-        return speed_diff / abs(MAX_DECEL) if speed_diff > 0 else 0.0
-
-    @staticmethod
-    def _safe_accel_duration(speed_diff: float) -> float:
-        """最大加速で速度差を0にするのに要する時間。"""
-        return speed_diff / abs(MAX_ACCEL) if speed_diff > 0 else 0.0
-
-    @staticmethod
-    def _ttc(distance: float, speed_diff: float) -> float:
-        """現在の速度差で進んだ際の衝突までの時間（TTC）。"""
-        return distance / speed_diff if speed_diff > 0 else math.inf
+    def _relative_decel(speed_diff: float, net_gap: float) -> float:
+        """前車速度へ揃える減速度: 控除済み車間が MIN_GAP に達する時点で速度差が 0 になる値を
+        FOLLOW_MIN_DECEL〜|MAX_DECEL| にクランプする。余地が無ければ最大減速。"""
+        room = net_gap - MIN_GAP
+        needed = speed_diff**2 / (2 * room) if room > 0 else abs(MAX_DECEL)
+        return min(max(needed, FOLLOW_MIN_DECEL), abs(MAX_DECEL))

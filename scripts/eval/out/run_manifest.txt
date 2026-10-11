@@ -980,3 +980,9 @@ v2__weave__Q4000__f0.6__s5	skipped	cd TraCI && uv run python -m v2 5 4000 0.6 --
 2026-07-24T10:36:40	ok	v2__diverge__Q4000__f0.4__s2	EVAL_OUTPUT_NAME=v2__diverge__Q4000__f0.4__s2 uv run python -m v2 2 4000 0.4 --env diverge --nogui
 2026-07-24T10:36:50	ok	v2__diverge__Q4000__f0.6__s2	EVAL_OUTPUT_NAME=v2__diverge__Q4000__f0.6__s2 uv run python -m v2 2 4000 0.6 --env diverge --nogui
 2026-07-24T10:39:36	ok	v2__weave2__Q4000__f0.4__s2	EVAL_OUTPUT_NAME=v2__weave2__Q4000__f0.4__s2 uv run python -m v2 2 4000 0.4 --env weave2 --nogui
+# 2026-10-07T01:42:06 run_eval 起動: scripts/run_eval.py --policy off-late --env weave --q 3000 --f 0.4 --seeds 1 --workers 1
+# 2026-10-07T01:42:06 run_eval 起動: scripts/run_eval.py --policy none --env weave --q 3000 --f 0.4 --seeds 1 --workers 1
+# 2026-10-07T01:42:06 run_eval 起動: scripts/run_eval.py --policy edf --env weave --q 3000 --f 0.4 --seeds 1 --workers 1
+2026-10-07T01:43:07	ok	v2-off-late__weave__Q3000__f0.4__s1	EVAL_OUTPUT_NAME=v2-off-late__weave__Q3000__f0.4__s1 uv run python -m v2 1 3000 0.4 --env weave --nogui --policy off-late
+2026-10-07T01:43:40	ok	v2-none__weave__Q3000__f0.4__s1	EVAL_OUTPUT_NAME=v2-none__weave__Q3000__f0.4__s1 uv run python -m v2 1 3000 0.4 --env weave --nogui --policy none
+2026-10-07T01:45:26	ok	v2__weave__Q3000__f0.4__s1	EVAL_OUTPUT_NAME=v2__weave__Q3000__f0.4__s1 uv run python -m v2 1 3000 0.4 --env weave --nogui

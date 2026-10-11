@@ -1,0 +1,2 @@
+veh_id,env,classification,phase,route,is_avoidance,target_lane,deadline_pos,activation_time,activation_pos,completed_in_time_raw,collided,final_road,final_lane,final_lane_pos,final_speed
+336,merge,COLLIDED,exit,r_ramp,False,1,194.51,422.3,0.14801854878622045,True,True,MainLane,0,44.18533987353571,19.78

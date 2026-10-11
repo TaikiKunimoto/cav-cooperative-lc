@@ -1,0 +1,604 @@
+ Retrying in 1 seconds
+Simulation started
+[env] mainlane WeaveZone: measured length 197.40 m
+depart_times[through]: [0.1, 1.1, 3.1, 5.1, 6.1, 12.1, 13.1, 14.1, 16.1, 20.1, 22.1, 24.1, 25.1, 26.1, 31.1, 33.1, 35.1, 37.1, 38.1, 40.1, 41.1, 42.1, 43.1, 45.1, 47.1, 49.1, 51.1, 52.1, 56.1, 59.1, 61.1, 62.1, 64.1, 65.1, 69.1, 72.1, 73.1, 74.1, 76.1, 78.1, 81.1, 84.1, 85.1, 86.1, 88.1, 89.1, 94.1, 100.1, 103.1, 104.1, 106.1, 109.1, 110.1, 113.1, 115.1, 116.1, 118.1, 119.1, 120.1, 123.1, 124.1, 126.1, 130.1, 131.1, 132.1, 134.1, 136.1, 137.1, 140.1, 144.1, 145.1, 146.1, 150.1, 151.1, 152.1, 155.1, 156.1, 157.1, 159.1, 163.1, 164.1, 166.1, 167.1, 170.1, 173.1, 174.1, 176.1, 179.1, 181.1, 182.1, 186.1, 188.1, 189.1, 190.1, 193.1, 197.1, 200.1, 201.1, 203.1, 208.1, 210.1, 213.1, 214.1, 217.1, 218.1, 221.1, 226.1, 227.1, 228.1, 229.1, 232.1, 235.1, 237.1, 238.1, 241.1, 242.1, 244.1, 248.1, 253.1, 254.1, 255.1, 256.1, 258.1, 259.1, 264.1, 265.1, 266.1, 267.1, 268.1, 272.1, 277.1, 280.1, 281.1, 282.1, 284.1, 285.1, 287.1, 292.1, 294.1, 295.1, 296.1, 297.1, 298.1, 299.1, 300.1, 301.1, 305.1, 307.1, 309.1, 311.1, 314.1, 316.1, 317.1, 320.1, 321.1, 323.1, 326.1, 327.1, 328.1, 329.1, 332.1, 333.1, 334.1, 337.1, 340.1, 341.1, 342.1, 343.1, 345.1, 346.1, 349.1, 350.1, 351.1, 352.1, 353.1, 356.1, 357.1, 359.1, 360.1, 361.1, 363.1, 364.1, 365.1, 367.1, 370.1, 372.1, 374.1, 375.1, 376.1, 379.1, 380.1, 383.1, 385.1, 386.1, 389.1, 391.1, 392.1, 395.1, 397.1, 400.1, 401.1, 405.1, 407.1, 410.1, 413.1, 415.1, 418.1, 419.1, 420.1, 424.1, 426.1, 430.1, 431.1, 433.1, 434.1, 436.1, 439.1, 440.1, 442.1, 443.1, 444.1, 445.1, 446.1, 450.1, 452.1, 453.1, 454.1, 455.1, 458.1, 460.1, 461.1, 463.1, 467.1, 469.1, 470.1, 473.1, 475.1, 477.1, 478.1, 479.1, 485.1, 489.1, 490.1, 491.1, 493.1, 494.1, 495.1, 497.1, 501.1, 503.1, 506.1, 507.1, 510.1, 511.1, 513.1, 514.1, 516.1, 517.1, 518.1, 519.1, 522.1, 526.1, 528.1, 529.1, 530.1, 532.1, 533.1, 535.1, 540.1, 542.1, 543.1, 544.1, 545.1, 549.1, 550.1, 553.1, 554.1, 557.1, 559.1, 560.1, 561.1, 562.1, 565.1, 567.1, 569.1, 571.1, 574.1, 576.1, 578.1, 580.1, 581.1, 582.1, 584.1, 586.1, 587.1, 589.1, 591.1, 592.1, 594.1, 599.1]
+depart_times[merging]: [3.1, 10.1, 25.1, 35.1, 36.1, 39.1, 43.1, 44.1, 46.1, 52.1, 66.1, 67.1, 78.1, 84.1, 86.1, 115.1, 132.1, 139.1, 146.1, 158.1, 160.1, 175.1, 176.1, 180.1, 183.1, 184.1, 186.1, 194.1, 195.1, 202.1, 203.1, 206.1, 223.1, 230.1, 236.1, 237.1, 244.1, 246.1, 248.1, 255.1, 261.1, 265.1, 270.1, 275.1, 276.1, 279.1, 281.1, 285.1, 287.1, 291.1, 292.1, 294.1, 305.1, 308.1, 309.1, 317.1, 321.1, 326.1, 327.1, 333.1, 337.1, 338.1, 349.1, 350.1, 361.1, 362.1, 363.1, 366.1, 369.1, 376.1, 382.1, 384.1, 389.1, 395.1, 402.1, 419.1, 424.1, 436.1, 443.1, 446.1, 451.1, 456.1, 466.1, 473.1, 474.1, 477.1, 482.1, 486.1, 498.1, 504.1, 518.1, 529.1, 539.1, 543.1, 550.1, 562.1, 564.1, 586.1, 589.1, 591.1]
+depart_times[diverging]: [2.1, 11.1, 13.1, 14.1, 20.1, 26.1, 31.1, 36.1, 38.1, 42.1, 53.1, 57.1, 60.1, 70.1, 82.1, 96.1, 105.1, 113.1, 114.1, 123.1, 124.1, 128.1, 139.1, 142.1, 151.1, 153.1, 155.1, 162.1, 164.1, 166.1, 168.1, 170.1, 173.1, 177.1, 191.1, 210.1, 215.1, 216.1, 239.1, 245.1, 249.1, 251.1, 256.1, 264.1, 267.1, 268.1, 272.1, 278.1, 287.1, 292.1, 303.1, 307.1, 309.1, 319.1, 320.1, 322.1, 325.1, 334.1, 351.1, 361.1, 363.1, 365.1, 369.1, 379.1, 388.1, 394.1, 398.1, 406.1, 408.1, 410.1, 414.1, 416.1, 434.1, 442.1, 449.1, 475.1, 484.1, 486.1, 502.1, 504.1, 515.1, 518.1, 519.1, 524.1, 535.1, 537.1, 540.1, 546.1, 553.1, 555.1, 560.1, 563.1, 569.1, 576.1, 581.1, 586.1, 591.1, 593.1, 596.1, 597.1]
+====================================================
+TIME: 0.0  Now: 15:27:03.559608
+====================================================
+[Tc t=0.1] requests=0 assigned=0
+====================================================
+TIME: 10.0  Now: 15:27:05.447250
+====================================================
+====================================================
+TIME: 20.0  Now: 15:27:07.760249
+====================================================
+====================================================
+TIME: 30.0  Now: 15:27:10.383310
+====================================================
+====================================================
+TIME: 40.0  Now: 15:27:13.018937
+====================================================
+[swap] t=40.1 28(lane0->1) <-> 29(lane1->0) pos 3.0/2.8
+[Tc t=50.0] requests=2 assigned=1
+    veh=37 dist=103.2 k=1 <- provider=-
+    veh=39 dist=110.5 k=1 <- provider=38
+====================================================
+TIME: 50.0  Now: 15:27:17.252030
+====================================================
+[swap] t=50.3 37(lane1->0) <-> 39(lane0->1) pos 100.5/93.5
+====================================================
+TIME: 60.0  Now: 15:27:20.495993
+====================================================
+====================================================
+TIME: 70.0  Now: 15:27:23.157615
+====================================================
+====================================================
+TIME: 80.0  Now: 15:27:25.743755
+====================================================
+====================================================
+TIME: 90.0  Now: 15:27:28.324421
+====================================================
+[Tc t=100.0] requests=0 assigned=0
+====================================================
+TIME: 100.0  Now: 15:27:30.704906
+====================================================
+====================================================
+TIME: 110.0  Now: 15:27:32.045778
+====================================================
+====================================================
+TIME: 120.0  Now: 15:27:34.610491
+====================================================
+====================================================
+TIME: 130.0  Now: 15:27:40.162521
+====================================================
+====================================================
+TIME: 140.0  Now: 15:27:43.857114
+====================================================
+[swap] t=142.8 108(lane1->0) <-> 107(lane0->1) pos 3.5/3.0
+[Tc t=150.0] requests=0 assigned=0
+====================================================
+TIME: 150.0  Now: 15:27:47.380996
+====================================================
+====================================================
+TIME: 160.0  Now: 15:27:50.200250
+====================================================
+====================================================
+TIME: 170.0  Now: 15:27:53.793548
+====================================================
+====================================================
+TIME: 180.0  Now: 15:27:57.364626
+====================================================
+====================================================
+TIME: 190.0  Now: 15:28:00.766028
+====================================================
+[Tc t=200.0] requests=0 assigned=0
+====================================================
+TIME: 200.0  Now: 15:28:03.472683
+====================================================
+====================================================
+TIME: 210.0  Now: 15:28:05.490082
+====================================================
+====================================================
+TIME: 220.0  Now: 15:28:07.539971
+====================================================
+====================================================
+TIME: 230.0  Now: 15:28:09.436286
+====================================================
+====================================================
+TIME: 240.0  Now: 15:28:11.300704
+====================================================
+[Tc t=250.0] requests=0 assigned=0
+====================================================
+TIME: 250.0  Now: 15:28:13.653786
+====================================================
+====================================================
+TIME: 260.0  Now: 15:28:16.194859
+====================================================
+====================================================
+TIME: 270.0  Now: 15:28:18.776958
+====================================================
+====================================================
+TIME: 280.0  Now: 15:28:21.658461
+====================================================
+====================================================
+TIME: 290.0  Now: 15:28:24.393453
+====================================================Step #0.00 (0ms ?*RT. ?UPS, TraCI: 1ms, vehicles TOT 0 ACT 0 BUF 0)                       Step #10.00 (0ms ?*RT. ?UPS, TraCI: 20ms, vehicles TOT 7 ACT 7 BUF 0)                     Step #20.00 (0ms ?*RT. ?UPS, TraCI: 20ms, vehicles TOT 15 ACT 8 BUF 0)                    Step #30.00 (0ms ?*RT. ?UPS, TraCI: 20ms, vehicles TOT 23 ACT 8 BUF 0)                    Step #40.00 (0ms ?*RT. ?UPS, TraCI: 40ms, vehicles TOT 34 ACT 11 BUF 0)                   Step #50.00 (0ms ?*RT. ?UPS, TraCI: 37ms, vehicles TOT 45 ACT 15 BUF 0)                   Step #60.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 52 ACT 11 BUF 0)                   Step #70.00 (0ms ?*RT. ?UPS, TraCI: 23ms, vehicles TOT 60 ACT 9 BUF 0)                    Step #80.00 (0ms ?*RT. ?UPS, TraCI: 21ms, vehicles TOT 67 ACT 9 BUF 0)                    Step #90.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 76 ACT 11 BUF 0)                   Step #100.00 (0ms ?*RT. ?UPS, TraCI: 13ms, vehicles TOT 78 ACT 5 BUF 0)                   Step #110.00 (0ms ?*RT. ?UPS, TraCI: 14ms, vehicles TOT 84 ACT 6 BUF 0)                   Step #120.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 93 ACT 10 BUF 0)                  Step #130.00 (0ms ?*RT. ?UPS, TraCI: 49ms, vehicles TOT 100 ACT 14 BUF 0)                 Step #140.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 109 ACT 11 BUF 0)                 Step #150.00 (0ms ?*RT. ?UPS, TraCI: 22ms, vehicles TOT 115 ACT 8 BUF 0)                  Step #160.00 (0ms ?*RT. ?UPS, TraCI: 34ms, vehicles TOT 126 ACT 11 BUF 0)                 Step #170.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 135 ACT 11 BUF 0)                 Step #180.00 (0ms ?*RT. ?UPS, TraCI: 32ms, vehicles TOT 145 ACT 12 BUF 0)                 Step #190.00 (0ms ?*RT. ?UPS, TraCI: 29ms, vehicles TOT 154 ACT 11 BUF 0)                 Step #200.00 (0ms ?*RT. ?UPS, TraCI: 18ms, vehicles TOT 160 ACT 8 BUF 0)                  Step #210.00 (0ms ?*RT. ?UPS, TraCI: 20ms, vehicles TOT 167 ACT 7 BUF 0)                  Step #220.00 (0ms ?*RT. ?UPS, TraCI: 19ms, vehicles TOT 175 ACT 9 BUF 0)                  Step #230.00 (0ms ?*RT. ?UPS, TraCI: 20ms, vehicles TOT 181 ACT 8 BUF 0)                  Step #240.00 (0ms ?*RT. ?UPS, TraCI: 22ms, vehicles TOT 189 ACT 10 BUF 0)                 Step #250.00 (1ms ~= 100.00*RT, ~12000.00UPS, TraCI: 29ms, vehicles TOT 198 ACT 12 BUF 0) Step #260.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 207 ACT 12 BUF 0)                 Step #270.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 217 ACT 13 BUF 0)                 Step #280.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 225 ACT 10 BUF 0)                 Step #290.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 235 ACT 12 BUF 0)                 Step #300.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 246 ACT 13 BUF 0)                 Step #310.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 256 ACT 13 BUF 1)                 Step #320.00 (1ms ~= 100.00*RT, ~12000.00UPS, TraCI: 24ms, vehicles TOT 263 ACT 12 BUF 0) Step #330.00 (0ms ?*RT. ?UPS, TraCI: 47ms, vehicles TOT 276 ACT 15 BUF 0)                 Step #340.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 284 ACT 12 BUF 0)                 Step #350.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 292 ACT 9 BUF 0)                  Step #360.00 (0ms ?*RT. ?UPS, TraCI: 29ms, vehicles TOT 301 ACT 11 BUF 0)                 Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=-3.60, offset=0.01), time=366.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=366.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=367.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=368.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=369.90.
+Step #370.00Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.00.
+ (1ms ~= 100.00*RT, ~21000.00UPS, TraCI: 56ms, vehicles TOT 316 ACT 21 BUF 0) Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=370.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=371.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=372.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=373.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=374.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=375.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=376.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=377.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=378.90.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.00.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.60.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.70.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.80.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=379.90.
+Step #380.00Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=380.00.
+ (0ms ?*RT. ?UPS, TraCI: 62ms, vehicles TOT 324 ACT 23 BUF 0)                 Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=380.10.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=380.20.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=380.30.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=380.40.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=380.50.
+Warning: Vehicle '293' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=380.60.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=-3.72, offset=0.01), time=387.00.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.10.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.20.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.30.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.40.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.50.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.60.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.70.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.80.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=387.90.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.00.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.10.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.20.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.30.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.40.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.50.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.60.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.70.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.80.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=388.90.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.00.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.10.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.20.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.30.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.40.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.50.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.60.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.70.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.80.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=389.90.
+Step #390.00Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=390.00.
+ (0ms ?*RT. ?UPS, TraCI: 79ms, vehicles TOT 333 ACT 27 BUF 0)                 Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=390.10.
+Warning: Vehicle '311' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=390.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=1.85, offset=0.08), time=396.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=-3.81, offset=0.01), time=396.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=396.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=397.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=398.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=399.90.
+Step #400.00Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.00.
+ (0ms ?*RT. ?UPS, TraCI: 111ms, vehicles TOT 340 ACT 31 BUF 0)                Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=400.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=401.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=402.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.60.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=403.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.20.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.30.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.30.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.40.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.40.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.50.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.50.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.60.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.70.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.70.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.80.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.80.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.90.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=404.90.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=405.00.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=405.00.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=405.10.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=405.10.
+Warning: Vehicle '305' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=405.20.
+Warning: Vehicle '315' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=405.20.
+Step #410.00 (1ms ~= 100.00*RT, ~34000.00UPS, TraCI: 159ms, vehicles TOT 347 ACT 34 BUF 0)Step #420.00 (0ms ?*RT. ?UPS, TraCI: 105ms, vehicles TOT 356 ACT 25 BUF 0)                Step #430.00 (0ms ?*RT. ?UPS, TraCI: 49ms, vehicles TOT 360 ACT 14 BUF 0)                 Step #440.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 368 ACT 9 BUF 0)                  Step #450.00 (0ms ?*RT. ?UPS, TraCI: 37ms, vehicles TOT 378 ACT 11 BUF 0)                 Step #460.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 386 ACT 9 BUF 0)                  Step #470.00 (13ms ~= 7.69*RT, ~538.46UPS, TraCI: 59ms, vehicles TOT 392 ACT 7 BUF 0)     Step #480.00 (0ms ?*RT. ?UPS, TraCI: 42ms, vehicles TOT 402 ACT 12 BUF 0)                 Step #490.00 (0ms ?*RT. ?UPS, TraCI: 48ms, vehicles TOT 408 ACT 9 BUF 0)                  Step #500.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 415 ACT 8 BUF 0)                  Step #510.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 422 ACT 8 BUF 0)                  Step #520.00 (0ms ?*RT. ?UPS, TraCI: 37ms, vehicles TOT 434 ACT 13 BUF 0)                 Step #530.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 440 ACT 11 BUF 0)                 Step #540.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 447 ACT 10 BUF 0)                 Step #550.00 (0ms ?*RT. ?UPS, TraCI: 36ms, vehicles TOT 456 ACT 12 BUF 0)                 Step #560.00 (0ms ?*RT. ?UPS, TraCI: 24ms, vehicles TOT 464 ACT 9 BUF 0)                  Step #570.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 475 ACT 13 BUF 0)                 Step #580.00 (0ms ?*RT. ?UPS, TraCI: 15ms, vehicles TOT 480 ACT 7 BUF 0)                  Step #590.00 (0ms ?*RT. ?UPS, TraCI: 21ms, vehicles TOT 491 ACT 12 BUF 0)                 Step #600.00 (0ms ?*RT. ?UPS, TraCI: 23ms, vehicles TOT 500 ACT 13 BUF 0)                 Step #609.60 (0ms ?*RT. ?UPS, TraCI: 14ms, vehicles TOT 500 ACT 4 BUF 0)                  
+
+[Tc t=300.0] requests=2 assigned=2
+    veh=237 dist=105.3 k=1 <- provider=239
+    veh=240 dist=142.5 k=1 <- provider=242
+====================================================
+TIME: 300.0  Now: 15:28:27.364405
+====================================================
+====================================================
+TIME: 310.0  Now: 15:28:30.128169
+====================================================
+====================================================
+TIME: 320.0  Now: 15:28:32.848874
+====================================================
+====================================================
+TIME: 330.0  Now: 15:28:35.723581
+====================================================
+====================================================
+TIME: 340.0  Now: 15:28:38.814666
+====================================================
+[Tc t=350.0] requests=0 assigned=0
+====================================================
+TIME: 350.0  Now: 15:28:41.506360
+====================================================
+====================================================
+TIME: 360.0  Now: 15:28:44.792332
+====================================================
+====================================================
+TIME: 370.0  Now: 15:28:49.254752
+====================================================
+====================================================
+TIME: 380.0  Now: 15:28:55.300071
+====================================================
+[swap] t=380.6 293(lane0->1) <-> 308(lane1->0) pos 197.4/194.8
+====================================================
+TIME: 390.0  Now: 15:29:02.276037
+====================================================
+[Tc t=400.0] requests=9 assigned=8
+    veh=315 dist=-50.0 k=2 <- provider=313
+    veh=305 dist=0.0 k=1 <- provider=316
+    veh=314 dist=15.6 k=1 <- provider=317
+    veh=330 dist=34.3 k=2 <- provider=325
+    veh=321 dist=39.1 k=1 <- provider=318
+    veh=327 dist=86.3 k=1 <- provider=328
+    veh=332 dist=111.6 k=1 <- provider=329
+    veh=335 dist=168.7 k=1 <- provider=337
+    veh=337 dist=179.5 k=1 <- provider=-
+====================================================
+TIME: 400.0  Now: 15:29:11.478601
+====================================================
+[swap] t=401.9 327(lane0->1) <-> 330(lane1->0) pos 123.0/121.2
+[swap] t=402.2 335(lane1->0) <-> 337(lane0->1) pos 49.6/46.1
+[swap] t=405.2 305(lane0->1) <-> 315(lane1->0) pos 197.4/197.4
+====================================================
+TIME: 410.0  Now: 15:29:22.811473
+====================================================
+====================================================
+TIME: 420.0  Now: 15:29:42.704242
+====================================================
+====================================================
+TIME: 430.0  Now: 15:29:51.077233
+====================================================
+====================================================
+TIME: 440.0  Now: 15:29:54.827477
+====================================================
+[Tc t=450.0] requests=0 assigned=0
+====================================================
+TIME: 450.0  Now: 15:29:58.665954
+====================================================
+====================================================
+TIME: 460.0  Now: 15:30:02.743314
+====================================================
+====================================================
+TIME: 470.0  Now: 15:30:05.813140
+====================================================
+====================================================
+TIME: 480.0  Now: 15:30:08.967124
+====================================================
+[swap] t=489.8 406(lane1->0) <-> 405(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 490.0  Now: 15:30:13.023518
+====================================================
+[Tc t=500.0] requests=0 assigned=0
+====================================================
+TIME: 500.0  Now: 15:30:16.175303
+====================================================
+[swap] t=507.8 419(lane1->0) <-> 418(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 510.0  Now: 15:30:19.189046
+====================================================
+====================================================
+TIME: 520.0  Now: 15:30:22.025911
+====================================================
+[swap] t=524.3 431(lane1->0) <-> 430(lane0->1) pos 71.7/71.2
+====================================================
+TIME: 530.0  Now: 15:30:25.435598
+====================================================
+====================================================
+TIME: 540.0  Now: 15:30:28.233606
+====================================================
+[Tc t=550.0] requests=2 assigned=1
+    veh=451 dist=115.7 k=1 <- provider=453
+    veh=454 dist=197.3 k=1 <- provider=-
+====================================================
+TIME: 550.0  Now: 15:30:31.400189
+====================================================
+====================================================
+TIME: 560.0  Now: 15:30:34.451210
+====================================================
+====================================================
+TIME: 570.0  Now: 15:30:37.510745
+====================================================
+====================================================
+TIME: 580.0  Now: 15:30:39.537016
+====================================================
+====================================================
+TIME: 590.0  Now: 15:30:41.376667
+====================================================
+[swap] t=594.2 487(lane1->0) <-> 486(lane0->1) pos 111.4/110.9
+[Tc t=600.0] requests=2 assigned=1
+    veh=493 dist=54.6 k=2 <- provider=496
+    veh=495 dist=84.5 k=2 <- provider=-
+====================================================
+TIME: 600.0  Now: 15:30:44.019026
+====================================================
+=====================================
+simulation end
+total generated vehicles : 500
+running vehicles : 4
+exit vehicles : 496
+total departed vehicles : 500
+traffic volume: 3000.0 pcu/h
+canceled vehicles : 0
+=====================================
+Phase A: Tc rounds with key ties (should be 0): 0
+Phase B: Tc rounds with double-assigned providers (should be 0): 0
+Layer2: total instant lane changes executed: 253
+Speed: emergency brake events (decel above |MAX_DECEL|): 0
+Speed: rule counts (vehicle-steps): align=2577, critical=468, follow=26116, hold=898, limit=44615, pass=6, yield=1381
+Deadline: mandatory-LC completed/requested = 200/200 (rate 1.000)
+
+=== Collision Summary ===
+Total collision events: 0
+Total vehicles involved: 0

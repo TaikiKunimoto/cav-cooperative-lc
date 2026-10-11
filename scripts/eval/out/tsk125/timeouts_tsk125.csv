@@ -1,0 +1,11 @@
+name,policy,scenario,env,q,f,seed,obstacle,am,status
+v2-none__weave_obs__Q3000__f0.4__s1__obs1-120-60,none,weave_obs,weave,3000,0.4,1,1-120-60,400,timeout
+v2-none__weave_obs__Q2000__f0.4__s1__obs1-120-60,none,weave_obs,weave,2000,0.4,1,1-120-60,400,failed
+v2-none__weave2_obs__Q3000__f0.4__s1__obs1-120-60,none,weave2_obs,weave2,3000,0.4,1,1-120-60,400,failed
+v2-none__weave2_obs__Q2000__f0.4__s1__obs1-120-60,none,weave2_obs,weave2,2000,0.4,1,1-120-60,400,failed
+v2__merge__Q6000__f0.8__s1,edf,merge,merge,6000,0.8,1,,400,failed
+v2__merge__Q5000__f0.8__s1,edf,merge,merge,5000,0.8,1,,400,failed
+v2-none__merge__Q6000__f0.8__s1,none,merge,merge,6000,0.8,1,,400,failed
+v2-off-late__merge__Q6000__f0.8__s1,off-late,merge,merge,6000,0.8,1,,400,failed
+v2-none__merge__Q5000__f0.8__s1,none,merge,merge,5000,0.8,1,,400,failed
+v2-off-late__merge__Q5000__f0.8__s1,off-late,merge,merge,5000,0.8,1,,400,failed

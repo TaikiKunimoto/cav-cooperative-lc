@@ -1,0 +1,3 @@
+run,env,q,f,seed,status,total,completed,incomplete,rate,collisions,stuck,warn,warn_max,warn_≤5.5,warn_5.5–10,warn_10–30,warn_30–100,warn_>100,ebrake,canceled,speed,pcuh
+v2__weave_obs__Q3000__f0.4__s1__obs1-120-60,weave,3000,0.4,1,ok,185,185,0,1.0,0,0,59,241.77,0,58,0,0,1,213,48,14.99,2712.0
+v2__weave2_obs__Q3000__f0.4__s1__obs1-120-60,weave2,3000,0.4,1,ok,200,200,0,1.0,0,0,9,277.8,0,8,0,0,1,27,0,21.45,3000.0
