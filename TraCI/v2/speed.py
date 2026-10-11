@@ -77,6 +77,7 @@ class SpeedLog:
         "rule",
         "target",
         "status",
+        "yield_for",  # 提供車が譲っている相手の要求車 ID（譲りが挿入に効いたかを数えるため）
     )
 
     def __init__(self, path: str) -> None:
@@ -101,6 +102,7 @@ class SpeedLog:
                 veh.speed_rule,
                 None if veh.speed_target is None else round(veh.speed_target, 3),
                 veh.status.name,
+                veh.yield_for,
             ]
         )
 
