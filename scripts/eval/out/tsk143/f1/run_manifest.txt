@@ -1,0 +1,7 @@
+# 2026-10-11T07:36:02 起動: scripts/eval/run_tsk143.py --label f1 --workers 6 git=9d3de5f dirty=True sumo=Eclipse SUMO sumo 1.27.0
+2026-10-11T07:39:30	ok	v2__merge__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env merge --nogui
+2026-10-11T07:40:24	ok	v2__weave2__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env weave2 --nogui
+2026-10-11T07:40:26	ok	v2__weave2__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env weave2 --nogui
+2026-10-11T07:41:07	ok	v2__merge__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env merge --nogui
+2026-10-11T07:41:24	ok	v2__weave__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env weave --nogui
+2026-10-11T07:42:12	ok	v2__weave__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env weave --nogui

@@ -1,0 +1,354 @@
+Step #0.00 (0ms ?*RT. ?UPS, TraCI: 5ms, vehicles TOT 0 ACT 0 BUF 0)                       Step #10.00 (1ms ~= 100.00*RT, ~9000.00UPS, TraCI: 15ms, vehicles TOT 9 ACT 9 BUF 0)      Step #20.00 (0ms ?*RT. ?UPS, TraCI: 23ms, vehicles TOT 18 ACT 12 BUF 0)                   Step #30.00 (0ms ?*RT. ?UPS, TraCI: 11ms, vehicles TOT 24 ACT 6 BUF 0)                    Step #40.00 (0ms ?*RT. ?UPS, TraCI: 19ms, vehicles TOT 33 ACT 9 BUF 0)                    Step #50.00 (0ms ?*RT. ?UPS, TraCI: 32ms, vehicles TOT 47 ACT 18 BUF 0)                   Step #60.00 (0ms ?*RT. ?UPS, TraCI: 39ms, vehicles TOT 53 ACT 18 BUF 0)                   Step #70.00 (0ms ?*RT. ?UPS, TraCI: 10ms, vehicles TOT 58 ACT 6 BUF 0)                    Step #80.00 (0ms ?*RT. ?UPS, TraCI: 20ms, vehicles TOT 68 ACT 10 BUF 0)                   Step #90.00 (0ms ?*RT. ?UPS, TraCI: 27ms, vehicles TOT 82 ACT 16 BUF 0)                   Step #100.00 (0ms ?*RT. ?UPS, TraCI: 12ms, vehicles TOT 85 ACT 7 BUF 0)                   Step #110.00 (0ms ?*RT. ?UPS, TraCI: 18ms, vehicles TOT 92 ACT 7 BUF 0)                   Step #120.00 (0ms ?*RT. ?UPS, TraCI: 13ms, vehicles TOT 98 ACT 8 BUF 0)                   Step #130.00 (0ms ?*RT. ?UPS, TraCI: 16ms, vehicles TOT 106 ACT 9 BUF 0)                  Step #140.00 (0ms ?*RT. ?UPS, TraCI: 18ms, vehicles TOT 115 ACT 10 BUF 0)                 Step #150.00 (0ms ?*RT. ?UPS, TraCI: 24ms, vehicles TOT 124 ACT 12 BUF 0)                 Step #160.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 133 ACT 12 BUF 0)                 Warning: Vehicle '122' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=1.27, offset=0.07), time=162.20.
+ Retrying in 1 seconds
+Simulation started
+[env] mainlane WeaveZone: measured length 197.40 m
+depart_times[through]: [0.1, 1.1, 3.1, 6.1, 13.1, 14.1, 16.1, 24.1, 25.1, 26.1, 31.1, 33.1, 35.1, 40.1, 42.1, 45.1, 47.1, 49.1, 51.1, 52.1, 56.1, 59.1, 61.1, 62.1, 64.1, 72.1, 73.1, 74.1, 78.1, 81.1, 84.1, 85.1, 86.1, 88.1, 89.1, 94.1, 100.1, 103.1, 104.1, 106.1, 109.1, 110.1, 113.1, 116.1, 119.1, 123.1, 126.1, 130.1, 131.1, 136.1, 137.1, 140.1, 144.1, 145.1, 146.1, 150.1, 151.1, 152.1, 155.1, 157.1, 164.1, 167.1, 170.1, 173.1, 174.1, 176.1, 179.1, 186.1, 189.1, 193.1, 201.1, 203.1, 217.1, 218.1, 221.1, 226.1, 227.1, 235.1, 238.1, 241.1, 242.1, 244.1, 248.1, 255.1, 256.1, 258.1, 259.1, 265.1, 266.1, 267.1, 280.1, 281.1, 282.1, 287.1, 292.1, 294.1, 295.1, 297.1, 298.1, 299.1, 300.1, 301.1, 307.1, 311.1, 314.1, 316.1, 317.1, 320.1, 323.1, 326.1, 332.1, 334.1, 340.1, 343.1, 345.1, 346.1, 349.1, 350.1, 352.1, 353.1, 356.1, 361.1, 364.1, 365.1, 370.1, 372.1, 374.1, 375.1, 380.1, 383.1, 386.1, 389.1, 392.1, 395.1, 397.1, 401.1, 410.1, 413.1, 420.1, 424.1, 430.1, 436.1, 439.1, 440.1, 442.1, 443.1, 445.1, 446.1, 453.1, 454.1, 455.1, 458.1, 460.1, 463.1, 467.1, 469.1, 470.1, 475.1, 478.1, 479.1, 485.1, 489.1, 490.1, 494.1, 501.1, 503.1, 506.1, 507.1, 511.1, 514.1, 516.1, 517.1, 518.1, 522.1, 526.1, 528.1, 529.1, 530.1, 532.1, 535.1, 540.1, 542.1, 543.1, 545.1, 549.1, 553.1, 554.1, 557.1, 559.1, 562.1, 567.1, 569.1, 571.1, 576.1, 578.1, 580.1, 581.1, 582.1, 584.1, 599.1]
+depart_times[merging]: [0.1, 1.1, 5.1, 10.1, 11.1, 12.1, 21.1, 25.1, 33.1, 39.1, 41.1, 42.1, 45.1, 48.1, 49.1, 66.1, 70.1, 74.1, 76.1, 77.1, 83.1, 84.1, 86.1, 88.1, 90.1, 97.1, 103.1, 115.1, 122.1, 124.1, 127.1, 131.1, 132.1, 137.1, 138.1, 144.1, 145.1, 147.1, 152.1, 154.1, 158.1, 163.1, 169.1, 175.1, 180.1, 181.1, 188.1, 201.1, 203.1, 207.1, 212.1, 213.1, 221.1, 223.1, 231.1, 236.1, 237.1, 241.1, 248.1, 249.1, 259.1, 261.1, 264.1, 269.1, 270.1, 272.1, 274.1, 285.1, 289.1, 292.1, 304.1, 311.1, 312.1, 318.1, 320.1, 322.1, 327.1, 328.1, 332.1, 333.1, 337.1, 341.1, 349.1, 351.1, 353.1, 362.1, 363.1, 365.1, 373.1, 377.1, 380.1, 381.1, 395.1, 400.1, 402.1, 413.1, 416.1, 417.1, 418.1, 420.1, 427.1, 428.1, 434.1, 436.1, 442.1, 443.1, 444.1, 447.1, 448.1, 449.1, 450.1, 452.1, 454.1, 455.1, 456.1, 458.1, 460.1, 464.1, 474.1, 476.1, 477.1, 482.1, 484.1, 485.1, 506.1, 509.1, 510.1, 516.1, 517.1, 520.1, 528.1, 529.1, 530.1, 531.1, 537.1, 543.1, 544.1, 545.1, 556.1, 565.1, 566.1, 568.1, 573.1, 580.1, 581.1, 585.1, 588.1, 590.1, 592.1, 597.1]
+depart_times[diverging]: [3.1, 5.1, 11.1, 13.1, 15.1, 20.1, 35.1, 36.1, 38.1, 39.1, 41.1, 42.1, 44.1, 46.1, 52.1, 57.1, 61.1, 71.1, 77.1, 82.1, 84.1, 86.1, 88.1, 108.1, 115.1, 122.1, 124.1, 128.1, 139.1, 143.1, 146.1, 153.1, 160.1, 161.1, 162.1, 166.1, 167.1, 173.1, 175.1, 182.1, 183.1, 184.1, 189.1, 194.1, 202.1, 203.1, 205.1, 207.1, 210.1, 215.1, 217.1, 221.1, 236.1, 237.1, 239.1, 243.1, 249.1, 261.1, 262.1, 265.1, 267.1, 268.1, 270.1, 272.1, 274.1, 281.1, 285.1, 287.1, 292.1, 294.1, 303.1, 305.1, 307.1, 308.1, 315.1, 317.1, 321.1, 327.1, 331.1, 339.1, 340.1, 341.1, 343.1, 349.1, 351.1, 358.1, 361.1, 365.1, 366.1, 369.1, 372.1, 374.1, 376.1, 382.1, 384.1, 389.1, 392.1, 394.1, 395.1, 400.1, 401.1, 408.1, 412.1, 416.1, 421.1, 424.1, 427.1, 429.1, 432.1, 436.1, 437.1, 439.1, 450.1, 452.1, 461.1, 466.1, 474.1, 479.1, 482.1, 484.1, 486.1, 493.1, 495.1, 496.1, 498.1, 502.1, 510.1, 512.1, 515.1, 518.1, 519.1, 520.1, 526.1, 527.1, 536.1, 541.1, 543.1, 553.1, 556.1, 560.1, 565.1, 566.1, 569.1, 574.1, 576.1, 582.1, 583.1, 591.1, 594.1, 596.1]
+====================================================
+TIME: 0.0  Now: 07:45:17.764933
+====================================================
+[Tc t=0.1] requests=0 assigned=0
+[swap] t=8.8 7(lane1->0) <-> 6(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 10.0  Now: 07:45:19.060925
+====================================================
+[swap] t=14.9 11(lane1->0) <-> 10(lane0->1) pos 6.3/0.2
+====================================================
+TIME: 20.0  Now: 07:45:21.457912
+====================================================
+====================================================
+TIME: 30.0  Now: 07:45:23.217596
+====================================================
+====================================================
+TIME: 40.0  Now: 07:45:24.633677
+====================================================
+[Tc t=50.0] requests=3 assigned=3
+    veh=32 dist=-5.8 k=2 <- provider=34
+    veh=28 dist=1.8 k=1 <- provider=30
+    veh=38 dist=139.6 k=1 <- provider=42
+====================================================
+TIME: 50.0  Now: 07:45:27.401600
+====================================================
+====================================================
+TIME: 60.0  Now: 07:45:32.724459
+====================================================
+====================================================
+TIME: 70.0  Now: 07:45:34.815824
+====================================================
+====================================================
+TIME: 80.0  Now: 07:45:36.720665
+====================================================
+[swap] t=80.9 66(lane1->0) <-> 65(lane0->1) pos 6.3/0.2
+[swap] t=87.9 73(lane1->0) <-> 72(lane0->1) pos 6.3/0.2
+====================================================
+TIME: 90.0  Now: 07:45:39.060308
+====================================================
+[swap] t=91.7 80(lane1->0) <-> 79(lane0->1) pos 0.8/0.2
+[Tc t=100.0] requests=0 assigned=0
+====================================================
+TIME: 100.0  Now: 07:45:41.443525
+====================================================
+====================================================
+TIME: 110.0  Now: 07:45:42.636309
+====================================================
+[swap] t=118.8 95(lane1->0) <-> 94(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 120.0  Now: 07:45:44.296810
+====================================================
+[swap] t=125.8 99(lane1->0) <-> 98(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 130.0  Now: 07:45:45.955732
+====================================================
+====================================================
+TIME: 140.0  Now: 07:45:47.871484
+====================================================
+[Tc t=150.0] requests=2 assigned=1
+    veh=122 dist=138.3 k=2 <- provider=121
+    veh=120 dist=166.6 k=1 <- provider=-
+====================================================
+TIME: 150.0  Now: 07:45:49.931928
+====================================================
+====================================================
+TIME: 160.0  Now: 07:45:52.991255
+====================================================
+====================================================
+TIME: 170.0  Now: 07:45:56.075468
+====================================================
+====================================================
+TIME: 180.0  Now: 07:45:58.493357
+====================================================
+====================================================
+TIME: 190.0  Now: 07:46:00.588579
+====================================================
+[Tc t=200.0] requests=0 assigned=0
+====================================================
+TIME: 200.0  Now: 07:46:02.069221
+====================================================
+====================================================
+TIME: 210.0  Now: 07:46:03.595520
+====================================================
+[swap] t=210.8 169(lane1->0) <-> 168(lane0->1) pos 3.5/2.9
+[swap] t=212.9 165(lane0->1) <-> 166(lane1->0) pos 148.0/143.3
+====================================================
+TIME: 220.0  Now: 07:46:05.625645
+====================================================
+====================================================
+TIME: 230.0  Now: 07:46:07.744003
+====================================================
+[swap] t=239.8 186(lane1->0) <-> 185(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 240.0  Now: 07:46:09.538519
+====================================================
+[swap] t=241.0 188(lane1->0) <-> 187(lane0->1) pos 3.5/3.0
+[Tc t=250.0] requests=0 assigned=0
+====================================================
+TIME: 250.0  Now: 07:46:11.943146
+====================================================Step #170.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 142 ACT 17 BUF 0)                 Step #180.00 (0ms ?*RT. ?UPS, TraCI: 18ms, vehicles TOT 150 ACT 9 BUF 0)                  Step #190.00 (0ms ?*RT. ?UPS, TraCI: 21ms, vehicles TOT 159 ACT 10 BUF 0)                 Step #200.00 (0ms ?*RT. ?UPS, TraCI: 9ms, vehicles TOT 161 ACT 5 BUF 0)                   Step #210.00 (0ms ?*RT. ?UPS, TraCI: 19ms, vehicles TOT 170 ACT 9 BUF 0)                  Step #220.00 (1ms ~= 100.00*RT, ~8000.00UPS, TraCI: 17ms, vehicles TOT 177 ACT 8 BUF 0)   Step #230.00 (0ms ?*RT. ?UPS, TraCI: 23ms, vehicles TOT 183 ACT 8 BUF 0)                  Step #240.00 (0ms ?*RT. ?UPS, TraCI: 22ms, vehicles TOT 191 ACT 9 BUF 0)                  Step #250.00 (1ms ~= 100.00*RT, ~12000.00UPS, TraCI: 25ms, vehicles TOT 200 ACT 12 BUF 0) Step #260.00 (0ms ?*RT. ?UPS, TraCI: 19ms, vehicles TOT 205 ACT 9 BUF 0)                  Step #270.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 216 ACT 14 BUF 0)                 Step #280.00 (0ms ?*RT. ?UPS, TraCI: 21ms, vehicles TOT 222 ACT 10 BUF 0)                 Step #290.00 (0ms ?*RT. ?UPS, TraCI: 18ms, vehicles TOT 231 ACT 9 BUF 0)                  Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.02), time=297.50.
+Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=297.60.
+Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=297.70.
+Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=297.80.
+Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=297.90.
+Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=298.00.
+Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=298.10.
+Warning: Vehicle '224' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=298.20.
+Step #300.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 240 ACT 15 BUF 0)                 Step #310.00 (0ms ?*RT. ?UPS, TraCI: 23ms, vehicles TOT 248 ACT 10 BUF 0)                 Step #320.00 (0ms ?*RT. ?UPS, TraCI: 25ms, vehicles TOT 257 ACT 11 BUF 0)                 Warning: Vehicle '246' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=328.80.
+Step #330.00 (0ms ?*RT. ?UPS, TraCI: 35ms, vehicles TOT 266 ACT 18 BUF 0)                 Step #340.00 (0ms ?*RT. ?UPS, TraCI: 36ms, vehicles TOT 273 ACT 10 BUF 0)                 Step #350.00 (0ms ?*RT. ?UPS, TraCI: 26ms, vehicles TOT 284 ACT 12 BUF 0)                 Warning: Vehicle '274' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=1.27, offset=0.07), time=356.20.
+Step #360.00 (0ms ?*RT. ?UPS, TraCI: 35ms, vehicles TOT 292 ACT 17 BUF 0)                 Step #370.00 (0ms ?*RT. ?UPS, TraCI: 36ms, vehicles TOT 302 ACT 16 BUF 0)                 Step #380.00 (0ms ?*RT. ?UPS, TraCI: 41ms, vehicles TOT 311 ACT 18 BUF 0)                 Step #390.00 (1ms ~= 100.00*RT, ~12000.00UPS, TraCI: 29ms, vehicles TOT 320 ACT 12 BUF 0) Step #400.00 (0ms ?*RT. ?UPS, TraCI: 17ms, vehicles TOT 327 ACT 9 BUF 0)                  Step #410.00 (0ms ?*RT. ?UPS, TraCI: 13ms, vehicles TOT 333 ACT 6 BUF 0)                  Step #420.00 (0ms ?*RT. ?UPS, TraCI: 17ms, vehicles TOT 341 ACT 9 BUF 0)                  Step #430.00 (0ms ?*RT. ?UPS, TraCI: 28ms, vehicles TOT 350 ACT 15 BUF 0)                 Warning: Vehicle '336' performs emergency stop at the end of lane 'WeaveZone_0' because there is no connection to the next edge (decel=2.34, offset=0.03), time=433.70.
+Step #440.00 (0ms ?*RT. ?UPS, TraCI: 45ms, vehicles TOT 359 ACT 22 BUF 0)                 Warning: Vehicle '345' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=447.20.
+Step #450.00 (0ms ?*RT. ?UPS, TraCI: 48ms, vehicles TOT 370 ACT 26 BUF 0)                 Step #460.00 (0ms ?*RT. ?UPS, TraCI: 65ms, vehicles TOT 382 ACT 34 BUF 0)                 Warning: Vehicle '355' performs emergency stop at the end of lane 'WeaveZone_2' because there is no connection to the next edge (decel=2.34, offset=0.03), time=467.10.
+Warning: Vehicle '355' performs emergency stop at the end of lane 'WeaveZone_1' because there is no connection to the next edge (decel=2.34, offset=0.03), time=467.20.
+Step #470.00 (1ms ~= 100.00*RT, ~41000.00UPS, TraCI: 81ms, vehicles TOT 390 ACT 41 BUF 0) Warning: Vehicle '383' performs emergency braking on lane 'OnRamp_0' with decel=9.00, wished=5.00, severity=1.00, time=471.40.
+Warning: Vehicle '383' performs emergency braking on lane 'OnRamp_0' with decel=9.00, wished=5.00, severity=1.00, time=471.70.
+Warning: Vehicle '383' performs emergency braking on lane 'OnRamp_0' with decel=9.00, wished=5.00, severity=1.00, time=472.00.
+Warning: Vehicle '383' performs emergency braking on lane 'OnRamp_0' with decel=9.00, wished=5.00, severity=1.00, time=472.40.
+Warning: Vehicle '383' performs emergency braking on lane 'OnRamp_0' with decel=9.00, wished=5.00, severity=1.00, time=472.70.
+Warning: Vehicle '389' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=479.50.
+Warning: Vehicle '389' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=479.80.
+Step #480.00 (0ms ?*RT. ?UPS, TraCI: 424ms, vehicles TOT 399 ACT 39 BUF 0)                Warning: Vehicle '389' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=480.10.
+Warning: Vehicle '389' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=480.50.
+Step #490.00 (1ms ~= 100.00*RT, ~47000.00UPS, TraCI: 90ms, vehicles TOT 407 ACT 47 BUF 0) Warning: Teleporting vehicle '394'; collision with vehicle '398', lane='WeaveZone_0', gap=-0.80, time=496.70, stage=move.
+Warning: Vehicle '394' ends teleporting on edge 'MainLane', time=497.90.
+Step #500.00 (0ms ?*RT. ?UPS, TraCI: 82ms, vehicles TOT 413 ACT 43 BUF 0)                 Step #510.00 (0ms ?*RT. ?UPS, TraCI: 64ms, vehicles TOT 420 ACT 39 BUF 0)                 Step #520.00 (0ms ?*RT. ?UPS, TraCI: 72ms, vehicles TOT 433 ACT 45 BUF 0)                 Step #530.00 (0ms ?*RT. ?UPS, TraCI: 76ms, vehicles TOT 442 ACT 45 BUF 1)                 Step #540.00 (0ms ?*RT. ?UPS, TraCI: 79ms, vehicles TOT 450 ACT 49 BUF 0)                 Warning: Vehicle '441' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=545.70.
+Step #550.00 (0ms ?*RT. ?UPS, TraCI: 72ms, vehicles TOT 460 ACT 52 BUF 0)                 Warning: Vehicle '447' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=558.10.
+Step #560.00 (0ms ?*RT. ?UPS, TraCI: 71ms, vehicles TOT 467 ACT 51 BUF 0)                 Warning: Vehicle '455' performs emergency braking on lane 'MainApproach_1' with decel=9.00, wished=5.00, severity=1.00, time=560.10.
+Warning: Vehicle '455' performs emergency braking on lane 'MainApproach_1' with decel=9.00, wished=5.00, severity=1.00, time=560.30.
+Step #570.00 (0ms ?*RT. ?UPS, TraCI: 58ms, vehicles TOT 475 ACT 45 BUF 2)                 Step #580.00 (0ms ?*RT. ?UPS, TraCI: 58ms, vehicles TOT 483 ACT 43 BUF 0)                 Warning: Vehicle '479' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=584.30.
+Warning: Vehicle '479' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=584.60.
+Warning: Vehicle '479' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=585.00.
+Warning: Vehicle '479' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=585.30.
+Step #590.00 (1ms ~= 100.00*RT, ~47000.00UPS, TraCI: 45ms, vehicles TOT 493 ACT 47 BUF 0) Step #600.00 (0ms ?*RT. ?UPS, TraCI: 47ms, vehicles TOT 500 ACT 50 BUF 0)                 Warning: Vehicle '490' performs emergency braking on lane 'MainApproach_0' with decel=9.00, wished=5.00, severity=1.00, time=609.30.
+Step #610.00 (0ms ?*RT. ?UPS, TraCI: 38ms, vehicles TOT 500 ACT 38 BUF 0)                 Warning: Vehicle '498' performs emergency braking on lane 'OnRamp_0' with decel=9.00, wished=5.00, severity=1.00, time=610.60.
+Warning: Teleporting vehicle '498'; collision with vehicle '495', lane='OnRamp_0', gap=-0.06, time=610.80, stage=move.
+Warning: Vehicle '498' ends teleporting on edge 'WeaveZone', time=610.80.
+
+[swap] t=252.9 199(lane1->0) <-> 198(lane0->1) pos 6.3/0.2
+====================================================
+TIME: 260.0  Now: 07:46:13.828735
+====================================================
+[swap] t=264.8 206(lane1->0) <-> 205(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 270.0  Now: 07:46:16.585237
+====================================================
+[swap] t=273.9 217(lane1->0) <-> 216(lane0->1) pos 6.3/0.2
+[swap] t=275.8 219(lane1->0) <-> 218(lane0->1) pos 3.5/3.0
+[swap] t=277.8 221(lane1->0) <-> 220(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 280.0  Now: 07:46:19.489617
+====================================================
+[swap] t=288.8 227(lane1->0) <-> 226(lane0->1) pos 3.5/2.9
+====================================================
+TIME: 290.0  Now: 07:46:21.370703
+====================================================
+[swap] t=295.7 233(lane1->0) <-> 232(lane0->1) pos 0.8/0.2
+[Tc t=300.0] requests=0 assigned=0
+====================================================
+TIME: 300.0  Now: 07:46:24.074626
+====================================================
+====================================================
+TIME: 310.0  Now: 07:46:27.271491
+====================================================
+====================================================
+TIME: 320.0  Now: 07:46:29.589488
+====================================================
+====================================================
+TIME: 330.0  Now: 07:46:32.981407
+====================================================
+[swap] t=331.0 263(lane0->1) <-> 264(lane1->0) pos 7.8/3.5
+====================================================
+TIME: 340.0  Now: 07:46:36.579510
+====================================================
+[swap] t=345.3 275(lane0->1) <-> 276(lane1->0) pos 15.8/11.5
+[Tc t=350.0] requests=1 assigned=1
+    veh=274 dist=-0.5 k=2 <- provider=273
+====================================================
+TIME: 350.0  Now: 07:46:39.014683
+====================================================
+[swap] t=352.7 283(lane1->0) <-> 282(lane0->1) pos 0.8/0.2
+====================================================
+TIME: 360.0  Now: 07:46:42.312261
+====================================================
+====================================================
+TIME: 370.0  Now: 07:46:45.894618
+====================================================
+====================================================
+TIME: 380.0  Now: 07:46:50.093958
+====================================================
+[swap] t=382.6 307(lane1->0) <-> 305(lane0->1) pos 94.1/94.0
+====================================================
+TIME: 390.0  Now: 07:46:53.787858
+====================================================
+[swap] t=398.9 324(lane0->1) <-> 325(lane1->0) pos 5.7/0.8
+[Tc t=400.0] requests=1 assigned=1
+    veh=321 dist=36.2 k=2 <- provider=324
+====================================================
+TIME: 400.0  Now: 07:46:55.680850
+====================================================
+[swap] t=403.8 328(lane1->0) <-> 327(lane0->1) pos 3.5/2.9
+====================================================
+TIME: 410.0  Now: 07:46:57.676871
+====================================================
+[swap] t=419.8 338(lane1->0) <-> 337(lane0->1) pos 3.5/3.0
+====================================================
+TIME: 420.0  Now: 07:46:59.062596
+====================================================
+====================================================
+TIME: 430.0  Now: 07:47:01.251940
+====================================================
+[swap] t=430.8 347(lane1->0) <-> 346(lane0->1) pos 3.2/2.9
+====================================================
+TIME: 440.0  Now: 07:47:04.799436
+====================================================
+[Tc t=450.0] requests=5 assigned=5
+    veh=351 dist=-36.4 k=2 <- provider=344
+    veh=355 dist=-1.0 k=2 <- provider=350
+    veh=358 dist=51.8 k=2 <- provider=357
+    veh=354 dist=77.4 k=1 <- provider=353
+    veh=361 dist=149.7 k=1 <- provider=362
+====================================================
+TIME: 450.0  Now: 07:47:09.215223
+====================================================
+====================================================
+TIME: 460.0  Now: 07:47:15.244776
+====================================================
+====================================================
+TIME: 470.0  Now: 07:47:22.790832
+====================================================
+====================================================
+TIME: 480.0  Now: 07:47:31.290879
+====================================================
+[swap] t=482.2 387(lane1->0) <-> 383(lane0->1) pos 2.8/0.1
+====================================================
+TIME: 490.0  Now: 07:47:40.344824
+====================================================
+[swap] t=493.2 391(lane0->1) <-> 398(lane1->0) pos 2.2/0.1
+Collision detected at 496.7 between: 398, 394
+[Tc t=500.0] requests=7 assigned=6
+    veh=372 dist=83.2 k=1 <- provider=376
+    veh=378 dist=105.6 k=1 <- provider=380
+    veh=392 dist=109.8 k=2 <- provider=389
+    veh=379 dist=137.1 k=1 <- provider=385
+    veh=381 dist=149.6 k=1 <- provider=383
+    veh=386 dist=172.8 k=1 <- provider=391
+    veh=395 dist=197.2 k=1 <- provider=-
+====================================================
+TIME: 500.0  Now: 07:47:49.941493
+====================================================
+====================================================
+TIME: 510.0  Now: 07:47:57.165619
+====================================================
+[swap] t=517.9 414(lane1->0) <-> 420(lane0->1) pos 9.5/2.4
+====================================================
+TIME: 520.0  Now: 07:48:04.045243
+====================================================
+[swap] t=523.7 423(lane1->0) <-> 427(lane0->1) pos 3.7/3.5
+====================================================
+TIME: 530.0  Now: 07:48:11.811246
+====================================================
+[swap] t=539.8 440(lane0->1) <-> 437(lane1->0) pos 3.1/0.1
+====================================================
+TIME: 540.0  Now: 07:48:19.882226
+====================================================
+[swap] t=549.8 438(lane1->0) <-> 444(lane0->1) pos 2.8/0.1
+[Tc t=550.0] requests=6 assigned=5
+    veh=421 dist=-1.6 k=2 <- provider=417
+    veh=419 dist=81.2 k=1 <- provider=420
+    veh=434 dist=89.3 k=2 <- provider=432
+    veh=433 dist=138.6 k=1 <- provider=440
+    veh=432 dist=168.5 k=1 <- provider=-
+    veh=442 dist=185.6 k=1 <- provider=444
+====================================================
+TIME: 550.0  Now: 07:48:28.407120
+====================================================
+====================================================
+TIME: 560.0  Now: 07:48:35.356240
+====================================================
+[swap] t=569.7 451(lane1->0) <-> 458(lane0->1) pos 3.5/0.1
+====================================================
+TIME: 570.0  Now: 07:48:41.958921
+====================================================
+====================================================
+TIME: 580.0  Now: 07:48:47.958669
+====================================================
+[swap] t=589.6 484(lane0->1) <-> 479(lane1->0) pos 0.6/0.0
+====================================================
+TIME: 590.0  Now: 07:48:53.395923
+====================================================
+[Tc t=600.0] requests=12 assigned=8
+    veh=467 dist=62.5 k=2 <- provider=468
+    veh=463 dist=64.9 k=1 <- provider=465
+    veh=470 dist=80.3 k=2 <- provider=475
+    veh=469 dist=89.8 k=1 <- provider=466
+    veh=472 dist=93.4 k=2 <- provider=477
+    veh=471 dist=114.1 k=1 <- provider=484
+    veh=476 dist=117.2 k=2 <- provider=480
+    veh=474 dist=128.0 k=1 <- provider=482
+    veh=481 dist=128.6 k=2 <- provider=-
+    veh=478 dist=147.1 k=1 <- provider=-
+    veh=486 dist=174.5 k=1 <- provider=-
+    veh=491 dist=187.9 k=1 <- provider=-
+====================================================
+TIME: 600.0  Now: 07:48:58.433480
+====================================================
+[swap] t=608.8 489(lane1->0) <-> 495(lane0->1) pos 0.8/0.1
+====================================================
+TIME: 610.0  Now: 07:49:03.093273
+====================================================
+Collision detected at 610.8 between: 495, 498
+====================================================Step #620.00 (0ms ?*RT. ?UPS, TraCI: 31ms, vehicles TOT 500 ACT 32 BUF 0)                 Step #630.00 (0ms ?*RT. ?UPS, TraCI: 30ms, vehicles TOT 500 ACT 30 BUF 0)                 Step #640.00 (0ms ?*RT. ?UPS, TraCI: 24ms, vehicles TOT 500 ACT 25 BUF 0)                 Step #650.00 (0ms ?*RT. ?UPS, TraCI: 12ms, vehicles TOT 500 ACT 13 BUF 0)                 Step #659.20 (0ms ?*RT. ?UPS, TraCI: 5ms, vehicles TOT 500 ACT 2 BUF 0)                   
+
+TIME: 620.0  Now: 07:49:06.695832
+====================================================
+====================================================
+TIME: 630.0  Now: 07:49:09.825186
+====================================================
+[swap] t=631.5 478(lane0->1) <-> 472(lane1->0) pos 129.6/128.6
+====================================================
+TIME: 640.0  Now: 07:49:12.554604
+====================================================
+[Tc t=650.0] requests=1 assigned=0
+    veh=497 dist=128.7 k=1 <- provider=-
+====================================================
+TIME: 650.0  Now: 07:49:14.323391
+====================================================
+=====================================
+simulation end
+total generated vehicles : 500
+running vehicles : 2
+exit vehicles : 498
+total departed vehicles : 500
+traffic volume: 3000.0 pcu/h
+canceled vehicles : 1
+=====================================
+Phase A: Tc rounds with key ties (should be 0): 0
+Phase B: Tc rounds with double-assigned providers (should be 0): 0
+Layer2: total instant lane changes executed: 385
+Speed: emergency brake events (decel above |MAX_DECEL|): 70
+Speed: rule counts (vehicle-steps): align=6799, critical=820, emergency=70, follow=47923, hold=8230, limit=64258, yield=9231
+Deadline: mandatory-LC completed/requested = 299/299 (rate 1.000)
+
+=== Collision Summary ===
+Total collision events: 2
+Total vehicles involved: 4
+Time 496.7: Collision between vehicles: 398, 394
+Time 610.8: Collision between vehicles: 495, 498
