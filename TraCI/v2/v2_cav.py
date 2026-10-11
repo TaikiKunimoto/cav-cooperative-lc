@@ -150,7 +150,7 @@ class V2CAV(BaseModel):
         （テレポート無効方針 §2.4.1 と整合）。出口時とシミュレーション終了時の双方から呼ばれ、
         出口/残存いずれの車も一度だけ計上される。
         """
-        requested = [op for op in self.operations if not op.is_avoidance and op.activated]
+        requested = [op for op in self.operations if not op.is_avoidance and not op.is_return and op.activated]
         if requested:
             completed = sum(1 for op in requested if op.completed_in_time)
             n_collided = len(requested) if collided else 0
@@ -175,7 +175,7 @@ class V2CAV(BaseModel):
         """
         rows: list[dict[str, Any]] = []
         for op in self.operations:
-            if not op.activated:
+            if not op.activated or op.is_return:
                 continue
             if op.completed_in_time and not collided:
                 continue
@@ -234,7 +234,7 @@ class V2CAV(BaseModel):
         """
         rows: list[dict[str, Any]] = []
         for op in self.operations:
-            if op.is_avoidance or not op.activated:
+            if op.is_avoidance or op.is_return or not op.activated:
                 continue
             if op.completed_in_time and (op.completion_time is None or op.completion_pos is None):
                 raise ValueError(
@@ -299,7 +299,7 @@ class V2CAV(BaseModel):
         if self.road != mainlane_edge:
             return
         for op in self.operations:
-            if op.completed_in_time:
+            if op.completed_in_time or op.is_return:
                 continue
             if op.is_avoidance:
                 if op.is_done(self.lane, self.lane_pos):

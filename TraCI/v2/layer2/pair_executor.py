@@ -95,6 +95,10 @@ class Layer2:
             requester = by_id.get(req.veh_id)
             if requester is None:
                 continue
+            if requester.road != snap.mainlane_edge or requester.lane != req.current_lane:
+                # 要求の鮮度: 調停（Tc）の後に本線を出た／レーンが変わった車の古い要求は実行しない
+                # （Tc > step のとき。古い要求の changeLane は車線数の少ない edge で例外になる）
+                continue
             target_lane = Safety.next_lane(req)
             check = Layer2._insertion_check_live(requester.id, requester.speed, target_lane < req.current_lane)
             if check.ok and Layer2._slot_free(committed, target_lane, req.current_pos):

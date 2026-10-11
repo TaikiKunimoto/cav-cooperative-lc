@@ -200,7 +200,14 @@ class V2Simulation(BaseModel):
                     obstacle_metrics.on_placed(obstacle_placed_pos, current_time)
             # 障害物より後方・同一レーンの through 車に必須LC（回避）を動的付与＝エスカレーション（コア機構 §4）
             if self.obstacle is not None and obstacle_placed_pos is not None:
-                self.obstacle.escalate(active, self.env.mainlane_edge, obstacle_placed_pos, obstacle_num_lanes)
+                self.obstacle.escalate(
+                    active,
+                    self.env.mainlane_edge,
+                    obstacle_placed_pos,
+                    obstacle_num_lanes,
+                    self.env.through_lanes,
+                    self.env.mainlane_length,
+                )
             if obstacle_metrics is not None:
                 obstacle_metrics.step(active, self.env.mainlane_edge)
 
