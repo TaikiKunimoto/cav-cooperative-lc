@@ -9,7 +9,7 @@ metadata:
 
 2026-06-16 に実施した提案手法 v2 の評価（明日のスライド1–2枚用）。パイプラインは `scripts/eval/`（当時の実操作: `run_sweep.py`→`aggregate.py`→`make_figures.py`、PR#49の効果検証は `compare_fix.py`）。成果物は `scripts/eval/out/`（figures/・summary_*・FINDINGS.md・eval_deliverable.zip）。
 
-**現在(2026-07)のツール**: 上記個別ステップは `run_all.py` に一気通貫化された（実行→集計→作図→Excel。`uv run python scripts/eval/run_all.py --suite proposed [--quick]`、集計以降のみは `--skip-sweep`）。PR #50（パイプライン＋評価フック＋`config/v1-fast`）と PR #52（run_all・export_excel・check_determinism・sgnlab リモート）は**マージ済み**。詳細 `scripts/eval/README.md`、運用ルール `docs/評価運用SOP.md`、リモート実行 `scripts/remote/`。スキル `eval-sweep`・`sgnlab-eval` で呼べる。
+**現在(2026-07)のツール**: 上記個別ステップは `run_all.py` に一気通貫化された（実行→集計→作図→Excel。`uv run python scripts/eval/run_all.py --suite proposed [--quick]`、集計以降のみは `--skip-sweep`）。PR #50（パイプライン＋評価フック＋`config/v1-fast`）と PR #52（run_all・export_excel・check_determinism・sgnlab リモート）は**マージ済み**。詳細 `scripts/eval/README.md`、運用ルール `docs/評価運用SOP.md`。スキル `eval-sweep` で呼べる（sgnlab-eval と `scripts/remote/` は 2026-10-14 に廃止）。
 
 **結果（389 run）**:
 - メッセージA成立：単一機構で4必須LC環境の締切達成率 平均 97.9〜99.6%（diverge/merge/weave/weave2）。図1。

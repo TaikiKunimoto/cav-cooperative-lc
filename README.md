@@ -118,7 +118,6 @@ uv run python scripts/eval/run_all.py --suite proposed           # フルスイ�
 ```
 
 - 使い方の詳細：`scripts/eval/README.md`
-- sgnlab（リモート）実行：`scripts/remote/README.md`
 - 運用ルール・再現性・QAチェックリスト：`docs/評価運用SOP.md`
 
 ---
