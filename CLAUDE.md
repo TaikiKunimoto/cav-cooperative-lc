@@ -21,7 +21,6 @@
 - `TraCI/v1/` — ベースライン（卒論手法 `custom`・LC2013 `default`・`simple`）。**凍結: 今後は使わない**
 - `config/v2/<env>/` — 評価環境（diverge / merge / straight / weave / weave2）の net・rou
 - `scripts/eval/` — 評価スイープ・集計・作図・Excel（`/eval-sweep` スキル，運用ルールは `docs/評価運用SOP.md`）
-- `scripts/remote/` — sgnlab サーバでの実行（`/sgnlab-eval` スキル）
 - `tests/golden/` — 挙動不変を確かめる golden-master（v1・v2）
 - `docs/` — `spec/`（現行コードの仕様。v2 を読む・直すときはまずここ），実装計画（`実装計画_EDF統一調停_確定版.md` は設計時の仕様），評価運用 SOP
 

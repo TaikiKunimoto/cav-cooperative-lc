@@ -20,7 +20,7 @@
 | `export_excel.py` | 集計結果＋来歴を1つの Excel ブックへ → `out/excel/評価サマリ_<git>_<日時>.xlsx`（毎回新規＝上書きなし） |
 | `check_determinism.py` | 同一条件・同一seed を複数回実行し結果一致を検証（実装変更後の再現性ガード） |
 
-sgnlab（リモート）で回す場合は `scripts/remote/README.md`、運用ルールは `docs/評価運用SOP.md` を参照。
+運用ルールは `docs/評価運用SOP.md` を参照。
 
 ## 使い方（リポジトリ直下から）
 

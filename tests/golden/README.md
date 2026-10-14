@@ -53,7 +53,7 @@ SUMO 1.27 を .pkg(framework) で導入。ハーネスは環境変数 `SUMO_HOME
 
 ## 注意
 - `snapshots/` はマシン/SUMOバージョン依存のため **git管理外**（`.gitignore`）。
-  リファクタ前に各自 `record` して基準を作る。macOS で採った基準は Linux（sgnlab）では一致しない
+  リファクタ前に各自 `record` して基準を作る。macOS で採った基準は Linux（研究室のデスクトップ）では一致しない
   （同じ seed でもプラットフォームで結果が変わる）ので、採ったマシンで `check` する。
 - Python client(traci/sumolib) は pin 1.22、SUMO 本体は 1.27。現状この組合せで動作
   （`default_cav` の `lcm=`/`sm=` 非推奨警告は出るが機能する）。
