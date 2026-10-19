@@ -11,6 +11,7 @@ config ディレクトリを自動判定してリンクを張る）。
 
 ## 進め方・作法（feedback）
 
+- [現実の車にできない操作を入れない](physically-feasible-maneuvers-only.md) — 実装・分析・仕様・評価のたびに「現実の車がその操作をできるか」を確かめる。SUMO が衝突と数えないことは根拠にならない（2026-10-19）
 - [日本語で連絡](japanese-for-user-communication.md) — ユーザーへの問いかけ・進捗報告は日本語で
 - [main直push禁止](no-direct-push-to-main.md) — 変更は必ずブランチ→commit→PR
 

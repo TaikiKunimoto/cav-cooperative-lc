@@ -43,6 +43,7 @@ uv run python tests/golden/run_golden.py check --suite v2        # v2 の挙動�
 ## 規約
 
 - **main に直接 push しない。** ブランチ → commit → PR。
+- **現実の車にできない操作をシミュレーションに入れない。** 車線変更・入れ替え・停止・加減速などの操作は，現実の車ができるか（車体が重ならないか，止まった車は前に進まないと横へ動けない，加減速度の上限など）を確かめてから入れる。既存の操作の分析・docs でも同じ点検をする。SUMO が衝突と判定しないことや達成率が上がることは根拠にならない（`.claude-memory/physically-feasible-maneuvers-only.md`）。
 - タスクは Notion「⚜️タスク」DB の TSK 番号で管理する（GitHub Issue は使わない）。ブランチ名は `種類/TSK-番号-要約`，コミットの件名と PR タイトルの末尾に `[TSK-番号]` を付ける。
 - class 主体で書く: 操作ごとの自由関数を並べず，意味を持つ class（RSU・EDF・Safety・Snapshot・LCRequest など）に classmethod / staticmethod として振る舞いを持たせる。生成系は `from_spec` / `capture` / `build_all` のような classmethod。
 - 想定外の入力は境界で検証し，期待と受け取った値を含めて `raise ValueError(...)` する。
