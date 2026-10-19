@@ -3,7 +3,7 @@
     <node id="MainStart" x="-500.00" y="0.00" type="dead_end"/>
     <node id="OnRampStart" x="-300.00" y="-15.00" type="dead_end"/>
     <node id="WeaveStart" x="0.00" y="0.00" type="priority"/>
-    <node id="WeaveEnd" x="457.00" y="0.00" type="priority"/>
-    <node id="End" x="657.00" y="0.00" type="dead_end"/>
-    <node id="ExitEnd" x="657.00" y="-12.00" type="dead_end"/>
+    <node id="WeaveEnd" x="275.00" y="0.00" type="priority"/>
+    <node id="End" x="475.00" y="0.00" type="dead_end"/>
+    <node id="ExitEnd" x="475.00" y="-12.00" type="dead_end"/>
 </nodes>

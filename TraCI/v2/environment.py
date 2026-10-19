@@ -217,14 +217,14 @@ WEAVE2 = Environment(
 )
 
 # --- 環境④ MD-1f 一側織込み: 本線 2 車線と合流ランプ（40 km/h）が WeaveStart で連結し、ランプの車線が補助車線
-# （WeaveZone lane0）になる。織込み区間（WeaveZone 3 車線、457 m）の補助車線で、合流車（OnRamp→lane0→本線 lane1、上へ）と
-# 出口へ行く車（本線→lane0→出口、下へ）が逆向きに交差する。補助車線は WeaveEnd で出口ランプ（ExitRamp）へ抜ける。
-# 区間長 457 m は仮（1,500 ft）。日本の基準値を確かめたら build_networks.py の Geometry.weave と一緒に差し替える ---
+# （WeaveZone lane0）になる。織込み区間（WeaveZone 3 車線、275 m＝ランプの接続端間の距離の標準値、本線 96〜113 km/h）の
+# 補助車線で、合流車（OnRamp→lane0→本線 lane1、上へ）と出口へ行く車（本線→lane0→出口、下へ）が逆向きに交差する。
+# 補助車線は WeaveEnd で出口ランプ（ExitRamp）へ抜ける ---
 WEAVE = Environment(
     name="weave",
     sumocfg="../config/v2/weave/weave.sumocfg",
     mainlane_edge="WeaveZone",  # 補助車線を含む3車線の織込み区間（調停対象）
-    mainlane_length=457.0,  # 補助車線(WeaveZone lane0)が出口へ抜ける位置 ＝ 締切
+    mainlane_length=275.0,  # 補助車線(WeaveZone lane0)が出口へ抜ける位置 ＝ 締切
     through_lanes=(1, 2),
     request_at_entry=True,
     ramp_lanes=(0,),
@@ -232,10 +232,10 @@ WEAVE = Environment(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
         # 合流（オンランプ → 補助車線 WeaveZone lane0 → 本線 lane1 へ上がる）
-        Group(name="merging", route="r_ramp", weight=1.0, target_lane=1, deadline_pos=457.0, depart_edge="OnRamp"),
+        Group(name="merging", route="r_ramp", weight=1.0, target_lane=1, deadline_pos=275.0, depart_edge="OnRamp"),
         # 分流（本線 → 補助車線 WeaveZone lane0 へ降りる → 出口）。合流と逆向きに補助車線で交差＝織込み
         Group(
-            name="diverging", route="r_exit", weight=1.0, target_lane=0, deadline_pos=457.0, depart_edge="MainApproach"
+            name="diverging", route="r_exit", weight=1.0, target_lane=0, deadline_pos=275.0, depart_edge="MainApproach"
         ),
     ),
 )

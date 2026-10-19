@@ -2,7 +2,7 @@
 <edges>
     <edge id="MainApproach" from="MainStart" to="WeaveStart" numLanes="2" speed="27.78" length="500.00" priority="10"/>
     <edge id="OnRamp" from="OnRampStart" to="WeaveStart" numLanes="1" speed="11.11" length="300.00" priority="1" shape="-300.00,-15.00 -100.00,-15.00 -87.50,-14.41 -75.00,-12.93 -62.50,-11.00 -50.00,-9.07 -37.50,-7.59 -25.00,-7.00 0.00,-7.00"/>
-    <edge id="WeaveZone" from="WeaveStart" to="WeaveEnd" numLanes="3" speed="27.78" length="457.00" priority="10"/>
+    <edge id="WeaveZone" from="WeaveStart" to="WeaveEnd" numLanes="3" speed="27.78" length="275.00" priority="10"/>
     <edge id="MainLane" from="WeaveEnd" to="End" numLanes="2" speed="27.78" length="200.00" priority="10"/>
-    <edge id="ExitRamp" from="WeaveEnd" to="ExitEnd" numLanes="1" speed="27.78" length="200.00" priority="1" shape="457.00,-7.00 460.33,-7.37 463.67,-8.29 467.00,-9.50 470.33,-10.71 473.67,-11.63 477.00,-12.00 657.00,-12.00"/>
+    <edge id="ExitRamp" from="WeaveEnd" to="ExitEnd" numLanes="1" speed="27.78" length="200.00" priority="1" shape="275.00,-7.00 278.33,-7.37 281.67,-8.29 285.00,-9.50 288.33,-10.71 291.67,-11.63 295.00,-12.00 475.00,-12.00"/>
 </edges>
