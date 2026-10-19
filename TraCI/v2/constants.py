@@ -15,6 +15,10 @@ MAX_DECEL: float = -5.0  # [m/s^2] 最大減速度（vType decel=5.0 と統一�
 # 緊急制動の上限減速度。最大減速 |MAX_DECEL| では前車速度へ揃える前にバンパー間が minGap を割るときだけ、
 # ここまでの減速を許す（SUMO vType の emergencyDecel 既定値と同じ）。発動回数は結果に出力する。
 EMERGENCY_DECEL: float = 9.0  # [m/s^2]
+# 突発障害物になる車の減速度。指定時刻以降、この減速度で止まれば指定位置で止まれる地点に来た車を障害物にし、
+# 減速させて指定位置で停車させる（1 step で止めると直後 40 m 以内の後続は物理的に止まれない）。
+# 前が詰まっていれば追従の安全側（|MAX_DECEL| まで）が優先される。
+OBSTACLE_DECEL: float = 2.5  # [m/s^2]
 MIN_GAP: float = 2.8  # [m] 最小車間距離（vType minGap と統一。提案は model_post_init で setMinGap）
 VEH_LENGTH: float = 5.0  # [m] 車長（vType length と統一）
 # SUMO の laneChangeMode 既定値（strategic/cooperative/speedGain/keepRight 有効・traci と衝突時は安全側）。
