@@ -37,10 +37,16 @@ from utils.traci_wrapper import (
 from v2.constants import (
     ALIGN_DECEL,
     ALIGN_DELTA,
+    FOLLOW_GAIN,
+    FOLLOW_MIN_DECEL,
+    FOLLOW_TAU,
+    FRONT_YIELD_LOOKBACK,
     HOLD_DECEL,
     HOLD_MARGIN,
+    LC_SAFETY_MARGIN,
     MAX_DECEL,
     MIN_GAP,
+    OPPOSITE_ORDER,
     SWAP_STOPPED_EPS,
     SWAP_WINDOW,
     TIME_STEP,
@@ -51,6 +57,7 @@ from v2.constants import (
     YIELD_MAX_DURATION,
     YIELD_MIN_RATIO,
     YIELD_MIN_SPEED,
+    YIELD_ON_FRONT,
 )
 from v2.layer1.rsu import Assignment
 from v2.layer2.safety import Safety
@@ -72,6 +79,7 @@ class InsertionCheck:
 
     front_ok: bool
     rear_ok: bool
+    front_short: float = 0.0  # 先行側の不足量 [m]（必要量 − 実ギャップの最大。足りていれば 0）
 
     @property
     def ok(self) -> bool:
@@ -122,6 +130,11 @@ class Layer2:
 
         swapped = Layer2._execute_swaps([r for r in unresolved if not r.accelerating], snap, committed)
         lc_count += len(swapped)
+        yielding_to: dict[str, frozenset[str]] = {}  # 優先度の高い要求車 -> 自分のために下がる対向の低い要求車
+        if OPPOSITE_ORDER > 0:
+            yielding_to = Layer2._order_opposite_pairs(
+                [r for r in unresolved if r.veh_id not in swapped and not r.accelerating], by_id
+            )
 
         for req in unresolved:
             if req.veh_id in swapped:
@@ -130,11 +143,16 @@ class Layer2:
             provider_id = provider_of.get(req.veh_id)
             provider = by_id.get(provider_id) if provider_id is not None else None
             check = checks[req.veh_id]
-            if provider is not None and not check.rear_ok:
-                # 必要なときだけ譲る: 後続側の隙間不足で入れなかった要求にだけ提供車が下がる
-                Layer2._provider_yield(provider, requester, snap.sim_time)
+            yield_on_front = YIELD_ON_FRONT > 0 and not check.front_ok
+            if provider is not None and yield_on_front and YIELD_ON_FRONT >= 2:
+                yield_on_front = Layer2._front_room_from_rear_slack(provider, requester, check.front_short)
+            if provider is not None and (not check.rear_ok or yield_on_front):
+                # 必要なときだけ譲る: 後続側の隙間不足で入れなかった要求に提供車が下がる。YIELD_ON_FRONT>0 なら前側の不足でも
+                # 譲り、要求車が前の車の後ろへ下がる分（前側の不足量）だけ広く空ける
+                extra = check.front_short if yield_on_front else 0.0
+                Layer2._provider_yield(provider, requester, snap.sim_time, extra)
             # 目標レーンのスロットに自分を縦方向で整列させ、挿入成功率を上げる
-            Layer2._requester_align_to_slot(requester, req, check)
+            Layer2._requester_align_to_slot(requester, req, check, yielding_to.get(req.veh_id, frozenset()))
             if req.deadline_pos - req.current_pos <= HOLD_MARGIN:
                 # 締切間近でなお挿入不可: D で止まれる速度を上限にして lane-drop 端の急停止を防ぐ（整列は続ける）
                 Layer2._hold_before_deadline(requester, req)
@@ -172,13 +190,16 @@ class Layer2:
             dist >= Safety.net_required(get_veh_speed(nid), ego_speed)
             for nid, dist in get_veh_neighbors(veh_id, lat)  # 後続（bit2=0）: ego が止まっても後続が止まれる車間
         )
-        front_ok = all(
-            dist >= Safety.net_required(ego_speed, get_veh_speed(nid))
-            for nid, dist in Layer2._front_neighbors(
-                veh_id, going_right, ego_speed
-            )  # 先行: ego が先行へ追突しない車間
+        front_short = max(
+            (
+                Safety.net_required(ego_speed, get_veh_speed(nid)) - dist
+                for nid, dist in Layer2._front_neighbors(
+                    veh_id, going_right, ego_speed
+                )  # 先行: ego が先行へ追突しない車間
+            ),
+            default=0.0,
         )
-        return InsertionCheck(front_ok=front_ok, rear_ok=rear_ok)
+        return InsertionCheck(front_ok=front_short <= 0.0, rear_ok=rear_ok, front_short=max(front_short, 0.0))
 
     @staticmethod
     def _front_neighbors(veh_id: str, going_right: bool, ego_speed: float) -> list[tuple[str, float]]:
@@ -289,6 +310,83 @@ class Layer2:
                 break
         return swapped
 
+    # --- 対向の 2 台の順番（優先度の低い方が下がる） ---
+
+    @staticmethod
+    def _order_opposite_pairs(unresolved: list[LCRequest], by_id: dict[str, V2CAV]) -> dict[str, frozenset[str]]:
+        """隣の車線どうしで互いに相手の車線を目指す 2 台（対向の 2 台）の順番を、優先度（EDF の鍵）で決める（OPPOSITE_ORDER）。
+
+        ``unresolved`` は鍵の昇順（優先度の高い順）。各組で優先度の低い方が ``_stay_behind`` で高い方の後ろへ下がり、
+        高い方が入る場所を自分の前に残す。使う操作は加減速だけで車線は変えない（入れ替えのように車体がすり抜けない）。
+        戻り値は「優先度の高い要求車 -> そのために下がる低い要求車の集合」（高い方の整列で使う）。
+        """
+        yielding_to: dict[str, set[str]] = {}
+        for j, low in enumerate(unresolved):
+            r = by_id.get(low.veh_id)
+            if r is None:
+                continue
+            for high in unresolved[:j]:
+                if not Layer2._is_opposite(low, high):
+                    continue
+                h = by_id.get(high.veh_id)
+                if h is not None and Layer2._stay_behind(r, low, h, high):
+                    yielding_to.setdefault(high.veh_id, set()).add(low.veh_id)
+        return {vid: frozenset(lows) for vid, lows in yielding_to.items()}
+
+    @staticmethod
+    def _is_opposite(a: LCRequest, b: LCRequest) -> bool:
+        """隣の車線どうしで、互いに相手の今の車線へ移りたい 2 台か。"""
+        return Safety.next_lane(a) == b.current_lane and Safety.next_lane(b) == a.current_lane
+
+    @staticmethod
+    def _stay_behind(low: V2CAV, low_req: LCRequest, high: V2CAV, high_req: LCRequest) -> bool:
+        """優先度の低い車を、優先度の高い車の後ろへ下げる。高い車の挿入を妨げる位置にいれば True を返す。
+
+        締切の位置は高い車に残す: 2 台とも締切まで来ると同じ位置で止まり、前にいた低い車も追いつかれて横に並ぶ。
+        そこで締切前の保持の区間では、低い車は締切の 1 台分手前（車長 ＋ minGap ＋ 余裕 2·LC_SAFETY_MARGIN）で
+        HOLD_DECEL で止まれる速度を上限にする（締切前の保持と同じ形）。高い車が車線変更を終えれば外れる。
+
+        高い車が低い車の車線へ入るには、低い車がその後ろに ``Safety.net_required(v_低, v_高)``（挿入判定の後続側と
+        同じ式）だけ離れているか、前に ``Safety.net_required(v_高, v_低)`` だけ離れている必要がある。後ろ側には
+        1 step 分の余裕 LC_SAFETY_MARGIN を足し、止まるときも挿入判定の 0.5 m に余裕 0.5 m を足した車間を残す。
+
+        - 十分前・十分後ろにいる: 何もしない。
+        - 後ろにいるが近い: 不足に比例して高い車の速度より遅い目標を取る（追従と同じ形。高い車が締切で止まっても、
+          その真横や、高い車が入れない近さでは止まらない）。
+        - 横に重なっている（または前寄り）で高い車が走行中: 高い車の速度 − YIELD_DELTA を目標に YIELD_DECEL 以下で
+          下がって後ろへ回る（提供車の譲りと同じ則）。
+        - 高い車が止まっていて低い車が前寄り: 前へ出て空ける（前が詰まっていれば追従の候補が勝つ）。
+        - 高い車が止まっていて低い車が後ろ寄りで重なっている: その場で止まり、それ以上前へ出ない。
+        """
+        low_pos, high_pos = low_req.current_pos, high_req.current_pos
+        slot = high_req.deadline_pos - (VEH_LENGTH + MIN_GAP + 2 * LC_SAFETY_MARGIN)  # 低い車が止まってよい一番前
+        reserved = high_req.deadline_pos - low_pos <= HOLD_MARGIN
+        if reserved:
+            low.propose("order", math.sqrt(2 * HOLD_DECEL * max(slot - low_pos, 0.0)), abs(MAX_DECEL))
+        front_gap = (low_pos - VEH_LENGTH) - high_pos - MIN_GAP  # 高い車の前端から低い車の後端まで（minGap 控除済み）
+        if front_gap >= Safety.net_required(high.speed, low.speed):
+            return reserved
+        rear_gap = (high_pos - VEH_LENGTH) - low_pos - MIN_GAP  # 低い車の前端から高い車の後端まで（minGap 控除済み）
+        need = Safety.net_required(low.speed, high.speed) + LC_SAFETY_MARGIN
+        if rear_gap >= need:
+            return reserved
+        if rear_gap >= 0.0:
+            target = max(0.0, high.speed + FOLLOW_GAIN * (rear_gap - need))
+            room = rear_gap - 2 * LC_SAFETY_MARGIN  # 止まり切ったときに残す車間（挿入判定の 0.5 m ＋ 余裕 0.5 m）
+            if low.speed > high.speed:
+                decel = (low.speed - high.speed) ** 2 / (2 * room) if room > 0 else abs(MAX_DECEL)
+                decel = min(max(decel, FOLLOW_MIN_DECEL), abs(MAX_DECEL))
+            else:
+                decel = FOLLOW_MIN_DECEL
+            low.propose("order", min(target, high.speed), decel)
+        elif high.speed >= YIELD_MIN_SPEED:
+            low.propose("order", max(high.speed - YIELD_DELTA, 0.0), YIELD_DECEL)
+        elif low_pos > high_pos:
+            low.propose("order", low.speed + ALIGN_DELTA, ALIGN_DECEL)
+        else:
+            low.propose("order", 0.0, abs(MAX_DECEL))
+        return True
+
     @staticmethod
     def _swap_live_gap_ok(veh_id: str, ego_speed: float, going_right: bool, partner_id: str, at_wall: bool) -> bool:
         """スワップ相手を除く実測（getNeighbors）の前後ギャップ検査。
@@ -365,7 +463,7 @@ class Layer2:
     # --- 提供車の協調減速 ---
 
     @staticmethod
-    def _provider_yield(provider: V2CAV, requester: V2CAV, now: float) -> None:
+    def _provider_yield(provider: V2CAV, requester: V2CAV, now: float, extra: float = 0.0) -> None:
         """提供車が要求車の後方に挿入可能な隙間を作る（必要なときだけ・有界に譲る）。
 
         呼ばれるのは、要求車の自力挿入が「後続側の隙間不足」で落ちたときだけ（先行側の不足や整列で解ける場合は
@@ -398,8 +496,8 @@ class Layer2:
             return
         # 控除済みギャップ（要求車後端 − 提供車前端 − minGap。snapshot の縦位置は前端基準）
         current_net = (r.lane_pos - VEH_LENGTH - p.lane_pos) - MIN_GAP
-        if current_net >= Safety.net_required(p.speed, r.speed):
-            return  # 自分との隙間は足りている
+        if current_net >= Safety.net_required(p.speed, r.speed) + extra:
+            return  # 自分との隙間は足りている（extra: 要求車が前側の不足で後ろへ下がる分）
         p.yield_time += TIME_STEP
         target = max(r.speed - YIELD_DELTA, YIELD_MIN_RATIO * r.speed, 0.0)
         p.propose("yield", target, YIELD_DECEL)
@@ -424,6 +522,29 @@ class Layer2:
         provider.propose("yield", v_cap, abs(MAX_DECEL))
 
     @staticmethod
+    def _front_room_from_rear_slack(provider: V2CAV, requester: V2CAV, front_short: float) -> bool:
+        """前側の不足分まで空ける譲り（YIELD_ON_FRONT=2）を、提供車の後ろの車の余裕で賄えるか。
+
+        提供車が下がって要求車との間に空ける量（必要量 ＋ 前側の不足量 − 今の隙間）を、提供車の後続が
+        追従の安全車間（``V2CAV.control_speed`` と同じ式）を超えて持っている余裕から出せるときだけ True。
+        後ろが詰まっていれば前側の分は空けない（後続側の不足のときだけ譲る規則に戻る）。後続がいなければ True。
+        getFollower の距離は後続の minGap 控除済み（getLeader と同じ）。
+        """
+        if requester.lane_pos is None or provider.lane_pos is None:
+            return False
+        current_net = (requester.lane_pos - VEH_LENGTH - provider.lane_pos) - MIN_GAP
+        need = Safety.net_required(provider.speed, requester.speed) + front_short - current_net
+        if need <= 0:
+            return True  # 既に足りている（_provider_yield は何もしない）
+        follower = traci.vehicle.getFollower(provider.id, FRONT_YIELD_LOOKBACK)
+        if not follower or not follower[0]:
+            return True
+        follower_id, gap = follower
+        v_f = get_veh_speed(follower_id)
+        safety_gap = max(Safety.net_required(v_f, provider.speed), v_f * FOLLOW_TAU) + MIN_GAP
+        return bool(gap - safety_gap >= need)
+
+    @staticmethod
     def _hold_before_deadline(requester: V2CAV, req: LCRequest) -> None:
         """挿入できていない要求車に、締切位置 D で HOLD_DECEL の減速で止まれる速度 √(2·HOLD_DECEL·残距離) を上限として与える。
 
@@ -439,7 +560,9 @@ class Layer2:
         requester.propose("hold", v_hold, abs(MAX_DECEL))
 
     @staticmethod
-    def _requester_align_to_slot(requester: V2CAV, req: LCRequest, check: InsertionCheck) -> None:
+    def _requester_align_to_slot(
+        requester: V2CAV, req: LCRequest, check: InsertionCheck, yielding: frozenset[str] = frozenset()
+    ) -> None:
         """要求車自身を目標レーンのスロットに縦方向で整列させる（合流のための自己速度調整）。
 
         自力挿入の判定でどちら側が足りなかったかで挙動を分ける::
@@ -451,6 +574,8 @@ class Layer2:
                 後続より速くなれば相対制動の必要量も縮む）。
 
         減速度は ALIGN_DECEL 以下（快適減速）。候補として出すので own leader が近ければ追従の最大減速が勝つ。
+        ``yielding`` は、この要求車のために下がる優先度の低い対向の要求車（OPPOSITE_ORDER）。前を塞いでいても
+        相手が下がるので、それに合わせて自分は下がらない（両方が下がり合うと 2 台そろって減速し続ける）。
         """
         if requester.speed <= 0:
             return
@@ -460,7 +585,9 @@ class Layer2:
             for nid, dist in Layer2._front_neighbors(requester.id, going_right, requester.speed)
         ]
         if not check.front_ok:
-            blocking = [v for _, dist, v in fronts if dist < Safety.net_required(requester.speed, v)]
+            blocking = [
+                v for nid, dist, v in fronts if nid not in yielding and dist < Safety.net_required(requester.speed, v)
+            ]
             if blocking:
                 requester.propose("align", max(min(blocking) - ALIGN_DELTA, 0.0), ALIGN_DECEL)
             return

@@ -29,6 +29,7 @@ from v2.constants import (
     TIME_STEP,
 )
 from v2.environment import Environment, Group
+from v2.feasibility import Feasibility, LanePositions
 from v2.layer1.priority import EDF, FCFS
 from v2.layer1.rsu import RSU, Assignment
 from v2.layer2.pair_executor import Layer2
@@ -126,6 +127,9 @@ class V2Simulation(BaseModel):
         assignments: list[Assignment] = []  # 直近 Tc の割当（Layer2 で実行）
         req_by_id: dict[str, LCRequest] = {}  # 直近 Tc の要求（id 引き）
         speed_log = SpeedLog.from_env()  # V2_SPEED_LOG=<path> のときだけ全車の速度指令を記録する
+        prev_lanes: LanePositions = {}  # 前 step の本線上の (車線, 縦位置)。現実性の検査に使う
+        overlap_lc = 0  # 車体が重なる位置への車線変更の数（0 であるべき）
+        crossing_lc = 0  # 横に重なった 2 台が互いの車線へ移ったすり抜けの数（0 であるべき）
 
         while self._should_continue():
             traci.simulationStep()
@@ -189,6 +193,18 @@ class V2Simulation(BaseModel):
 
                 if veh.leader_distance is not None and veh.leader_speed is not None:
                     stats.calculate_TTC(veh.leader_distance, veh.leader_speed, veh.speed)
+
+            # --- 現実性の検査（観測のみ）: 前 step から車線を移った車が、車体の重なる位置へ入っていないか、
+            # 横に重なった 2 台が互いの車線へすり抜けていないかを数える ---
+            cur_lanes: LanePositions = {
+                veh.id: (veh.lane, veh.lane_pos)
+                for veh in active
+                if veh.road == self.env.mainlane_edge and veh.lane is not None and veh.lane_pos is not None
+            }
+            overlap, crossing = Feasibility.count_violations(prev_lanes, cur_lanes)
+            overlap_lc += overlap
+            crossing_lc += crossing
+            prev_lanes = cur_lanes
 
             # --- 突発障害物（位置到達トリガ）。appear_time 以降、指定レーンで pos に到達した最初の車を停止＝障害物化 ---
             if self.obstacle is not None and obstacle_placed_pos is None and current_time >= self.obstacle.appear_time:
@@ -287,6 +303,10 @@ class V2Simulation(BaseModel):
         print(f"Phase A: Tc rounds with key ties (should be 0): {tie_events}")
         print(f"Phase B: Tc rounds with double-assigned providers (should be 0): {double_assign_events}")
         print(f"Layer2: total instant lane changes executed: {total_lc}")
+        print(
+            f"Feasibility: lane changes into an occupied position: {overlap_lc}; "
+            f"pass-through lane changes: {crossing_lc} (both should be 0)"
+        )
         print(f"Speed: emergency brake events (decel above |MAX_DECEL|): {self.emergency_brake_total}")
         rule_summary = ", ".join(f"{k}={v}" for k, v in sorted(self.speed_rule_counts.items()))
         print(f"Speed: rule counts (vehicle-steps): {rule_summary}")
