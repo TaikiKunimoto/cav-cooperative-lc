@@ -1,6 +1,7 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（diverge） -->
 <nodes>
-    <node id="MainStart"    x="-1000.0" y="0.0"   type="dead_end"/>
-    <node id="DivergeStart" x="0.0"     y="0.0"   type="priority"/>
-    <node id="End"          x="69.0"    y="0.0"   type="dead_end"/>
-    <node id="ExitEnd"      x="72.0"    y="-11.4" type="dead_end"/>
+    <node id="MainStart" x="-1000.00" y="0.00" type="dead_end"/>
+    <node id="DivergeStart" x="0.00" y="0.00" type="priority"/>
+    <node id="End" x="200.00" y="0.00" type="dead_end"/>
+    <node id="ExitEnd" x="200.00" y="-12.00" type="dead_end"/>
 </nodes>

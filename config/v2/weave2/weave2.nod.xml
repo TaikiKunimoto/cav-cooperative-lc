@@ -1,18 +1,11 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（weave2） -->
 <nodes>
-    <!-- 本線(2車線)の始点 -->
-    <node id="MainStart" x="-100.0" y="0.0" type="dead_end"/>
-    <!-- 織込みゾーンの始点。上下からオンランプ(加速車線 lane0=下/lane3=上)が連結する -->
-    <node id="WeaveStart" x="0.0" y="0.0" type="priority"/>
-    <!-- 織込みゾーンの終点。上下へオフランプ(出口車線 lane0=下/lane3=上)が分岐する -->
-    <node id="WeaveEnd" x="400.0" y="0.0" type="priority"/>
-    <!-- 本線終点 -->
-    <node id="End" x="464.0" y="0.0" type="dead_end"/>
-    <!-- 下側オンランプの始点。下から smoothstep で lane0 レベル(-4.8)へ平行進入 -->
-    <node id="OnRampBottomStart" x="-100.0" y="-20.0" type="dead_end"/>
-    <!-- 上側オンランプの始点。上から smoothstep で lane3 レベル(+4.8)へ平行進入（下と上下対称） -->
-    <node id="OnRampTopStart" x="-100.0" y="20.0" type="dead_end"/>
-    <!-- 下側オフランプの終点。lane0 から下へ滑らかに分流し本線と平行に伸ばす -->
-    <node id="OffRampBottomEnd" x="458.0" y="-9.8" type="dead_end"/>
-    <!-- 上側オフランプの終点。lane3 から上へ滑らかに分流し本線と平行に伸ばす（下と上下対称） -->
-    <node id="OffRampTopEnd" x="458.0" y="9.8" type="dead_end"/>
+    <node id="MainStart" x="-500.00" y="0.00" type="dead_end"/>
+    <node id="WeaveStart" x="0.00" y="0.00" type="priority"/>
+    <node id="WeaveEnd" x="610.00" y="0.00" type="priority"/>
+    <node id="End" x="810.00" y="0.00" type="dead_end"/>
+    <node id="OnRampBottomStart" x="-300.00" y="-20.00" type="dead_end"/>
+    <node id="OnRampTopStart" x="-300.00" y="20.00" type="dead_end"/>
+    <node id="OffRampBottomEnd" x="810.00" y="-10.25" type="dead_end"/>
+    <node id="OffRampTopEnd" x="810.00" y="10.25" type="dead_end"/>
 </nodes>

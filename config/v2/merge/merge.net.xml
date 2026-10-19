@@ -1,81 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2026-06-16T11:16:26.804232+09:00 by Eclipse SUMO netconvert 1.27.0
+<!-- generated on 2026-10-19T21:29:19.622333+09:00 by Eclipse SUMO netconvert 1.27.0
 <netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
         <node-files value="merge.nod.xml"/>
         <edge-files value="merge.edg.xml"/>
+        <connection-files value="merge.con.xml"/>
     </input>
 
     <output>
         <output-file value="merge.net.xml"/>
     </output>
 
-    <ramp_guessing>
-        <ramps.guess value="true"/>
-        <ramps.ramp-length value="200"/>
-    </ramp_guessing>
+    <building_defaults>
+        <default.lanewidth value="3.50"/>
+    </building_defaults>
 
 </netconvertConfiguration>
 -->
 
 <net version="1.20" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
 
-    <location netOffset="100.00,15.00" convBoundary="0.00,0.00,350.00,15.00" origBoundary="-100.00,-15.00,250.00,0.00" projParameter="!"/>
+    <location netOffset="500.00,15.00" convBoundary="0.00,0.00,940.00,15.00" origBoundary="-500.00,-15.00,440.00,0.00" projParameter="!"/>
 
     <edge id=":AccelEnd_0" function="internal">
-        <lane id=":AccelEnd_0_0" index="0" speed="27.78" length="8.00" shape="296.00,10.20 304.00,10.20"/>
-        <lane id=":AccelEnd_0_1" index="1" speed="27.78" length="8.00" shape="296.00,13.40 304.00,13.40"/>
+        <lane id=":AccelEnd_0_0" index="0" speed="27.78" length="8.00" width="3.50" shape="736.00,9.75 744.00,9.75"/>
+        <lane id=":AccelEnd_0_1" index="1" speed="27.78" length="8.00" width="3.50" shape="736.00,13.25 744.00,13.25"/>
     </edge>
     <edge id=":MergeNode_0" function="internal">
-        <lane id=":MergeNode_0_0" index="0" speed="27.78" length="3.00" shape="98.49,6.97 101.49,7.00"/>
+        <lane id=":MergeNode_0_0" index="0" speed="27.78" length="3.00" width="3.50" shape="498.50,9.75 501.50,9.75"/>
+        <lane id=":MergeNode_0_1" index="1" speed="27.78" length="3.00" width="3.50" shape="498.50,13.25 501.50,13.25"/>
     </edge>
-    <edge id=":MergeNode_1" function="internal">
-        <lane id=":MergeNode_1_0" index="0" speed="27.78" length="3.00" shape="98.49,10.20 101.49,10.20"/>
-        <lane id=":MergeNode_1_1" index="1" speed="27.78" length="3.00" shape="98.49,13.40 101.49,13.40"/>
-    </edge>
-
-    <edge id="MainApproach" from="MainStart" to="MergeNode" priority="10">
-        <lane id="MainApproach_0" index="0" speed="27.78" length="98.49" shape="0.00,10.20 98.49,10.20"/>
-        <lane id="MainApproach_1" index="1" speed="27.78" length="98.49" shape="0.00,13.40 98.49,13.40"/>
-    </edge>
-    <edge id="MainLane" from="AccelEnd" to="End" priority="10">
-        <lane id="MainLane_0" index="0" speed="27.78" length="46.00" shape="304.00,10.20 350.00,10.20"/>
-        <lane id="MainLane_1" index="1" speed="27.78" length="46.00" shape="304.00,13.40 350.00,13.40"/>
-    </edge>
-    <edge id="MergeZone" from="MergeNode" to="AccelEnd" priority="10">
-        <lane id="MergeZone_0" index="0" speed="27.78" length="194.51" acceleration="1" shape="101.49,7.00 296.00,7.00"/>
-        <lane id="MergeZone_1" index="1" speed="27.78" length="194.51" shape="101.49,10.20 296.00,10.20"/>
-        <lane id="MergeZone_2" index="2" speed="27.78" length="194.51" shape="101.49,13.40 296.00,13.40"/>
-    </edge>
-    <edge id="OnRamp" from="RampStart" to="MergeNode" priority="1" shape="0.00,0.00 10.00,0.54 20.00,1.92 30.00,3.78 40.00,5.76 50.00,7.50 100.00,8.60">
-        <lane id="OnRamp_0" index="0" speed="27.78" length="99.04" shape="0.09,-1.60 10.15,-1.05 20.26,0.34 30.30,2.21 40.29,4.19 50.16,5.90 98.49,6.97"/>
+    <edge id=":MergeNode_2" function="internal">
+        <lane id=":MergeNode_2_0" index="0" speed="19.45" length="3.00" width="3.50" shape="498.50,6.25 501.50,6.25"/>
     </edge>
 
-    <junction id="End" type="dead_end" x="350.00" y="15.00" incLanes="MainLane_0 MainLane_1" intLanes="" shape="350.00,8.60 350.00,15.00"/>
-    <junction id="AccelEnd" type="priority" x="300.00" y="15.00" incLanes="MergeZone_0 MergeZone_1 MergeZone_2" intLanes=":AccelEnd_0_0 :AccelEnd_0_1" shape="304.00,15.00 304.00,8.60 300.97,7.77 299.03,6.23 297.79,5.64 296.00,5.40 296.00,15.00">
+    <edge id="MainApproach" from="MainStart" to="MergeNode" priority="10" length="500.00">
+        <lane id="MainApproach_0" index="0" speed="27.78" length="500.00" width="3.50" shape="0.00,9.75 498.50,9.75"/>
+        <lane id="MainApproach_1" index="1" speed="27.78" length="500.00" width="3.50" shape="0.00,13.25 498.50,13.25"/>
+    </edge>
+    <edge id="MainLane" from="AccelEnd" to="End" priority="10" length="200.00">
+        <lane id="MainLane_0" index="0" speed="27.78" length="200.00" width="3.50" shape="744.00,9.75 940.00,9.75"/>
+        <lane id="MainLane_1" index="1" speed="27.78" length="200.00" width="3.50" shape="744.00,13.25 940.00,13.25"/>
+    </edge>
+    <edge id="MergeZone" from="MergeNode" to="AccelEnd" priority="10" length="240.00">
+        <lane id="MergeZone_0" index="0" speed="27.78" length="240.00" width="3.50" acceleration="1" shape="501.50,6.25 736.00,6.25"/>
+        <lane id="MergeZone_1" index="1" speed="27.78" length="240.00" width="3.50" shape="501.50,9.75 736.00,9.75"/>
+        <lane id="MergeZone_2" index="2" speed="27.78" length="240.00" width="3.50" shape="501.50,13.25 736.00,13.25"/>
+    </edge>
+    <edge id="OnRamp" from="RampStart" to="MergeNode" priority="1" length="300.00" shape="200.00,0.00 400.00,0.00 412.50,0.59 425.00,2.07 437.50,4.00 450.00,5.93 462.50,7.41 475.00,8.00 500.00,8.00">
+        <lane id="OnRamp_0" index="0" speed="11.11" length="300.00" width="3.50" shape="200.00,-1.75 400.04,-1.75 412.64,-1.16 425.24,0.34 437.77,2.27 450.24,4.20 462.64,5.66 475.04,6.25 498.50,6.25"/>
+    </edge>
+
+    <junction id="AccelEnd" type="priority" x="740.00" y="15.00" incLanes="MergeZone_0 MergeZone_1 MergeZone_2" intLanes=":AccelEnd_0_0 :AccelEnd_0_1" shape="744.00,15.00 744.00,8.00 740.96,7.09 739.04,5.41 737.81,4.76 736.00,4.50 736.00,15.00">
         <request index="0" response="00" foes="00" cont="0"/>
         <request index="1" response="00" foes="00" cont="0"/>
     </junction>
-    <junction id="MainStart" type="dead_end" x="0.00" y="15.00" incLanes="" intLanes="" shape="0.00,15.00 0.00,8.60"/>
-    <junction id="MergeNode" type="priority" x="100.00" y="15.00" incLanes="OnRamp_0 MainApproach_0 MainApproach_1" intLanes=":MergeNode_0_0 :MergeNode_1_0 :MergeNode_1_1" shape="101.49,15.00 101.49,5.40 98.49,5.37 98.49,15.00">
+    <junction id="End" type="dead_end" x="940.00" y="15.00" incLanes="MainLane_0 MainLane_1" intLanes="" shape="940.00,8.00 940.00,15.00"/>
+    <junction id="MainStart" type="dead_end" x="0.00" y="15.00" incLanes="" intLanes="" shape="0.00,15.00 0.00,8.00"/>
+    <junction id="MergeNode" type="priority" x="500.00" y="15.00" incLanes="MainApproach_0 MainApproach_1 OnRamp_0" intLanes=":MergeNode_0_0 :MergeNode_0_1 :MergeNode_2_0" shape="501.50,15.00 501.50,4.50 498.50,4.50 498.50,15.00">
         <request index="0" response="000" foes="000" cont="0"/>
         <request index="1" response="000" foes="000" cont="0"/>
         <request index="2" response="000" foes="000" cont="0"/>
     </junction>
-    <junction id="RampStart" type="dead_end" x="0.00" y="0.00" incLanes="" intLanes="" shape="-0.00,-0.00 0.17,-3.20"/>
+    <junction id="RampStart" type="dead_end" x="200.00" y="0.00" incLanes="" intLanes="" shape="200.00,-0.00 200.00,-3.50"/>
 
-    <connection from="MainApproach" to="MergeZone" fromLane="0" toLane="1" via=":MergeNode_1_0" dir="s" state="M"/>
-    <connection from="MainApproach" to="MergeZone" fromLane="1" toLane="2" via=":MergeNode_1_1" dir="s" state="M"/>
+    <connection from="MainApproach" to="MergeZone" fromLane="0" toLane="1" via=":MergeNode_0_0" dir="s" state="M"/>
+    <connection from="MainApproach" to="MergeZone" fromLane="1" toLane="2" via=":MergeNode_0_1" dir="s" state="M"/>
     <connection from="MergeZone" to="MainLane" fromLane="1" toLane="0" via=":AccelEnd_0_0" dir="s" state="M"/>
     <connection from="MergeZone" to="MainLane" fromLane="2" toLane="1" via=":AccelEnd_0_1" dir="s" state="M"/>
-    <connection from="OnRamp" to="MergeZone" fromLane="0" toLane="0" via=":MergeNode_0_0" dir="s" state="M"/>
+    <connection from="OnRamp" to="MergeZone" fromLane="0" toLane="0" via=":MergeNode_2_0" dir="s" state="M"/>
 
     <connection from=":AccelEnd_0" to="MainLane" fromLane="0" toLane="0" dir="s" state="M"/>
     <connection from=":AccelEnd_0" to="MainLane" fromLane="1" toLane="1" dir="s" state="M"/>
-    <connection from=":MergeNode_0" to="MergeZone" fromLane="0" toLane="0" dir="s" state="M"/>
-    <connection from=":MergeNode_1" to="MergeZone" fromLane="0" toLane="1" dir="s" state="M"/>
-    <connection from=":MergeNode_1" to="MergeZone" fromLane="1" toLane="2" dir="s" state="M"/>
+    <connection from=":MergeNode_0" to="MergeZone" fromLane="0" toLane="1" dir="s" state="M"/>
+    <connection from=":MergeNode_0" to="MergeZone" fromLane="1" toLane="2" dir="s" state="M"/>
+    <connection from=":MergeNode_2" to="MergeZone" fromLane="0" toLane="0" dir="s" state="M"/>
 
 </net>

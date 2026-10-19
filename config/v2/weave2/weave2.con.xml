@@ -1,16 +1,11 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（weave2） -->
 <connections>
-    <!-- 本線2車線 → 織込みゾーンの本線 lane1,2（center で整列） -->
     <connection from="MainApproach" to="WeaveZone" fromLane="0" toLane="1"/>
     <connection from="MainApproach" to="WeaveZone" fromLane="1" toLane="2"/>
-    <!-- 下側オンランプ → 加速車線 lane0(下) -->
     <connection from="OnRampBottom" to="WeaveZone" fromLane="0" toLane="0"/>
-    <!-- 上側オンランプ → 加速車線 lane3(上) -->
     <connection from="OnRampTop" to="WeaveZone" fromLane="0" toLane="3"/>
-    <!-- 織込みゾーン本線 lane1,2 → tail 本線 -->
     <connection from="WeaveZone" to="MainLane" fromLane="1" toLane="0"/>
     <connection from="WeaveZone" to="MainLane" fromLane="2" toLane="1"/>
-    <!-- 出口車線 lane0(下) → 下側オフランプ -->
     <connection from="WeaveZone" to="OffRampBottom" fromLane="0" toLane="0"/>
-    <!-- 出口車線 lane3(上) → 上側オフランプ -->
     <connection from="WeaveZone" to="OffRampTop" fromLane="3" toLane="0"/>
 </connections>

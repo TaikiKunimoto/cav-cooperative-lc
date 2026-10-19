@@ -1,14 +1,9 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（weave） -->
 <nodes>
-    <!-- 本線(2車線)の始点 -->
-    <node id="MainStart"   x="-100.0" y="0.0"   type="dead_end"/>
-    <!-- オンランプが本線へ合流し、織込み区間(補助車線)が始まる地点 -->
-    <node id="WeaveStart"  x="0.0"    y="0.0"   type="priority"/>
-    <!-- 補助車線がオフランプ(出口)へ抜け、織込み区間が終わる地点 -->
-    <node id="WeaveEnd"    x="200.0"  y="0.0"   type="priority"/>
-    <!-- 本線終点 -->
-    <node id="End"         x="261.0"  y="0.0"   type="dead_end"/>
-    <!-- オンランプ(1車線)の始点。下側から進入 -->
-    <node id="OnRampStart" x="-100.0" y="-15.0" type="dead_end"/>
-    <!-- オフランプ(1車線)の終点。WeaveEnd 分岐直後に降りた後は本線と平行(水平)に走らせる（diverge と同様） -->
-    <node id="ExitEnd"     x="250.0"  y="-8.2"  type="dead_end"/>
+    <node id="MainStart" x="-500.00" y="0.00" type="dead_end"/>
+    <node id="OnRampStart" x="-300.00" y="-15.00" type="dead_end"/>
+    <node id="WeaveStart" x="0.00" y="0.00" type="priority"/>
+    <node id="WeaveEnd" x="457.00" y="0.00" type="priority"/>
+    <node id="End" x="657.00" y="0.00" type="dead_end"/>
+    <node id="ExitEnd" x="657.00" y="-12.00" type="dead_end"/>
 </nodes>

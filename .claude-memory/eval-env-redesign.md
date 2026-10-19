@@ -7,7 +7,14 @@ metadata:
   originSessionId: be656bff-3c37-48d0-970d-084c934025c6
 ---
 
-> このメモは 2026-06 の設計経緯・知見の記録。現行の環境定義は `config/v2/{diverge,merge,straight,weave,weave2}` に反映済み（PR#43でジオメトリ整形マージ済み）。以下は「なぜこの形状か」を残すための背景。
+> **2026-10-19 に実道の基準に合わせて作り直した（branch feat/TSK-143-env-standards）。今の正はこの節。** 以下の 2026-06 の記録のうち、短い buffer・tail（~50 m）、OnRamp 100 m、`--ramps.guess` による生成、区間長（merge 194 / weave 196 / weave2 392 m）、weave2 の対角の重み 2 は古い。
+> - 道路網は `config/v2/build_networks.py` が 5 環境ぶん生成する（`Geometry` に長さ・速度・車線幅を集約。nod/edg/con は生成物で手で直さない。各 `build.sh` はその呼び出しだけ）。`--ramps.guess` は使わず、全環境を手動の connection で作る（区間長を edge の `length` でちょうどの値にするため）。
+> - 共通: 車線幅 3.5 m（道路構造令 第 5 条第 4 項）、本線 100 km/h、合流ランプ 40 km/h（加速車線で加速する）、出口ランプは本線と同じ速度（減速車線を作らない。評価区間の外）、区間の手前の本線 500 m・合流ランプ 300 m、区間の後ろ 200 m。
+> - 区間長: merge 240 m（加速車線長の標準値、本線 100 km/h、テーパ込み）、weave 457 m（仮。1,500 ft。日本の基準値に差し替える予定）、weave2 610 m（2,000 ft）、diverge 1,000 m、straight 1,000 m。weave2 の要求を出す 6 グループは同じ重み。
+> - ランプは接続する車線の位置まで本線と平行に寄せてから接続する（spreadType right の区間では lane0 の左端＝形の線から 2·車線幅、weave2 の center では ±1.5·車線幅）。斜めにノードへ入れると junction が数十 m ずれる警告が出る。
+> - `TraCI/v2/environment.py`: 区間長と締切は道路網と同じ値。実行開始時に `check_measured_length` が実長と照合し、ずれていれば止まる（以前は実長に黙って置き換えていた）。`request_at_entry=True`（merge・weave・weave2）は区間に入った時点で要求を出す（`--activation-margin` を明示したときはその値）。
+>
+> このメモの以下は 2026-06 の設計経緯・知見の記録（PR#43 でジオメトリ整形マージ済み）。「なぜこの形状か」を残すための背景。
 
 v2の評価環境(config/v2/{diverge,merge,straight,weave,weave2})を「実際の道路に近い形状」へ環境ごとに再設計中。各環境を独立PRにする。
 

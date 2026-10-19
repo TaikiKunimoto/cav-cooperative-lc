@@ -1,18 +1,8 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（weave） -->
 <edges>
-    <!-- 独立区間: 本線2車線 -->
-    <edge id="MainApproach" from="MainStart"  to="WeaveStart" numLanes="2" speed="27.78" priority="10"/>
-    <!-- 織込み区間の本線2車線。ramps.guess がオンランプの加速車線とオフランプの減速車線を
-         1本の連続補助車線(下側lane0)として付与し、WeaveZone を3車線(lane0=補助, lane1,2=本線)にする -->
-    <edge id="WeaveZone"    from="WeaveStart" to="WeaveEnd"   numLanes="2" speed="27.78" priority="10"/>
-    <!-- 織込み後の本線2車線(tail) -->
-    <edge id="MainLane"     from="WeaveEnd"   to="End"        numLanes="2" speed="27.78" priority="10"/>
-    <!-- オンランプ1車線(低優先度。ramps.guess が on-ramp と認識し加速車線を生成)。merge と同様に直線でなく
-         shape で湾曲: OnRampStart 側50m(x:-100→-50)を ease-in 三次カーブで本線とほぼ平行から立ち上げ、
-         合流側50m(x:-50→0)は直線(傾き0.15)のまま残す(ramps.guess の加速車線への自動寄せを温存)。端点不変。 -->
-    <edge id="OnRamp"       from="OnRampStart" to="WeaveStart" numLanes="1" speed="27.78" priority="1"
-          shape="-100.00,-15.00 -90.00,-14.46 -80.00,-13.08 -70.00,-11.22 -60.00,-9.24 -50.00,-7.50 0.00,0.00"/>
-    <!-- オフランプ1車線(低優先度。ramps.guess が off-ramp と認識し減速車線を生成)。diverge と同様に shape で
-         WeaveEnd 分岐直後に下へ降り、その後は本線と平行(水平 -11.4)に ~50m 伸ばす（従来は斜めに離れ続けていた）。 -->
-    <edge id="ExitRamp"     from="WeaveEnd"   to="ExitEnd"    numLanes="1" speed="27.78" priority="1"
-          shape="200.00,0.00 212.00,-8.20 250.00,-8.20"/>
+    <edge id="MainApproach" from="MainStart" to="WeaveStart" numLanes="2" speed="27.78" length="500.00" priority="10"/>
+    <edge id="OnRamp" from="OnRampStart" to="WeaveStart" numLanes="1" speed="11.11" length="300.00" priority="1" shape="-300.00,-15.00 -100.00,-15.00 -87.50,-14.41 -75.00,-12.93 -62.50,-11.00 -50.00,-9.07 -37.50,-7.59 -25.00,-7.00 0.00,-7.00"/>
+    <edge id="WeaveZone" from="WeaveStart" to="WeaveEnd" numLanes="3" speed="27.78" length="457.00" priority="10"/>
+    <edge id="MainLane" from="WeaveEnd" to="End" numLanes="2" speed="27.78" length="200.00" priority="10"/>
+    <edge id="ExitRamp" from="WeaveEnd" to="ExitEnd" numLanes="1" speed="27.78" length="200.00" priority="1" shape="457.00,-7.00 460.33,-7.37 463.67,-8.29 467.00,-9.50 470.33,-10.71 473.67,-11.63 477.00,-12.00 657.00,-12.00"/>
 </edges>

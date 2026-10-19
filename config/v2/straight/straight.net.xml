@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2026-06-15T20:23:09.671269+09:00 by Eclipse SUMO netconvert 1.27.0
+<!-- generated on 2026-10-19T21:29:19.698052+09:00 by Eclipse SUMO netconvert 1.27.0
 <netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <node-files value="config/v2/straight/straight.nod.xml"/>
-        <edge-files value="config/v2/straight/straight.edg.xml"/>
+        <node-files value="straight.nod.xml"/>
+        <edge-files value="straight.edg.xml"/>
     </input>
 
     <output>
-        <output-file value="config/v2/straight/straight.net.xml"/>
+        <output-file value="straight.net.xml"/>
     </output>
+
+    <building_defaults>
+        <default.lanewidth value="3.50"/>
+    </building_defaults>
 
 </netconvertConfiguration>
 -->
@@ -19,13 +23,13 @@
 
     <location netOffset="0.00,0.00" convBoundary="0.00,0.00,1000.00,0.00" origBoundary="0.00,0.00,1000.00,0.00" projParameter="!"/>
 
-    <edge id="Road" from="Start" to="End" priority="-1">
-        <lane id="Road_0" index="0" speed="27.78" length="1000.00" shape="0.00,-8.00 1000.00,-8.00"/>
-        <lane id="Road_1" index="1" speed="27.78" length="1000.00" shape="0.00,-4.80 1000.00,-4.80"/>
-        <lane id="Road_2" index="2" speed="27.78" length="1000.00" shape="0.00,-1.60 1000.00,-1.60"/>
+    <edge id="Road" from="Start" to="End" priority="10" length="1000.00">
+        <lane id="Road_0" index="0" speed="27.78" length="1000.00" width="3.50" shape="0.00,-8.75 1000.00,-8.75"/>
+        <lane id="Road_1" index="1" speed="27.78" length="1000.00" width="3.50" shape="0.00,-5.25 1000.00,-5.25"/>
+        <lane id="Road_2" index="2" speed="27.78" length="1000.00" width="3.50" shape="0.00,-1.75 1000.00,-1.75"/>
     </edge>
 
-    <junction id="End" type="dead_end" x="1000.00" y="0.00" incLanes="Road_0 Road_1 Road_2" intLanes="" shape="1000.00,-9.60 1000.00,0.00"/>
-    <junction id="Start" type="dead_end" x="0.00" y="0.00" incLanes="" intLanes="" shape="0.00,0.00 0.00,-9.60"/>
+    <junction id="End" type="dead_end" x="1000.00" y="0.00" incLanes="Road_0 Road_1 Road_2" intLanes="" shape="1000.00,-10.50 1000.00,0.00"/>
+    <junction id="Start" type="dead_end" x="0.00" y="0.00" incLanes="" intLanes="" shape="0.00,0.00 0.00,-10.50"/>
 
 </net>

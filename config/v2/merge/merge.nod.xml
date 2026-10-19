@@ -1,10 +1,8 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（merge） -->
 <nodes>
-    <!-- 本線(2車線)の始点 -->
-    <node id="MainStart" x="-100.0" y="0.0" type="dead_end"/>
-    <!-- 合流ランプが本線に合流する地点（ここから加速車線=下側lane0 が始まる） -->
-    <node id="MergeNode" x="0.0" y="0.0" type="priority"/>
-    <!-- 本線終点 -->
-    <node id="End" x="250.0" y="0.0" type="dead_end"/>
-    <!-- 合流ランプ(1車線)の始点。下側から浅い角度で進入 -->
-    <node id="RampStart" x="-100.0" y="-15.0" type="dead_end"/>
+    <node id="MainStart" x="-500.00" y="0.00" type="dead_end"/>
+    <node id="RampStart" x="-300.00" y="-15.00" type="dead_end"/>
+    <node id="MergeNode" x="0.00" y="0.00" type="priority"/>
+    <node id="AccelEnd" x="240.00" y="0.00" type="priority"/>
+    <node id="End" x="440.00" y="0.00" type="dead_end"/>
 </nodes>

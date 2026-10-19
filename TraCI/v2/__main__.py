@@ -94,8 +94,11 @@ def _get_options() -> tuple[optparse.Values, list[str]]:
         "--activation-margin",
         dest="activation_margin",
         type="float",
-        default=ACTIVATION_MARGIN,
-        help=f"要求の活性化位置 [m]（締切Dの何m手前で活性化するか。既定 {ACTIVATION_MARGIN:.0f}。柱B-2の猶予距離比較用）",
+        default=None,
+        help=(
+            "要求の活性化位置 [m]（締切Dの何m手前で活性化するか。既定は環境ごと: 合流・織り込みは区間に入った時点、"
+            f"分流・封鎖は {ACTIVATION_MARGIN:.0f}。柱B-2の猶予距離比較用）"
+        ),
     )
     parser.add_option(
         "--set",
@@ -133,11 +136,11 @@ if __name__ == "__main__":
         sys.exit(f"不明な --env '{options.env}'（利用可能: {', '.join(ENVIRONMENTS)}）")
 
     policy = Policy(options.policy)
-    if options.activation_margin <= 0:
+    if options.activation_margin is not None and options.activation_margin <= 0:
         sys.exit(f"--activation-margin は正の値で指定してください（受け取り: {options.activation_margin}）")
 
     filename = _create_file_name(env.name, total_inflow, mlc_ratio, seed, policy)
-    if options.activation_margin != ACTIVATION_MARGIN:
+    if options.activation_margin is not None and options.activation_margin != ACTIVATION_MARGIN:
         filename += f"_am{int(options.activation_margin)}"
     if CONSTANT_OVERRIDES:
         filename += "_set-" + "-".join(f"{k}{v:g}" for k, v in CONSTANT_OVERRIDES.items())
