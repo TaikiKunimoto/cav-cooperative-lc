@@ -49,6 +49,7 @@ from v2.constants import (
     MAX_DECEL,
     MIN_GAP,
     OPPOSITE_ORDER,
+    STAGE_HOLD,
     TIME_STEP,
     VEH_LENGTH,
     YIELD_COOLDOWN,
@@ -102,11 +103,12 @@ class Layer2:
         要求は EDF 順（``req_by_id`` は鍵昇順の keyed から構築済み）に処理し、より緊急な要求車が先にスロットを
         確定する。前後二方向の安全（``_insertion_safe_live``＝getNeighbors でジャンクション跨ぎに実測）が満たされていれば
         提供車の有無に依らず changeLane する（空車線・疎な車線へも自力で移れる）。
-        同一stepで同じ目標車線の重なる位置への二重挿入は ``committed`` で弾く（custom_cav の同一step同一レーンチェックに相当）。
+        同一stepに同じ目標車線へ入る車どうしも、挿入判定と同じ安全車間を取る（``_slot_free``。両側から同じ車線へ入る 2 台が
+        挿入判定ではお互いを見ないため）。先に確定するのは鍵の上位の車。
         """
         provider_of = {a.requester_id: a.provider_id for a in assignments}
         lc_count = 0
-        committed: dict[int, list[float]] = {}  # 今stepで確定した target_lane -> 縦位置のリスト
+        committed: dict[int, list[tuple[float, float]]] = {}  # 今stepで確定した target_lane -> (縦位置, 速度) のリスト
         unresolved: list[LCRequest] = []  # 通常挿入が不可だった要求（EDF 順を保持）
         checks: dict[str, InsertionCheck] = {}  # 通常挿入が不可だった要求の、前後どちらの隙間が足りなかったか
         for req in req_by_id.values():  # EDF 順（鍵昇順）
@@ -120,9 +122,13 @@ class Layer2:
             target_lane = Safety.next_lane(req)
             check = Layer2._insertion_check_live(requester.id, requester.speed, target_lane < req.current_lane)
             # 加速の途中の合流車は入らない（整列のために判定の結果だけ残す）
-            if not req.accelerating and check.ok and Layer2._slot_free(committed, target_lane, req.current_pos):
+            if (
+                not req.accelerating
+                and check.ok
+                and Layer2._slot_free(committed, target_lane, req.current_pos, requester.speed)
+            ):
                 traci.vehicle.changeLane(requester.id, target_lane, 0)
-                committed.setdefault(target_lane, []).append(req.current_pos)
+                committed.setdefault(target_lane, []).append((req.current_pos, requester.speed))
                 lc_count += 1
             else:
                 unresolved.append(req)
@@ -147,16 +153,34 @@ class Layer2:
                 Layer2._provider_yield(provider, requester, snap.sim_time, extra)
             # 目標レーンのスロットに自分を縦方向で整列させ、挿入成功率を上げる
             Layer2._requester_align_to_slot(requester, req, check, yielding_to.get(req.veh_id, frozenset()))
-            if req.deadline_pos - req.current_pos <= HOLD_MARGIN:
-                # 締切間近でなお挿入不可: D で止まれる速度を上限にして lane-drop 端の急停止を防ぐ（整列は続ける）
+            if Layer2._hold_pos(req) - req.current_pos <= HOLD_MARGIN:
+                # 締切間近でなお挿入不可: 保持の位置で止まれる速度を上限にして lane-drop 端の急停止を防ぐ（整列は続ける）
                 Layer2._hold_before_deadline(requester, req)
         return lc_count
 
     @staticmethod
-    def _slot_free(committed: dict[int, list[float]], target_lane: int, pos: float) -> bool:
-        """今step、同じ目標車線で重なる位置への挿入が既に確定していないか（同時LC衝突を防ぐ）。"""
-        check_range = VEH_LENGTH + MIN_GAP
-        return all(abs(p - pos) >= check_range for p in committed.get(target_lane, []))
+    def _slot_free(
+        committed: dict[int, list[tuple[float, float]]], target_lane: int, pos: float, speed: float
+    ) -> bool:
+        """今step、同じ目標車線へ確定した車線変更と、挿入判定と同じ安全車間が取れるか（同時LC衝突を防ぐ）。
+
+        確定した車（縦位置 q・速度 w）は目標車線にいるものとみなし、前にいれば ``Safety.net_required(v, w)``、後ろにいれば
+        ``Safety.net_required(w, v)`` を minGap 控除済みの車間に求める（縦位置は前端基準）。両側の車線から同じ車線へ入る
+        2 台は、挿入判定（getNeighbors）ではお互いが見えない。位置の重なりだけを見ていたときは、間が 4 m・速度差 8 m/s の
+        2 台が同じ step に入って追突した。
+        """
+        for q, w in committed.get(target_lane, []):
+            if q >= pos:
+                if (q - VEH_LENGTH) - pos - MIN_GAP < Safety.net_required(speed, w):
+                    return False
+            elif (pos - VEH_LENGTH) - q - MIN_GAP < Safety.net_required(w, speed):
+                return False
+        return True
+
+    @staticmethod
+    def _hold_pos(req: LCRequest) -> float:
+        """要求車が保持で止まる位置。STAGE_HOLD のときは次の 1 段の締切（中間の締切 D − (k − 1)·R）、でなければ締切 D。"""
+        return req.stage_deadline if STAGE_HOLD > 0 else req.deadline_pos
 
     @staticmethod
     def _insertion_check_live(veh_id: str, ego_speed: float, going_right: bool) -> InsertionCheck:
@@ -294,8 +318,9 @@ class Layer2:
         - 高い車が止まっていて低い車が後ろ寄りで重なっている: その場で止まり、それ以上前へ出ない。
         """
         low_pos, high_pos = low_req.current_pos, high_req.current_pos
-        slot = high_req.deadline_pos - (VEH_LENGTH + MIN_GAP + 2 * LC_SAFETY_MARGIN)  # 低い車が止まってよい一番前
-        reserved = high_req.deadline_pos - low_pos <= HOLD_MARGIN
+        high_hold = Layer2._hold_pos(high_req)  # 高い車が保持で止まる位置
+        slot = high_hold - (VEH_LENGTH + MIN_GAP + 2 * LC_SAFETY_MARGIN)  # 低い車が止まってよい一番前
+        reserved = high_hold - low_pos <= HOLD_MARGIN
         if reserved:
             low.propose("order", math.sqrt(2 * HOLD_DECEL * max(slot - low_pos, 0.0)), abs(MAX_DECEL))
         front_gap = (low_pos - VEH_LENGTH) - high_pos - MIN_GAP  # 高い車の前端から低い車の後端まで（minGap 控除済み）
@@ -408,15 +433,21 @@ class Layer2:
 
     @staticmethod
     def _hold_before_deadline(requester: V2CAV, req: LCRequest) -> None:
-        """挿入できていない要求車に、締切位置 D で HOLD_DECEL の減速で止まれる速度 √(2·HOLD_DECEL·残距離) を上限として与える。
+        """挿入できていない要求車に、保持の位置（締切 D。STAGE_HOLD のときは次の 1 段の締切）で HOLD_DECEL の減速で
+        止まれる速度 √(2·HOLD_DECEL·残距離) を上限として与える。
 
         分岐直前まで巡航して SUMO トポロジー（teleport 無効の lane-drop）で急停止するのを避ける挙動品質（F5）。
         旧実装の「D で停止する減速で目標 0 を指令」は、100 m 手前から全車が止まる計画で減速して流れを落とし、
         減速した要求車と後続の速度差が開いて後続側の必要車間が広がる（かえって入れなくなる）副作用があった。
         上限なので、整列・挿入はそのまま続く。候補として出すので前車が近ければ追従の最大減速が勝つ。
+        2 回以上移る車が中間の締切を越えてしまったときは、そこで止まる（上限 0）。
         """
-        remaining = req.deadline_pos - req.current_pos  # D までの残距離（要求は road==mainlane の同一フレームで生成）
+        remaining = (
+            Layer2._hold_pos(req) - req.current_pos
+        )  # 保持の位置までの残距離（要求は road==mainlane の同一フレームで生成）
         if remaining <= 0:
+            if req.remaining_k >= 2 and STAGE_HOLD > 0:
+                requester.propose("hold", 0.0, abs(MAX_DECEL))  # 中間の締切を越えた多段の車
             return  # 既に D を越えていれば SUMO トポロジーに任せる
         v_hold = math.sqrt(2 * HOLD_DECEL * remaining)
         requester.propose("hold", v_hold, abs(MAX_DECEL))

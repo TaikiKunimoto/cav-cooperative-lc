@@ -79,6 +79,11 @@ class LCRequest(BaseModel):
     # 加速車線で本線へ移る速度まで加速している途中（提供車の割当も車線変更もまだしない。accelerating_to_merge）
     accelerating: bool = False
 
+    @property
+    def stage_deadline(self) -> float:
+        """次の 1 段の車線変更の締切（中間の締切）: 締切 D から、このあとに残る車線変更の分 (k − 1)·R を引いた位置。"""
+        return self.deadline_pos - (self.remaining_k - 1) * R
+
     @staticmethod
     def in_activation_window(
         mainlane_edge: str,
