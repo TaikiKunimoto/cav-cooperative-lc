@@ -64,7 +64,7 @@ VARIANTS_E4: list[tuple[str, str]] = [
     ("noyield", "COOP_YIELD=0"),  # 提供車の協調減速（Phase B の割当）を抜く
     ("nohold", "HOLD_MARGIN=0"),  # 締切前の保持を抜く
     ("noalign", "ALIGN_DELTA=0"),  # スロット整列を抜く（同速追従に戻す）
-    ("noswap", "SWAP_WINDOW=-1"),  # 対向スワップを抜く
+    ("noorder", "OPPOSITE_ORDER=0"),  # 対向の 2 台の順番を抜く（旧 noswap はスワップごと削除）
     ("r0", "R=0"),  # 多段 LC の実効距離補正を抜く
     ("tc1", "TC=1.0"),  # 調停周期 0.1 → 1.0 s
 ]

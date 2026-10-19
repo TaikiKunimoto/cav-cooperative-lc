@@ -1,4 +1,5 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（straight） -->
 <nodes>
-    <node id="Start" x="0.0" y="0.0" type="dead_end"/>
-    <node id="End" x="1000.0" y="0.0" type="dead_end"/>
+    <node id="Start" x="0.00" y="0.00" type="dead_end"/>
+    <node id="End" x="1000.00" y="0.00" type="dead_end"/>
 </nodes>

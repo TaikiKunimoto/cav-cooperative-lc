@@ -1,8 +1,6 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（diverge） -->
 <edges>
-    <edge id="DivergeZone" from="MainStart" to="DivergeStart" numLanes="3" speed="27.78" priority="10"/>
-    <edge id="MainLane" from="DivergeStart" to="End" numLanes="3" speed="27.78" priority="10"/>
-    <!-- 分流を滑らかに: smoothstep の多点カーブで lane0(水平)に接して降下し ~20m で水平 -11.4 に漸近
-         (MainLane と平行)、その後 ExitEnd まで水平。旧版の一点折れ(43°ハード)を解消し最大勾配~31°に。 -->
-    <edge id="ExitRamp" from="DivergeStart" to="ExitEnd" numLanes="1" speed="27.78" priority="1"
-          shape="0.00,0.00 3.33,-0.84 6.67,-2.96 10.00,-5.70 13.33,-8.44 16.67,-10.56 20.00,-11.40 72.00,-11.40"/>
+    <edge id="DivergeZone" from="MainStart" to="DivergeStart" numLanes="3" speed="27.78" length="1000.00" priority="10"/>
+    <edge id="MainLane" from="DivergeStart" to="End" numLanes="3" speed="27.78" length="200.00" priority="10"/>
+    <edge id="ExitRamp" from="DivergeStart" to="ExitEnd" numLanes="1" speed="27.78" length="200.00" priority="1" shape="0.00,-7.00 3.33,-7.37 6.67,-8.29 10.00,-9.50 13.33,-10.71 16.67,-11.63 20.00,-12.00 200.00,-12.00"/>
 </edges>

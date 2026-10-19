@@ -6,12 +6,15 @@ route 名（r_exit/r_pass）には依存しない。
 
 活性化は「早め固定」: 締切の固定マージン手前（``ACTIVATION_MARGIN``）を通過し、かつ目標車線に未到達なら活性。
 卒論の動的開始位置（渋滞末尾・前倒し）はコア外（システムモデル §4 改訂 / docs/実装計画_EDF統一調停.md §8）。
+
+合流ランプから続く車線（加速車線・補助車線）にいる要求車は、本線へ移る速度まで加速している途中なら ``accelerating`` を
+立てる。その間は Layer1 が提供車を割り当てず、Layer2 も車線変更しない（鍵は他の車の提供車選びに使われる）。
 """
 
 from pydantic import BaseModel, ConfigDict
 
 from status.status import CarAction
-from v2.constants import ACTIVATION_MARGIN
+from v2.constants import ACTIVATION_MARGIN, HOLD_DECEL, MAX_ACCEL, MERGE_SPEED, R
 from v2.snapshot import Snapshot, VehObs
 
 
@@ -73,6 +76,13 @@ class LCRequest(BaseModel):
     remaining_k: int  # |目標レーン − 現在レーン|
     current_pos: float  # 縦位置 pos
     wait_time: float  # 活性化からの経過
+    # 加速車線で本線へ移る速度まで加速している途中（提供車の割当も車線変更もまだしない。accelerating_to_merge）
+    accelerating: bool = False
+
+    @property
+    def stage_deadline(self) -> float:
+        """次の 1 段の車線変更の締切（中間の締切）: 締切 D から、このあとに残る車線変更の分 (k − 1)·R を引いた位置。"""
+        return self.deadline_pos - (self.remaining_k - 1) * R
 
     @staticmethod
     def in_activation_window(
@@ -124,12 +134,44 @@ class LCRequest(BaseModel):
             wait_time=wait_time,
         )
 
+    @staticmethod
+    def accelerating_to_merge(req: "LCRequest", speed: float, snap: Snapshot) -> bool:
+        """合流ランプから続く車線にいる要求車が、まだ本線へ移る速度まで加速している途中か。
+
+        移る速度は MERGE_SPEED（加速車線の設計到達速度）と、目標車線で最も近い先行車の速度の小さい方（本線のほうが
+        遅い渋滞時は、その流れの速さまで加速すれば足りる）。今の速度がこれに届いておらず、MAX_ACCEL で届いてから
+        HOLD_DECEL で締切に止まれるだけの距離が残っていれば加速の途中とする。距離が残っていない（加速車線の終わりが
+        近い）ときは加速の途中とみなさず、今の速度のまま挿入判定だけで移れるようにする（締切に間に合わせる）。
+        残りの距離は EDF の鍵と同じく、このあとに残る車線変更の分 (k − 1)·R を引いて測る。
+        """
+        step = 1 if req.direction == CarAction.CHANGE_LEFT else -1
+        merge_speed = MERGE_SPEED
+        target_members = snap.lane_members.get(f"{snap.mainlane_edge}_{req.current_lane + step}", [])
+        for vid in reversed(target_members):  # 縦位置の昇順
+            o = snap.obs[vid]
+            if o.lane_pos is not None and o.lane_pos >= req.current_pos:
+                merge_speed = min(merge_speed, o.speed)  # 目標車線で最も近い先行車
+                break
+        if speed >= merge_speed:
+            return False
+        remaining = (req.deadline_pos - req.current_pos) - (req.remaining_k - 1) * R
+        needed = (merge_speed**2 - speed**2) / (2 * MAX_ACCEL) + merge_speed**2 / (2 * HOLD_DECEL)
+        return remaining >= needed
+
     @classmethod
-    def build_all(cls, snap: Snapshot, margin: float = ACTIVATION_MARGIN) -> "list[LCRequest]":
-        """スナップショット中の全車から、活性な必須LC要求のリストを生成する。"""
+    def build_all(
+        cls, snap: Snapshot, margin: float = ACTIVATION_MARGIN, ramp_lanes: tuple[int, ...] = ()
+    ) -> "list[LCRequest]":
+        """スナップショット中の全車から、活性な必須LC要求のリストを生成する。
+
+        ramp_lanes（合流ランプから続く車線）にいて、本線へ移る速度まで加速している途中の要求車は ``accelerating`` を立てる。
+        """
         requests: list[LCRequest] = []
         for o in snap.obs.values():
             req = cls.from_obs(o, snap.sim_time, snap.mainlane_edge, margin)
-            if req is not None:
-                requests.append(req)
+            if req is None:
+                continue
+            if req.current_lane in ramp_lanes and cls.accelerating_to_merge(req, o.speed, snap):
+                req = req.model_copy(update={"accelerating": True})
+            requests.append(req)
         return requests

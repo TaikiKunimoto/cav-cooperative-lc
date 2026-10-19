@@ -1,0 +1,8 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（merge） -->
+<connections>
+    <connection from="MainApproach" to="MergeZone" fromLane="0" toLane="1"/>
+    <connection from="MainApproach" to="MergeZone" fromLane="1" toLane="2"/>
+    <connection from="OnRamp" to="MergeZone" fromLane="0" toLane="0"/>
+    <connection from="MergeZone" to="MainLane" fromLane="1" toLane="0"/>
+    <connection from="MergeZone" to="MainLane" fromLane="2" toLane="1"/>
+</connections>

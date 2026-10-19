@@ -24,12 +24,12 @@ from utils.traci_wrapper import (
     get_veh_id_list,
 )
 from v2.constants import (
-    ACTIVATION_MARGIN,
     DRAIN_MAX,
     TC,
     TIME_STEP,
 )
 from v2.environment import Environment, Group
+from v2.feasibility import Feasibility, LanePositions
 from v2.layer1.priority import EDF, FCFS
 from v2.layer1.rsu import RSU, Assignment
 from v2.layer2.pair_executor import Layer2
@@ -79,9 +79,9 @@ class V2Simulation(BaseModel):
     seed: str  # 乱数シード（統計ラベル用。random.seed の実行はエントリ側）
     obstacle: Obstacle | None = None  # 突発障害物（指定レーン・位置・時刻）。None なら障害物なし
     policy: Policy = Policy.EDF  # 調停ポリシー（アブレーション比較の切替軸。柱B）
-    # 活性化窓 [m]（締切Dの何m手前から要求を活性化するか）。柱B-2 の猶予距離比較でのみ既定から変える。
-    # off-late の車線変更解禁位置も本値に連動する
-    activation_margin: float = ACTIVATION_MARGIN
+    # 活性化窓 [m]（締切Dの何m手前から要求を活性化するか）。None なら環境の既定（合流・織り込みは区間に入った時点、
+    # 分流・封鎖は ACTIVATION_MARGIN）。柱B-2 の猶予距離比較でのみ値を指定する。off-late の車線変更解禁位置も本値に連動する
+    activation_margin: float | None = None
 
     veh_id: int = 0  # 次に投入する車両へ振る連番ID
     # グループ別の流入時刻（環境のグループ定義順を保持）
@@ -127,6 +127,9 @@ class V2Simulation(BaseModel):
         assignments: list[Assignment] = []  # 直近 Tc の割当（Layer2 で実行）
         req_by_id: dict[str, LCRequest] = {}  # 直近 Tc の要求（id 引き）
         speed_log = SpeedLog.from_env()  # V2_SPEED_LOG=<path> のときだけ全車の速度指令を記録する
+        prev_lanes: LanePositions = {}  # 前 step の本線上の (車線, 縦位置)。現実性の検査に使う
+        overlap_lc = 0  # 車体が重なる位置への車線変更の数（0 であるべき）
+        crossing_lc = 0  # 横に重なった 2 台が互いの車線へ移ったすり抜けの数（0 であるべき）
 
         while self._should_continue():
             traci.simulationStep()
@@ -183,13 +186,25 @@ class V2Simulation(BaseModel):
 
                 veh.update_self_observation()  # 自車両の状態更新
                 # TODO: ここ本当に必要か，一回で良いのか？
-                veh.update_activation(self.env.mainlane_edge, self.activation_margin)  # 活性化を一度だけ記録
+                veh.update_activation(self.env.mainlane_edge, self.margin())  # 活性化を一度だけ記録
                 veh.update_deadline_achievement(self.env.mainlane_edge)  # 締切までに目標到達したら一度だけ記録（F3）
                 active.append(veh)
                 self._update_lane_queue(vid)
 
                 if veh.leader_distance is not None and veh.leader_speed is not None:
                     stats.calculate_TTC(veh.leader_distance, veh.leader_speed, veh.speed)
+
+            # --- 現実性の検査（観測のみ）: 前 step から車線を移った車が、車体の重なる位置へ入っていないか、
+            # 横に重なった 2 台が互いの車線へすり抜けていないかを数える ---
+            cur_lanes: LanePositions = {
+                veh.id: (veh.lane, veh.lane_pos)
+                for veh in active
+                if veh.road == self.env.mainlane_edge and veh.lane is not None and veh.lane_pos is not None
+            }
+            overlap, crossing = Feasibility.count_violations(prev_lanes, cur_lanes)
+            overlap_lc += overlap
+            crossing_lc += crossing
+            prev_lanes = cur_lanes
 
             # --- 突発障害物（位置到達トリガ）。appear_time 以降、指定レーンで pos に到達した最初の車を停止＝障害物化 ---
             if self.obstacle is not None and obstacle_placed_pos is None and current_time >= self.obstacle.appear_time:
@@ -218,7 +233,7 @@ class V2Simulation(BaseModel):
             if not self.policy.is_noncooperative and tc_accumulator + 1e-9 >= TC:
                 tc_accumulator = 0.0
                 snap = Snapshot.capture(active, current_time, self.env.mainlane_edge)
-                requests = LCRequest.build_all(snap, self.activation_margin)
+                requests = LCRequest.build_all(snap, self.margin(), self.env.ramp_lanes)
                 if self.policy is Policy.EDF:
                     keyed = EDF.order_requests(requests)  # Phase A: 全要求車の鍵を計算し EDF（dist昇順）にソート
                     assignments = RSU.arbitrate(keyed, snap)  # Phase B: 鍵順に提供車を占有印つきで確保
@@ -288,6 +303,10 @@ class V2Simulation(BaseModel):
         print(f"Phase A: Tc rounds with key ties (should be 0): {tie_events}")
         print(f"Phase B: Tc rounds with double-assigned providers (should be 0): {double_assign_events}")
         print(f"Layer2: total instant lane changes executed: {total_lc}")
+        print(
+            f"Feasibility: lane changes into an occupied position: {overlap_lc}; "
+            f"pass-through lane changes: {crossing_lc} (both should be 0)"
+        )
         print(f"Speed: emergency brake events (decel above |MAX_DECEL|): {self.emergency_brake_total}")
         rule_summary = ", ".join(f"{k}={v}" for k, v in sorted(self.speed_rule_counts.items()))
         print(f"Speed: rule counts (vehicle-steps): {rule_summary}")
@@ -315,13 +334,19 @@ class V2Simulation(BaseModel):
         stats.add_result(self.simulation_time, self.seed, self.inflow_through, self.inflow_mlc, results)
         traci.close()
 
+    def margin(self) -> float:
+        """要求を出し始める位置（締切の何 m 手前か）。指定が無ければ環境の既定値。"""
+        return self.activation_margin if self.activation_margin is not None else self.env.default_activation_margin()
+
     def _set_environment(self) -> None:
         """環境のグループ別流入量（総流入 Q × 必須LC比率 f から展開）に従い、流入時刻を乱数で決定（seed で決定的）。"""
-        # 締切 D は「lane-drop 端＝本線エッジの終端」。公称値でなく net の実エッジ長を測って適用する
-        # （公称〜実長の数m の差で、物理的に成功した終端間際の必須LC が失敗誤計上されるのを防ぐ）。
+        # 締切 D は「区間（本線 edge）の終端」。道路網は区間長ちょうどで作るので、環境の定義と食い違えば止める
         actual_length = get_lane_length(f"{self.env.mainlane_edge}_0")
-        self.env = self.env.with_measured_length(actual_length)
-        print(f"[env] mainlane {self.env.mainlane_edge}: measured length {actual_length:.2f} m")
+        self.env.check_measured_length(actual_length)
+        print(
+            f"[env] mainlane {self.env.mainlane_edge}: measured length {actual_length:.2f} m, "
+            f"activation margin {self.margin():.1f} m"
+        )
         for group, rate in self.env.group_rates(self.total_inflow, self.mlc_ratio):
             k = int((self.simulation_time / 3600) * rate)
 

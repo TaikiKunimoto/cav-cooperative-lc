@@ -67,7 +67,7 @@ def get_veh_acceleration(id: str) -> float:
     return cast(float, traci.vehicle.getAcceleration(id))
 
 
-def get_veh_leader(id: str, setting: int) -> tuple[str, float] | None:
+def get_veh_leader(id: str, setting: float) -> tuple[str, float] | None:
     """前方車両の (ID, 車間距離 [m]) を返す。``setting`` は探索の look-ahead 距離 [m]。前方車がいなければ None。"""
     return cast(tuple[str, float] | None, traci.vehicle.getLeader(id, setting))
 

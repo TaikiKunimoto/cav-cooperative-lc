@@ -1,3 +1,4 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（straight） -->
 <edges>
-    <edge id="Road" from="Start" to="End" numLanes="3" speed="27.78"/>
+    <edge id="Road" from="Start" to="End" numLanes="3" speed="27.78" length="1000.00" priority="10"/>
 </edges>

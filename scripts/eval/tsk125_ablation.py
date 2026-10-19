@@ -27,13 +27,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import tsk125_figures as tf
 
 # 並び順: 提案 → 要素を 1 つ抜いた変種 → パラメータ変更 → 既存の比較対象（抜く量が大きい順）
-VARIANT_ORDER = ["edf", "noyield", "nohold", "noalign", "noswap", "r0", "tc1", "none", "sumo", "rel", "off-late"]
+# noswap は 10/20 にスワップを削除する前の結果（scripts/eval/out/tsk125）を描くために残す
+VARIANT_ORDER = [
+    "edf",
+    "noyield",
+    "nohold",
+    "noalign",
+    "noswap",
+    "noorder",
+    "r0",
+    "tc1",
+    "none",
+    "sumo",
+    "rel",
+    "off-late",
+]
 VARIANT_LABEL = {
     "edf": "Proposed",
     "noyield": "− provider\nyielding",
     "nohold": "− hold before\ndeadline",
     "noalign": "− slot\nalignment",
     "noswap": "− opposing\nswap",
+    "noorder": "− opposite\nordering",
     "r0": "− multi-stage\ncorrection (R=0)",
     "tc1": "Tc 0.1→1.0 s",
     "none": "− EDF priority\n(FCFS)",
@@ -47,6 +62,7 @@ VARIANT_LABEL_JA = {
     "nohold": "⑦ 締切前の保持を抜く",
     "noalign": "⑥ スロット整列を抜く",
     "noswap": "⑤ 対向スワップを抜く",
+    "noorder": "⑤ 対向の 2 台の順番を抜く",
     "r0": "② 多段 LC 補正を抜く（R=0）",
     "tc1": "③ 調停周期 0.1→1.0 s",
     "none": "① EDF 優先度を抜く（到着順）",
@@ -61,6 +77,7 @@ GROUP_OF = {
     "nohold": "removed",
     "noalign": "removed",
     "noswap": "removed",
+    "noorder": "removed",
     "r0": "removed",
     "tc1": "param",
     "none": "removed",
@@ -82,6 +99,7 @@ VARIANT_COLOR = {
     "nohold": "#56B4E9",
     "noalign": "#1b4f72",
     "noswap": "#7fb3d5",
+    "noorder": "#7fb3d5",
     "r0": "#8e44ad",
     "tc1": "#CC79A7",
     "none": "#000000",

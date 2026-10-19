@@ -1,0 +1,9 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（weave） -->
+<connections>
+    <connection from="MainApproach" to="WeaveZone" fromLane="0" toLane="1"/>
+    <connection from="MainApproach" to="WeaveZone" fromLane="1" toLane="2"/>
+    <connection from="OnRamp" to="WeaveZone" fromLane="0" toLane="0"/>
+    <connection from="WeaveZone" to="ExitRamp" fromLane="0" toLane="0"/>
+    <connection from="WeaveZone" to="MainLane" fromLane="1" toLane="0"/>
+    <connection from="WeaveZone" to="MainLane" fromLane="2" toLane="1"/>
+</connections>

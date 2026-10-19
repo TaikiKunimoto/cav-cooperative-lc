@@ -4,13 +4,16 @@
 評価環境_パターン網羅.md §4「環境＝形状／パラメータ＝負荷・規模」。コア調停（EDF/2フェーズ/Layer2）は
 環境非依存で、各車は ``(target_lane, deadline_pos)`` だけを持つ（route 名 r_exit/r_pass には依存しない）。
 
-新しい環境（合流M・封鎖B・織込み 等）は net/rou を用意し Environment を1つ追加して ENVIRONMENTS に登録する。
-現状 net が存在するのは環境①（分流D）のみ。
+道路網（net）は ``config/v2/build_networks.py`` が長さ・速度・車線幅をまとめて作る。区間長（``mainlane_length``）と
+締切は、その道路網の区間の長さとちょうど一致させる（実行開始時に ``check_measured_length`` で照合する）。
+新しい環境は build_networks.py に形を足し、rou を用意して Environment を 1 つ追加し ENVIRONMENTS に登録する。
 """
 
 from typing import NamedTuple
 
 from pydantic import BaseModel, ConfigDict
+
+from v2.constants import ACTIVATION_MARGIN
 
 
 class Group(BaseModel):
@@ -47,22 +50,28 @@ class Environment(BaseModel):
     # 本線 edge のうち終端で本線へ続くレーン（through 車が走り続けてよいレーン）。突発障害物の回避先の選択と、
     # 回避後に本線へ戻る操作の目標に使う（出口車線・加速車線は含めない）
     through_lanes: tuple[int, ...]
+    # 区間に入った時点で要求を出すか（合流・織り込み。区間に入った車は自分の行き先と車線が分かっている）。
+    # False なら締切の ACTIVATION_MARGIN 手前から要求を出す（分流・封鎖）
+    request_at_entry: bool = False
+    # 本線 edge のうち合流ランプから続く車線（merge の加速車線、weave・weave2 の補助車線）。ここから本線へ移る要求車は、
+    # 合流の速度 MERGE_SPEED まで加速してから移る（LCRequest.accelerating_to_merge）
+    ramp_lanes: tuple[int, ...] = ()
 
-    def with_measured_length(self, actual_length: float) -> "Environment":
-        """本線の実測エッジ長を反映した Environment を返す（シミュレーション開始後に net から取得して適用）。
+    def default_activation_margin(self) -> float:
+        """要求を出し始める位置（締切の何 m 手前か）の既定値。区間に入った時点なら区間長（＝締切）を返す。"""
+        return self.mainlane_length if self.request_at_entry else ACTIVATION_MARGIN
 
-        環境定義の ``mainlane_length`` は公称値で、netconvert が生成する実エッジ長（ジャンクション形状で
-        数m 伸びる）と一致しない。締切 D を公称値のままにすると「公称長〜実エッジ長」の区間で完了した
-        必須LC（物理的には lane-drop 手前で成功し出口へ到達）が失敗として誤計上される。
-        締切が公称長と一致するグループ（＝lane-drop 端を締切とする定義）の deadline_pos を実測長へ置き換える。
+    def check_measured_length(self, actual_length: float) -> None:
+        """道路網の区間（本線 edge）の実長が ``mainlane_length`` と一致するかを確かめる（実行開始時）。
+
+        道路網は build_networks.py が区間長ちょうどで作るので、ずれていれば道路網と環境の定義の片方だけを
+        直したことになる。そのまま走らせると締切の位置が道路網と食い違うので止める。
         """
-        if actual_length <= 0:
-            raise ValueError(f"本線 {self.mainlane_edge} の実測長が不正です: {actual_length}")
-        groups = tuple(
-            g.model_copy(update={"deadline_pos": actual_length}) if g.deadline_pos == self.mainlane_length else g
-            for g in self.groups
-        )
-        return self.model_copy(update={"mainlane_length": actual_length, "groups": groups})
+        if abs(actual_length - self.mainlane_length) > 0.01:
+            raise ValueError(
+                f"本線 {self.mainlane_edge} の実長 {actual_length:.2f} m が環境の定義 {self.mainlane_length:.2f} m と"
+                " 違います。config/v2/build_networks.py と TraCI/v2/environment.py の区間長をそろえてください"
+            )
 
     def group_rates(self, total_inflow: float, mlc_ratio: float) -> list[GroupRate]:
         """総流入 Q と必須LC比率 f を、グループ別の流入量[veh/h]に展開する（グループ定義順を保持）。
@@ -84,9 +93,13 @@ class Environment(BaseModel):
         return rates
 
 
-# --- 環境① S-D 単一分流（実分流形状, 本線3車線・1000m）。投入は DivergeZone 直接。分流車は本線3車線を ~1000m 走る間に
-# 右端 lane0（占有された本線）へ必須LC＝調停の本体（deadline=DivergeStart=1000m地点）。DivergeStart で lane0 が
-# オフランプ車線(ExitRamp ~100m)へ分岐し出口へ。through と lane1,2 は MainLane へ継続。net は手動con（config/v2/diverge/build.sh）---
+# 5 環境の道路網は config/v2/build_networks.py が作る。共通: 車線幅 3.5 m、本線 100 km/h、合流ランプ 40 km/h（合流車は加速車線で
+# 合流の速度 65 km/h まで加速してから本線へ移る）、出口ランプは本線と同じ速度（評価区間の外）、区間の手前の本線 500 m・
+# 合流ランプ 300 m、区間の後ろ 200 m。
+# 区間長（mainlane_length）と締切は道路網の区間の長さとちょうど同じ値にする。
+
+# --- 環境① S-D 単一分流: 本線 3 車線の区間（1,000 m）の終わり DivergeStart で lane0 が出口（ExitRamp）と本線に分かれる。
+# 出口へ行く車は締切（分岐点）の ACTIVATION_MARGIN 手前から右端 lane0 へ必須LC＝調停の本体。through と lane1,2 は MainLane へ ---
 DIVERGE = Environment(
     name="diverge",
     sumocfg="../config/v2/diverge/diverge.sumocfg",
@@ -101,20 +114,21 @@ DIVERGE = Environment(
     ),
 )
 
-# --- 環境② S-M 単一合流（実合流形状）。手前に「本線2車線 / 合流ランプ1車線」が完全独立の区間があり、
-# MergeNode で合流ランプが本線下側へ加速車線(MergeZone lane0)として連結、加速車線端 AccelEnd で drop。
-# 合流車は OnRamp→加速車線(lane0)→本線 lane1 へ必須LC（上向き）。net は ramps.guess 生成（config/v2/merge/build.sh）---
+# --- 環境② S-M 単一合流: 本線 2 車線と合流ランプ（40 km/h）が MergeNode で連結し、ランプの車線が加速車線（MergeZone lane0、
+# 240 m＝本線 100 km/h の標準値、テーパを含む）になり、AccelEnd で無くなる。合流車は加速車線から本線 lane1 へ必須LC ---
 MERGE = Environment(
     name="merge",
     sumocfg="../config/v2/merge/merge.sumocfg",
     mainlane_edge="MergeZone",  # 加速車線を含む3車線の連結区間（調停対象）
-    mainlane_length=194.0,  # 加速車線(MergeZone lane0)が drop する位置 ＝ 締切
+    mainlane_length=240.0,  # 加速車線(MergeZone lane0)が無くなる位置 ＝ 締切
     through_lanes=(1, 2),
+    request_at_entry=True,
+    ramp_lanes=(0,),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach lane0/1 → MergeZone lane1/2）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
         # 合流（合流ランプ OnRamp → 加速車線 MergeZone lane0 → 目標 lane1 へ必須LC、締切=加速車線端）
-        Group(name="merging", route="r_ramp", weight=1.0, target_lane=1, deadline_pos=194.0, depart_edge="OnRamp"),
+        Group(name="merging", route="r_ramp", weight=1.0, target_lane=1, deadline_pos=240.0, depart_edge="OnRamp"),
     ),
 )
 
@@ -129,95 +143,99 @@ STRAIGHT = Environment(
     groups=(Group(name="through", route="r_main", weight=1.0),),  # 全車 through（必須LCは障害物で動的付与）
 )
 
-# --- 環境⑤ MD-2 両側織込み（上下左右対称, 4車線コア 1:2:1）。WeaveStart で上下2本のオンランプが合流し
-# （OnRampBottom→加速車線 lane0(下) / OnRampTop→加速車線 lane3(上)）、WeaveEnd で上下2本のオフランプへ分流する
+# --- 環境⑤ MD-2 両側織込み（上下対称, 4車線コア 1:2:1、610 m）。WeaveStart で上下2本の合流ランプが連結し
+# （OnRampBottom→補助車線 lane0(下) / OnRampTop→補助車線 lane3(上)）、WeaveEnd で上下2本の出口ランプへ分かれる
 # （lane0(下)→OffRampBottom / lane3(上)→OffRampTop）。本線2車線は中央 lane1,2。合流車は外側 lane0/lane3 から
-# 本線 lane1/lane2 へ、分流車は本線から外側 lane0/lane3 へ必須LC＝上下左右対称の両側織込み。MLC4種は weight 均等。
-# net は手動 connection 生成（config/v2/weave2/build.sh）---
+# 本線 lane1/lane2 へ、出口へ行く車は本線から外側 lane0/lane3 へ、対角の車は lane0↔lane3 へ必須LC。
+# 要求を出す 6 グループは同じ重み ---
 WEAVE2 = Environment(
     name="weave2",
     sumocfg="../config/v2/weave2/weave2.sumocfg",
-    mainlane_edge="WeaveZone",  # 加速/出口車線を含む4車線の織込みゾーン（調停対象, 1:2:1）
-    mainlane_length=392.0,  # 加速車線drop＝出口分岐位置＝締切（WeaveZone 実net長）
+    mainlane_edge="WeaveZone",  # 補助車線を含む4車線の織込みゾーン（調停対象, 1:2:1）
+    mainlane_length=610.0,  # 補助車線が出口へ抜ける位置＝締切
     through_lanes=(1, 2),
+    request_at_entry=True,
+    ramp_lanes=(0, 3),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
-        # 合流(下): OnRampBottom → 加速車線 lane0 → 目標 lane1 へ必須LC（下から上）
+        # 合流(下): OnRampBottom → 補助車線 lane0 → 目標 lane1 へ必須LC（下から上）
         Group(
             name="merging_bottom",
             route="r_ramp_b",
             weight=1.0,
             target_lane=1,
-            deadline_pos=392.0,
+            deadline_pos=610.0,
             depart_edge="OnRampBottom",
         ),
-        # 合流(上): OnRampTop → 加速車線 lane3 → 目標 lane2 へ必須LC（上から下, 合流下と上下対称）
+        # 合流(上): OnRampTop → 補助車線 lane3 → 目標 lane2 へ必須LC（上から下, 合流下と上下対称）
         Group(
             name="merging_top",
             route="r_ramp_t",
             weight=1.0,
             target_lane=2,
-            deadline_pos=392.0,
+            deadline_pos=610.0,
             depart_edge="OnRampTop",
         ),
-        # 分流(下): 本線 → 出口車線 lane0 へ必須LC → OffRampBottom（合流と逆向き＝織込み）
+        # 分流(下): 本線 → 補助車線 lane0 へ必須LC → OffRampBottom（合流と逆向き＝織込み）
         Group(
             name="diverging_bottom",
             route="r_exit_b",
             weight=1.0,
             target_lane=0,
-            deadline_pos=392.0,
+            deadline_pos=610.0,
             depart_edge="MainApproach",
         ),
-        # 分流(上): 本線 → 出口車線 lane3 へ必須LC → OffRampTop（分流下と上下対称）
+        # 分流(上): 本線 → 補助車線 lane3 へ必須LC → OffRampTop（分流下と上下対称）
         Group(
             name="diverging_top",
             route="r_exit_t",
             weight=1.0,
             target_lane=3,
-            deadline_pos=392.0,
+            deadline_pos=610.0,
             depart_edge="MainApproach",
         ),
-        # 対角(下→上): OnRampBottom(lane0) → 対角 lane3 へ3車線必須LC → OffRampTop（織込みの交差移動。weight=2で強調）
+        # 対角(下→上): OnRampBottom(lane0) → 対角 lane3 へ3車線必須LC → OffRampTop
         Group(
             name="crossing_bt",
             route="r_cross_bt",
-            weight=2.0,
+            weight=1.0,
             target_lane=3,
-            deadline_pos=392.0,
+            deadline_pos=610.0,
             depart_edge="OnRampBottom",
         ),
-        # 対角(上→下): OnRampTop(lane3) → 対角 lane0 へ3車線必須LC → OffRampBottom（対角下→上と上下対称, weight=2）
+        # 対角(上→下): OnRampTop(lane3) → 対角 lane0 へ3車線必須LC → OffRampBottom（対角下→上と上下対称）
         Group(
             name="crossing_tb",
             route="r_cross_tb",
-            weight=2.0,
+            weight=1.0,
             target_lane=0,
-            deadline_pos=392.0,
+            deadline_pos=610.0,
             depart_edge="OnRampTop",
         ),
     ),
 )
 
-# --- 環境④ MD-1f 一側織込み（実形状）。手前に「本線2車線 / オンランプ1車線」の独立区間があり、WeaveStart で
-# オンランプが本線下側の補助車線(WeaveZone lane0)として連結。織込み区間(WeaveZone 3車線)の補助車線で、合流車
-# (OnRamp→lane0→本線lane1, 上へ)と分流車(本線→lane0→出口, 下へ)が逆向きに交差。補助車線端 WeaveEnd で
-# lane0 はオフランプ(ExitRamp)へ抜ける。net は ramps.guess 生成（config/v2/weave/build.sh）---
+# --- 環境④ MD-1f 一側織込み: 本線 2 車線と合流ランプ（40 km/h）が WeaveStart で連結し、ランプの車線が補助車線
+# （WeaveZone lane0）になる。織込み区間（WeaveZone 3 車線、275 m＝ランプの接続端間の距離の標準値、本線 96〜113 km/h）の
+# 補助車線で、合流車（OnRamp→lane0→本線 lane1、上へ）と出口へ行く車（本線→lane0→出口、下へ）が逆向きに交差する。
+# 補助車線は WeaveEnd で出口ランプ（ExitRamp）へ抜ける ---
 WEAVE = Environment(
     name="weave",
     sumocfg="../config/v2/weave/weave.sumocfg",
     mainlane_edge="WeaveZone",  # 補助車線を含む3車線の織込み区間（調停対象）
-    mainlane_length=196.0,  # 補助車線(WeaveZone lane0)が出口へ抜ける位置 ＝ 締切
+    mainlane_length=275.0,  # 補助車線(WeaveZone lane0)が出口へ抜ける位置 ＝ 締切
     through_lanes=(1, 2),
+    request_at_entry=True,
+    ramp_lanes=(0,),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
         # 合流（オンランプ → 補助車線 WeaveZone lane0 → 本線 lane1 へ上がる）
-        Group(name="merging", route="r_ramp", weight=1.0, target_lane=1, deadline_pos=196.0, depart_edge="OnRamp"),
+        Group(name="merging", route="r_ramp", weight=1.0, target_lane=1, deadline_pos=275.0, depart_edge="OnRamp"),
         # 分流（本線 → 補助車線 WeaveZone lane0 へ降りる → 出口）。合流と逆向きに補助車線で交差＝織込み
         Group(
-            name="diverging", route="r_exit", weight=1.0, target_lane=0, deadline_pos=196.0, depart_edge="MainApproach"
+            name="diverging", route="r_exit", weight=1.0, target_lane=0, deadline_pos=275.0, depart_edge="MainApproach"
         ),
     ),
 )

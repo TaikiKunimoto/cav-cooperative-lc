@@ -1,3 +1,4 @@
+<!-- build_networks.py が生成する。手で直さず build_networks.py を直す（diverge） -->
 <connections>
     <connection from="DivergeZone" to="MainLane" fromLane="0" toLane="0"/>
     <connection from="DivergeZone" to="ExitRamp" fromLane="0" toLane="0"/>
