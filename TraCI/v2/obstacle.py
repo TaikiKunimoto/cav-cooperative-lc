@@ -1,7 +1,8 @@
 """突発障害物（Obstacle）: 走行中の1台を停止させてブロック車両＝障害物にするシナリオイベント。
 
 形状（Environment）非依存で、どの環境にも ``--obstacle 'lane,pos,time'`` で動的に付与できる。
-配置（place）は「位置到達トリガ」: 指定レーンで pos に到達した最初の車を停止させ、lane も pos も指定どおりに再現する。
+配置（place）は「位置到達トリガ」: 指定レーンで、OBSTACLE_DECEL で減速すれば pos で止まれる地点に来た最初の車を
+障害物にし、減速させて pos で停車させる（lane も pos も指定どおりに再現する。1 step で止めると直後の車が物理的に止まれない）。
 配置後は escalate で、障害物より後方・同一レーンの through 車に隣レーンへの回避（必須LC）を動的付与する。
 """
 
@@ -9,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
+from v2.constants import OBSTACLE_DECEL
 from v2.lc_request import LCOperation
 
 if TYPE_CHECKING:
@@ -22,7 +24,9 @@ class Obstacle(BaseModel):
 
     lane: int  # 障害物を発生させる本線レーン index（0=最下段）
     pos: float  # 障害物の位置 [m]（mainlane_edge 始端からの距離）
-    appear_time: float  # 突発時刻 [s]（この時刻以降、指定レーンで pos に到達した最初の車を停止＝障害物化）
+    appear_time: (
+        float  # 突発時刻 [s]（この時刻以降、指定レーンで pos に止まれる地点に来た最初の車を減速させて障害物化）
+    )
 
     @classmethod
     def from_spec(cls, spec: str) -> "Obstacle":
@@ -52,32 +56,60 @@ class Obstacle(BaseModel):
                 f"指定可能 0..{mainlane_length}, 受け取り: {self.pos}）"
             )
 
-    def place(self, active: "list[V2CAV]", edge: str, watched_id: str | None) -> tuple[str | None, float | None]:
-        """指定レーンで pos に到達した最初の車を停止＝障害物にする（位置到達トリガ）。
+    @staticmethod
+    def stop_distance(speed: float) -> float:
+        """OBSTACLE_DECEL で減速して止まるまでの距離 [m]。"""
+        return speed**2 / (2 * OBSTACLE_DECEL)
 
-        pos 手前の先頭車を1台監視し、その車が pos に到達(lane_pos>=pos)した瞬間に停止させることで、
-        lane も pos も指定どおりに再現する（毎step ポーリングのため停止位置は pos+1step分 ≒ pos）。
-        まだ到達していなければ停止せず、次stepで再試行する。監視車が pos 到達前にレーンを抜けた／退出した
-        場合は監視を解除して選び直す。戻り値: (監視中の車ID, 停止位置)。停止できていなければ停止位置は None。
+    def place(self, active: "list[V2CAV]", edge: str, watched_id: str | None) -> tuple[str | None, float | None]:
+        """指定レーンで pos に止まれる地点に来た最初の車を減速させ、pos で停車させて障害物にする（位置到達トリガ）。
+
+        2 段階で進む::
+
+            (1) pos の手前で「OBSTACLE_DECEL で減速すれば pos で止まれる」先頭車を 1 台監視し、その地点
+                （lane_pos + 停止距離 ≥ pos）に来たら障害物にして減速を始める（調停から外し、車線変更を止める）。
+            (2) 止まるまで毎 step 減速させ（非協調の車はここで速度を下げる。提案の車は control_speed の候補が
+                同じ減速を入れ、前が詰まっていれば追従の安全側が勝つ）、止まったら停止を固定して配置完了とする。
+
+        回避操作の付与（escalate）は配置完了（停車）から始まる。監視車が手前でレーンを抜けた／退出した場合は選び直す。
+        戻り値: (監視中の車ID, 停止位置)。停車し終えていなければ停止位置は None。
         """
+        by_id = {v.id: v for v in active}
+        watched = by_id.get(watched_id) if watched_id is not None else None
+
+        # (2) 停車中: 止まったら配置完了。止まるまでは減速させる
+        if watched is not None and watched.is_obstacle and watched.obstacle_stop_pos is not None:
+            if watched.speed <= 0.0 and watched.lane_pos is not None:
+                watched.make_obstacle()
+                placed = watched.lane_pos
+                print(f"[obstacle] veh={watched.id} edge={edge} lane={self.lane} pos={placed:.1f}")
+                return watched_id, placed
+            watched.brake_as_obstacle()
+            return watched_id, None
+
         # 指定 edge・指定レーンを走行中の CAV（障害物化済みは除く）。lane_pos でアクセスするので None は除外
         in_lane = [
             v
             for v in active
             if v.road == edge and v.lane == self.lane and v.lane_pos is not None and not v.is_obstacle
         ]
-        by_id = {v.id: v for v in in_lane}
+        in_lane_ids = {v.id for v in in_lane}
 
-        # 監視中の車が pos に到達していたら停止＝障害物化
-        watched = by_id.get(watched_id) if watched_id is not None else None
-        if watched is not None and watched.lane_pos is not None and watched.lane_pos >= self.pos:
-            watched.make_obstacle()
-            placed = watched.lane_pos
-            print(f"[obstacle] veh={watched.id} edge={edge} lane={self.lane} pos={placed:.1f}")
-            return watched_id, placed
+        # (1) 監視中の車が pos で止まれる地点に来ていたら、障害物にして減速を始める
+        if watched is not None and watched.id in in_lane_ids and watched.lane_pos is not None:
+            if watched.lane_pos + self.stop_distance(watched.speed) >= self.pos:
+                watched.start_obstacle_stop(self.pos)
+                watched.brake_as_obstacle()
+                print(
+                    f"[obstacle] veh={watched.id} starts stopping at pos={watched.lane_pos:.1f}"
+                    f" speed={watched.speed:.1f} (stop at {self.pos:.1f})"
+                )
+                return watched_id, None
 
-        # 監視対象を（再）選定: pos 手前で最も pos に近い先頭車。手前に1台もいなければ未選定のまま待機する
-        approaching = [v for v in in_lane if v.lane_pos is not None and v.lane_pos < self.pos]
+        # 監視対象を（再）選定: まだ pos の手前で止まれる車のうち最も前の車。1台もいなければ未選定のまま待機する
+        approaching = [
+            v for v in in_lane if v.lane_pos is not None and v.lane_pos + self.stop_distance(v.speed) < self.pos
+        ]
         if approaching:
             lead = max(approaching, key=lambda v: (v.lane_pos or 0.0, -int(v.id)))
             return lead.id, None

@@ -23,7 +23,13 @@ import math
 import os
 import sys
 
-from utils.traci_wrapper import get_lane_max_speed, get_veh_neighbors, get_veh_speed
+from utils.traci_wrapper import (
+    get_lane_last_step_veh_ids,
+    get_lane_length,
+    get_lane_max_speed,
+    get_veh_neighbors,
+    get_veh_speed,
+)
 from v2.constants import (
     ALIGN_DECEL,
     ALIGN_DELTA,
@@ -163,9 +169,61 @@ class Layer2:
         )
         front_ok = all(
             dist >= Safety.net_required(ego_speed, get_veh_speed(nid))
-            for nid, dist in get_veh_neighbors(veh_id, lat | 2)  # 先行（bit2=1）: ego が先行へ追突しない車間
+            for nid, dist in Layer2._front_neighbors(
+                veh_id, going_right, ego_speed
+            )  # 先行: ego が先行へ追突しない車間
         )
         return InsertionCheck(front_ok=front_ok, rear_ok=rear_ok)
+
+    @staticmethod
+    def _front_neighbors(veh_id: str, going_right: bool, ego_speed: float) -> list[tuple[str, float]]:
+        """目標車線の先行車を (ID, minGap 控除済みの距離) で返す: getNeighbors の先行に、目標車線の先
+        （ジャンクションの内部レーンと次の edge）にいる車を足す（同じ車は近い方の距離を採る）。
+
+        getNeighbors は、今のレーンがルート上で続かない車（合流の加速車線・織り込みの出口側レーンの終端で止まった
+        要求車など）に対して、目標車線の先でジャンクションに入った車を返さないことがある。見落とすと、その車の
+        すぐ後ろに入って junction collision になる（385 run の衝突 1 件。壁で止まった要求車が、ジャンクションに
+        入りかけた先行車の 2.6 m 後ろに入った）。
+        """
+        lat = 1 if going_right else 0
+        fronts = dict(get_veh_neighbors(veh_id, lat | 2))  # 先行（bit2=1）
+        for nid, dist in Layer2._leaders_beyond_edge(veh_id, going_right, ego_speed):
+            if nid not in fronts or dist < fronts[nid]:
+                fronts[nid] = dist
+        return list(fronts.items())
+
+    @staticmethod
+    def _leaders_beyond_edge(veh_id: str, going_right: bool, ego_speed: float) -> list[tuple[str, float]]:
+        """目標車線の先（ルート上で続くジャンクションの内部レーンと次の edge）で最も手前にいる車を、link ごとに 1 台返す。
+
+        距離は getNeighbors と同じく minGap 控除済み（目標車線の残り長 ＋ その車の後端までの位置 − minGap）。
+        目標車線の終端までが、どれだけ近い先行車でも判定に効かない距離（停止した先行車に対する必要量 ＋ minGap）より
+        遠いときは調べない。
+        """
+        edge = traci.vehicle.getRoadID(veh_id)
+        target_lane = traci.vehicle.getLaneIndex(veh_id) + (-1 if going_right else 1)
+        lane_id = f"{edge}_{target_lane}"
+        remaining = get_lane_length(lane_id) - traci.vehicle.getLanePosition(veh_id)
+        if remaining > Safety.net_required(ego_speed, 0.0) + MIN_GAP:
+            return []
+        route = set(traci.vehicle.getRoute(veh_id))
+        found: list[tuple[str, float]] = []
+        for link in traci.lane.getLinks(lane_id):
+            approached, via = str(link[0]), str(link[4])
+            if approached.rsplit("_", 1)[0] not in route:
+                continue  # ルート上で続かない分岐（出口側など）の車は先行車ではない
+            via_length = get_lane_length(via) if via else 0.0
+            for lane, offset in ((via, remaining), (approached, remaining + via_length)):
+                ids = get_lane_last_step_veh_ids(lane) if lane else []
+                if not ids:
+                    continue
+                nid = min(ids, key=lambda v: float(traci.vehicle.getLanePosition(v)))
+                gap = (
+                    offset + float(traci.vehicle.getLanePosition(nid)) - float(traci.vehicle.getLength(nid)) - MIN_GAP
+                )
+                found.append((nid, gap))
+                break  # この link では最も手前の 1 台だけ
+        return found
 
     # --- 対向スワップ（織込みデッドロックの解消）---
 
@@ -255,7 +313,7 @@ class Layer2:
                 required -= MIN_GAP
             if dist < required:
                 return False
-        for nid, dist in get_veh_neighbors(veh_id, lat | 2):  # 先行
+        for nid, dist in Layer2._front_neighbors(veh_id, going_right, ego_speed):  # 先行（目標車線の先の車も含む）
             if nid == partner_id:
                 continue
             v_n = get_veh_speed(nid)
@@ -381,8 +439,10 @@ class Layer2:
         if requester.speed <= 0:
             return
         going_right = Safety.next_lane(req) < req.current_lane
-        lat = 1 if going_right else 0
-        fronts = [(nid, dist, get_veh_speed(nid)) for nid, dist in get_veh_neighbors(requester.id, lat | 2)]
+        fronts = [
+            (nid, dist, get_veh_speed(nid))
+            for nid, dist in Layer2._front_neighbors(requester.id, going_right, requester.speed)
+        ]
         if not check.front_ok:
             blocking = [v for _, dist, v in fronts if dist < Safety.net_required(requester.speed, v)]
             if blocking:

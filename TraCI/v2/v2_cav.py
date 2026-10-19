@@ -37,6 +37,7 @@ from v2.constants import (
     MAX_ACCEL,
     MAX_DECEL,
     MIN_GAP,
+    OBSTACLE_DECEL,
     SUMO_DEFAULT_LC_MODE,
     TIME_STEP,
 )
@@ -70,6 +71,8 @@ class V2CAV(BaseModel):
     operations: list[LCOperation] = Field(default_factory=list)
     # 障害物（突発）: True の車は停止し続け、調停（要求・提供）から除外される。snapshot には載る（安全判定で回避）。
     is_obstacle: bool = False
+    # 障害物として停車中の目標位置 [m]（減速して止まるまでの間だけ値を持ち、止まったら None。is_obstacle は減速中から True）
+    obstacle_stop_pos: float | None = None
     # 非協調モード（--policy off / off-late）: True なら SUMO 標準制御（LC2013・Krauss）を無効化せず残す。
     # traci からの車線変更・速度指令は一切行わない前提（観測・締切判定の計測だけが動く）。
     sumo_default_control: bool = False
@@ -310,8 +313,31 @@ class V2CAV(BaseModel):
                 op.completion_time = self.sim_time
                 op.completion_pos = self.lane_pos
 
+    def start_obstacle_stop(self, stop_pos: float) -> None:
+        """この車を障害物にするため、stop_pos で止まるよう減速を始める（調停から外し、車線変更を止める）。
+
+        減速は毎 step、提案の車は ``control_speed`` の候補（規則 stopping）として、非協調の車は
+        ``Obstacle.place`` から ``brake_as_obstacle`` で入れる。止まったら ``make_obstacle`` で停止を固定する。
+        """
+        self.is_obstacle = True
+        self.obstacle_stop_pos = stop_pos
+        traci.vehicle.setLaneChangeMode(self.id, 0)
+
+    def obstacle_brake_decel(self) -> float:
+        """停車中の障害物が目標位置で止まる減速度（OBSTACLE_DECEL 以上、|MAX_DECEL| 以下。位置を越えていれば最大）。"""
+        if self.obstacle_stop_pos is None or self.lane_pos is None:
+            return abs(MAX_DECEL)
+        remaining = self.obstacle_stop_pos - self.lane_pos
+        if remaining <= 0:
+            return abs(MAX_DECEL)
+        return min(abs(MAX_DECEL), max(OBSTACLE_DECEL, self.speed**2 / (2 * remaining)))
+
+    def brake_as_obstacle(self) -> None:
+        """停車中の障害物の速度を 1 step 分下げる（非協調の車用。提案の車は control_speed の候補が同じ減速を入れる）。"""
+        traci.vehicle.setSpeed(self.id, max(0.0, self.speed - self.obstacle_brake_decel() * TIME_STEP))
+
     def make_obstacle(self) -> None:
-        """この車を障害物（突発）にする。停止し、is_obstacle で調停（要求・提供）から外れる。
+        """停車し終えたこの車を障害物（突発）として固定する。停止し、is_obstacle で調停（要求・提供）から外れる。
 
         操作リストは捨てない（締切達成率 F3 の母数のため保持）。本来の必須LCが活性化済みのまま障害物化
         された車は、停止して目標へ到達できず終了時に未完了＝失敗として計上される（テレポート無効方針 §2.4.1）。
@@ -323,6 +349,7 @@ class V2CAV(BaseModel):
         edf/none では生成時に設定済みの値の再設定（冪等・挙動不変）。
         """
         self.is_obstacle = True
+        self.obstacle_stop_pos = None
         traci.vehicle.setSpeedMode(self.id, 0)
         traci.vehicle.setLaneChangeMode(self.id, 0)
         traci.vehicle.setSpeed(self.id, 0.0)
@@ -360,8 +387,11 @@ class V2CAV(BaseModel):
         無い: 譲り・整列・保持が要るときは Layer2 が候補を足し、調停で最も遅い候補が勝つ。
         """
         if self.is_obstacle:
-            traci.vehicle.setSpeed(self.id, 0.0)  # 障害物は停止し続ける（速度調停の対象外）
-            return
+            if self.obstacle_stop_pos is None:
+                traci.vehicle.setSpeed(self.id, 0.0)  # 停車し終えた障害物は止まり続ける（速度調停の対象外）
+                return
+            # 停車中: 目標位置で止まる減速を候補に足し、追従の候補と調停する（前が詰まれば追従が勝つ）
+            self.propose("stopping", 0.0, self.obstacle_brake_decel())
         if self.lane_id is None:
             return
         speed_limit = get_lane_max_speed(self.lane_id)
@@ -398,7 +428,7 @@ class V2CAV(BaseModel):
 
         障害物は control_speed で停止固定済み。候補が無い（走行レーン未確定など）ときは指令を出さない。
         """
-        if self.is_obstacle:
+        if self.is_obstacle and self.obstacle_stop_pos is None:
             self.speed_candidates.clear()
             return "obstacle"
         if not self.speed_candidates:
