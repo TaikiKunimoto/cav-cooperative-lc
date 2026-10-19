@@ -13,7 +13,7 @@ metadata:
 > - 区間長: merge 240 m（加速車線長の標準値、本線 100 km/h、テーパ込み）、weave 275 m（ランプの接続端間の距離の標準値、本線 96〜113 km/h。道路構造令の解説と運用 表 5-16）、weave2 610 m（2,000 ft）、diverge 1,000 m、straight 1,000 m。weave2 の要求を出す 6 グループは同じ重み。
 > - ランプは接続する車線の位置まで本線と平行に寄せてから接続する（spreadType right の区間では lane0 の左端＝形の線から 2·車線幅、weave2 の center では ±1.5·車線幅）。斜めにノードへ入れると junction が数十 m ずれる警告が出る。
 > - `TraCI/v2/environment.py`: 区間長と締切は道路網と同じ値。実行開始時に `check_measured_length` が実長と照合し、ずれていれば止まる（以前は実長に黙って置き換えていた）。`request_at_entry=True`（merge・weave・weave2）は区間に入った時点で要求を出す（`--activation-margin` を明示したときはその値）。
-> - 合流の速度: `ramp_lanes`（merge・weave の lane0、weave2 の lane0・lane3）から本線へ移る要求車は、`MERGE_SPEED`（65 km/h＝加速車線の設計到達速度）と目標車線の最も近い先行車の速度の小さい方まで加速してから移る。加速の途中（`LCRequest.accelerating`）は Layer1 が提供車を割り当てず、Layer2 も挿入・スワップしない。加速しきると締切の手前で `HOLD_DECEL` で止まれない位置（後に残る LC の (k−1)·R を引いた残り距離で測る）からは今の速度のまま移る。ランプを 40 km/h にしたら、合流車が加速車線の入口で 40 km/h のまま本線へ入るようになったため。
+> - 合流の速度: `ramp_lanes`（merge・weave の lane0、weave2 の lane0・lane3）から本線へ移る要求車は、`MERGE_SPEED`（65 km/h＝加速車線の設計到達速度）と目標車線の最も近い先行車の速度の小さい方まで加速してから移る。加速の途中（`LCRequest.accelerating`）は Layer1 が提供車を割り当てず、Layer2 も車線変更せず対向の順番にも加わらない。加速しきると締切の手前で `HOLD_DECEL` で止まれない位置（後に残る LC の (k−1)·R を引いた残り距離で測る）からは今の速度のまま移る。ランプを 40 km/h にしたら、合流車が加速車線の入口で 40 km/h のまま本線へ入るようになったため。
 >
 > このメモの以下は 2026-06 の設計経緯・知見の記録（PR#43 でジオメトリ整形マージ済み）。「なぜこの形状か」を残すための背景。
 

@@ -44,7 +44,7 @@ class Safety:
         （rear-end グレーズの防止。停止・微速域では ~0 なので詰まった車列への挿入可能性は保たれる）。
         判定と changeLane 反映の1stepズレに対する ``LC_SAFETY_MARGIN`` も足す（境界挿入の側面衝突防止）。
 
-        挿入判定・スワップ（Layer2）と追従（``V2CAV.control_speed`` の安全車間）の両方がこの 1 本の定義を使う
+        挿入判定・対向の 2 台の順番（Layer2）と追従（``V2CAV.control_speed`` の安全車間）がこの 1 本の定義を使う
         （層の間で安全の定義を食い違わせない）。
         """
         braking = max(0.0, (v_back**2 - v_front**2) / (2 * abs(MAX_DECEL)))

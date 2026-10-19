@@ -32,7 +32,7 @@ def _apply_constant_overrides(argv: list[str]) -> dict[str, float]:
     """``--set NAME=VALUE[,NAME=VALUE...]`` を v2.constants に適用する（要素の除去・感度分析用）。
 
     他モジュールは ``from v2.constants import X`` で import 時に値を束縛するため、それらを import する前に呼ぶ。
-    constants.py 内で他の定数から導出される値（SWAP_WINDOW など）は再計算しないので、必要なら直接指定する。
+    constants.py 内で他の定数から導出される値（TIME_STEP から決まる TC など）は再計算しないので、必要なら直接指定する。
     """
     overrides: dict[str, float] = {}
     i = 0

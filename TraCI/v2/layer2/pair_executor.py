@@ -2,13 +2,15 @@
 
 挿入が安全（前後二方向 OK）なら ``changeLane`` で瞬時に1段車線変更する。これは**提供車の有無に依らない**：
 目標車線が空（合流先の専用車線・疎な車線など）でも、ギャップが安全なら自力で移れる（provider が居ないと一切動けない
-旧挙動の修正）。安全でない要求は3段構えで解消する::
+旧挙動の修正）。安全でない要求は次の 4 つで解消する::
 
-    1. 対向スワップ … 隣接レーンで互いのレーンを目指し重なった2要求車（織込みの構造的ペア）は、
-       どちらも通常挿入が幾何学的に不可能。同一stepの相互 changeLane で原子的に交換する。
-    2. 提供車の譲り … 後続側の隙間不足で入れなかった要求にだけ、Phase B の割当提供車が挿入判定と同じ必要量まで
-       減速だけで（有界に）下がる。要求車が止まっていれば、入る場所の手前で HOLD_DECEL で止まれる後続が提供車になり
-       （RSU._find_provider）、そこで止まれる速度まで下がる。間の車が通り過ぎたところで要求車が入る。
+    1. 対向の 2 台の順番 … 隣の車線どうしで互いに相手の車線を目指す 2 台（織込みの構造的な組）は、優先度（EDF の鍵）の
+       低い方が高い方の後ろへ下がり、締切の位置を高い方に残す（加減速だけ）。高い方が入ったあとで低い方が入る。
+       横に重なった 2 台を同じ step に互いの車線へ移す「入れ替え」は、現実の車にできないので使わない。
+    2. 提供車の譲り … 後続側の隙間不足で入れなかった要求に、Phase B の割当提供車が挿入判定と同じ必要量まで
+       減速だけで（有界に）下がる。前側の不足で入れないときも、要求車が下がる分を提供車の後ろの車の余裕で賄えるなら
+       その分まで空ける（YIELD_ON_FRONT）。要求車が止まっていれば、入る場所の手前で HOLD_DECEL で止まれる後続が
+       提供車になり（RSU._find_provider）、そこで止まれる速度まで下がる。間の車が通り過ぎたところで要求車が入る。
     3. 要求車のスロット整列 … 前方の隙間が足りなければ前方隣接車より ALIGN_DELTA 遅く走って後ろへずれ、
        後方だけ足りなければ前方余地の範囲で ALIGN_DELTA 速く走って前へずれる（提供車の譲りと対称）。
        「前方と同速に合わせる」は横並びを固定し（lane-drop 終端に並んで到達→相互ブロック）、整列しないと
@@ -16,7 +18,7 @@
     4. 締切前の保持 … 締切 D までの実距離が HOLD_MARGIN 以下の要求車に「D で止まれる速度」を上限として与える。
 
 合流ランプから続く車線（加速車線・補助車線）にいて、本線へ移る速度まで加速している途中の要求車
-（``LCRequest.accelerating``）は、挿入もスワップもしない（Layer1 も提供車を割り当てない）。整列と保持は続ける。
+（``LCRequest.accelerating``）は、車線変更せず対向の順番にも加わらない（Layer1 も提供車を割り当てない）。整列と保持は続ける。
 
 速度は ``V2CAV.propose`` の候補として出し、``V2CAV.apply_speed_command`` が追従の候補と合わせて毎 step 1 回だけ指令する
 （最も遅い候補が勝つ。前車が近いときは追従の最大減速が、譲り・整列・保持より優先される）。
@@ -47,8 +49,6 @@ from v2.constants import (
     MAX_DECEL,
     MIN_GAP,
     OPPOSITE_ORDER,
-    SWAP_STOPPED_EPS,
-    SWAP_WINDOW,
     TIME_STEP,
     VEH_LENGTH,
     YIELD_COOLDOWN,
@@ -62,7 +62,7 @@ from v2.constants import (
 from v2.layer1.rsu import Assignment
 from v2.layer2.safety import Safety
 from v2.lc_request import LCRequest
-from v2.snapshot import Snapshot, VehObs
+from v2.snapshot import Snapshot
 from v2.v2_cav import V2CAV
 
 if "SUMO_HOME" in os.environ:
@@ -87,7 +87,7 @@ class InsertionCheck:
 
 
 class Layer2:
-    """Layer2（実行層）：スワップ・協調減速・スロット整列で gap を確保し、安全なら要求車を瞬時LCする（状態を持たない静的ロジック）。"""
+    """Layer2（実行層）：対向の順番・協調減速・スロット整列で gap を確保し、安全なら要求車を瞬時LCする（状態を持たない静的ロジック）。"""
 
     @staticmethod
     def execute_pairs(
@@ -97,7 +97,7 @@ class Layer2:
         snap: Snapshot,
     ) -> int:
         """各要求車を EDF 順に処理し、目標車線に十分なギャップがあれば瞬時LC、残る要求は
-        対向スワップ → 提供車の協調減速 ＋ 要求車のスロット整列で解消を図る。実行したLC数を返す。
+        対向の 2 台の順番 → 提供車の協調減速 ＋ 要求車のスロット整列で解消を図る。実行したLC数を返す。
 
         要求は EDF 順（``req_by_id`` は鍵昇順の keyed から構築済み）に処理し、より緊急な要求車が先にスロットを
         確定する。前後二方向の安全（``_insertion_safe_live``＝getNeighbors でジャンクション跨ぎに実測）が満たされていれば
@@ -128,17 +128,11 @@ class Layer2:
                 unresolved.append(req)
                 checks[req.veh_id] = check
 
-        swapped = Layer2._execute_swaps([r for r in unresolved if not r.accelerating], snap, committed)
-        lc_count += len(swapped)
         yielding_to: dict[str, frozenset[str]] = {}  # 優先度の高い要求車 -> 自分のために下がる対向の低い要求車
         if OPPOSITE_ORDER > 0:
-            yielding_to = Layer2._order_opposite_pairs(
-                [r for r in unresolved if r.veh_id not in swapped and not r.accelerating], by_id
-            )
+            yielding_to = Layer2._order_opposite_pairs([r for r in unresolved if not r.accelerating], by_id)
 
         for req in unresolved:
-            if req.veh_id in swapped:
-                continue
             requester = by_id[req.veh_id]
             provider_id = provider_of.get(req.veh_id)
             provider = by_id.get(provider_id) if provider_id is not None else None
@@ -251,65 +245,6 @@ class Layer2:
                 break  # この link では最も手前の 1 台だけ
         return found
 
-    # --- 対向スワップ（織込みデッドロックの解消）---
-
-    @staticmethod
-    def _execute_swaps(unresolved: list[LCRequest], snap: Snapshot, committed: dict[int, list[float]]) -> set[str]:
-        """互いに相手のレーンを目指し縦位置が重なった2要求車を、同一stepの相互 changeLane で交換する。
-
-        織込み環境では合流（上へ）と分流（下へ）の要求車が隣接レーンで対向し、縦位置が
-        SWAP_WINDOW 内に重なると前後どちらの安全ギャップも取れず、通常挿入・協調減速では
-        双方永久に解消できない（速度を合わせても下げても重なりが残る）。交換後は互いに別レーンの
-        同じ縦位置に収まるため相互干渉は消える。パートナー以外の前後車とは通常と同じ相対制動
-        モデルの安全ギャップを要求し、満たすペアのみ EDF 順に交換する。交換した要求車IDの集合を返す。
-        """
-        swapped: set[str] = set()
-        for i, a in enumerate(unresolved):
-            if a.veh_id in swapped:
-                continue
-            a_next = Safety.next_lane(a)
-            for b in unresolved[i + 1 :]:
-                if b.veh_id in swapped:
-                    continue
-                if b.current_lane != a_next or Safety.next_lane(b) != a.current_lane:
-                    continue
-                if abs(b.current_pos - a.current_pos) > SWAP_WINDOW:
-                    continue
-                if not (
-                    Layer2._slot_free(committed, a_next, a.current_pos)
-                    and Layer2._slot_free(committed, a.current_lane, b.current_pos)
-                ):
-                    continue
-                a_obs = snap.obs[a.veh_id]
-                b_obs = snap.obs[b.veh_id]
-                # 壁位置（両者とも締切の直前）でのみ、停止車列に対する live 検査の minGap 緩和を許す。
-                # 壁ペアは前方余地が無く他の解消手段（前進整列・提供車の譲歩）が幾何学的に存在しない一方、
-                # 中間帯の停止ペアまで緩和すると流全体が組み変わり別条件へ失敗が移動する（47run比較で実証）。
-                at_wall = (
-                    a.current_pos >= a.deadline_pos - SWAP_WINDOW and b.current_pos >= b.deadline_pos - SWAP_WINDOW
-                )
-                if not (
-                    Layer2._swap_gap_ok(snap, a_next, a.current_pos, a_obs.speed, ignore_id=b.veh_id)
-                    and Layer2._swap_gap_ok(snap, a.current_lane, b.current_pos, b_obs.speed, ignore_id=a.veh_id)
-                    and Layer2._swap_live_gap_ok(a.veh_id, a_obs.speed, a_next < a.current_lane, b.veh_id, at_wall)
-                    and Layer2._swap_live_gap_ok(
-                        b.veh_id, b_obs.speed, a.current_lane < b.current_lane, a.veh_id, at_wall
-                    )
-                ):
-                    continue
-                traci.vehicle.changeLane(a.veh_id, a_next, 0)
-                traci.vehicle.changeLane(b.veh_id, a.current_lane, 0)
-                committed.setdefault(a_next, []).append(a.current_pos)
-                committed.setdefault(a.current_lane, []).append(b.current_pos)
-                swapped.update((a.veh_id, b.veh_id))
-                print(
-                    f"[swap] t={snap.sim_time:.1f} {a.veh_id}(lane{a.current_lane}->{a_next})"
-                    f" <-> {b.veh_id}(lane{b.current_lane}->{a.current_lane})"
-                    f" pos {a.current_pos:.1f}/{b.current_pos:.1f}"
-                )
-                break
-        return swapped
-
     # --- 対向の 2 台の順番（優先度の低い方が下がる） ---
 
     @staticmethod
@@ -385,79 +320,6 @@ class Layer2:
             low.propose("order", low.speed + ALIGN_DELTA, ALIGN_DECEL)
         else:
             low.propose("order", 0.0, abs(MAX_DECEL))
-        return True
-
-    @staticmethod
-    def _swap_live_gap_ok(veh_id: str, ego_speed: float, going_right: bool, partner_id: str, at_wall: bool) -> bool:
-        """スワップ相手を除く実測（getNeighbors）の前後ギャップ検査。
-
-        スナップショットの ``lane_members`` は本線 edge 上の車両しか含まず、車体がジャンクション
-        内部レーンに跨る車両（前端が junction に入り後端が本線に残る車・流入直前の車）が見えない。
-        その盲点の第三者と重なって交換すると side collision になるため、通常挿入と同じ
-        junction 越境の実測検査を追加で行う（相手＝partner は交換で居なくなるので除外）。
-
-        要求量は原則、通常挿入と同じ「バンパー間 minGap+余裕」。ただし**壁ペア（at_wall=両者とも
-        締切直前）かつ自車・第三者とも事実上停止（< SWAP_STOPPED_EPS）の場合に限り** minGap 分を
-        差し引いた物理ギャップ基準に緩和する: 停止車列の自然間隔（バンパー間≈minGap）の第三者が
-        0.4m 差で live 検査だけを永久に落とし、壁位置で整列した対向ペアが交換できず両レーン先頭が
-        凍結する全域グリッドロックになる（weave2 Q3000 f0.6 seed2 で実測した残存変種）。壁ペアは
-        前方余地が無く他の解消手段が幾何学的に存在しない。停止域では minGap 未満の車間も無害
-        （SUMO の衝突は重なりのみ）。一方、緩和を走行中や中間帯の停止ペアへ広げると流全体が
-        組み変わり別条件へ失敗が移動する（衝突増・新たな未完了。47run 比較で実証）ため、
-        壁ペア×停止域に限定する。
-        """
-        lat = 1 if going_right else 0
-        for nid, dist in get_veh_neighbors(veh_id, lat):  # 後続
-            if nid == partner_id:
-                continue
-            v_n = get_veh_speed(nid)
-            required = Safety.net_required(v_n, ego_speed)
-            if at_wall and max(ego_speed, v_n) < SWAP_STOPPED_EPS:
-                required -= MIN_GAP
-            if dist < required:
-                return False
-        for nid, dist in Layer2._front_neighbors(veh_id, going_right, ego_speed):  # 先行（目標車線の先の車も含む）
-            if nid == partner_id:
-                continue
-            v_n = get_veh_speed(nid)
-            required = Safety.net_required(ego_speed, v_n)
-            if at_wall and max(ego_speed, v_n) < SWAP_STOPPED_EPS:
-                required -= MIN_GAP
-            if dist < required:
-                return False
-        return True
-
-    @staticmethod
-    def _swap_gap_ok(snap: Snapshot, lane: int, pos: float, speed: float, ignore_id: str) -> bool:
-        """スワップ相手を除いた目標車線の最近傍 前走/後続 に対し、相対制動モデルの安全ギャップを満たすか。
-
-        交換後もパートナーとは別レーンになるため、パートナー（ignore_id）だけを除外して判定する。
-        スナップショットの縦位置は前端基準（getLanePosition）なので車長を差し引いて実ギャップにする。
-        静的要求は minGap でなく制動項＋余裕（``_net_required``）のみとする: スワップは互いの足跡を
-        入れ替えるだけで各車線の車間パターンをほぼ保存するため（新ギャップ＝旧ギャップ∓Δpos）、
-        現に成立している車列に minGap 未満の車間ができても停止・微速域では無害（SUMO の衝突は重なり
-        のみ）。minGap を要求すると、詰まった車列で第三者の 20cm 差がスワップを永久拒否し、その第三者
-        はスワップが動かないと動けない循環待ち（残存デッドロック）になる。
-        """
-        leader: VehObs | None = None
-        follower: VehObs | None = None
-        for vid in snap.lane_members.get(f"{snap.mainlane_edge}_{lane}", []):  # 縦位置降順
-            o = snap.obs[vid]
-            if vid == ignore_id or o.lane_pos is None:
-                continue
-            if o.lane_pos >= pos:
-                leader = o  # 降順走査なので最後に残る leader が最近傍前走
-            else:
-                follower = o
-                break
-        if leader is not None and leader.lane_pos is not None:
-            gap = (leader.lane_pos - VEH_LENGTH) - pos
-            if gap < Safety.net_required(speed, leader.speed):
-                return False
-        if follower is not None and follower.lane_pos is not None:
-            gap = (pos - VEH_LENGTH) - follower.lane_pos
-            if gap < Safety.net_required(follower.speed, speed):
-                return False
         return True
 
     # --- 提供車の協調減速 ---
