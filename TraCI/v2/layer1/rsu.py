@@ -6,7 +6,9 @@
 
 - 占有印（claimed）で同一提供車の二重割当を防ぐ＝**横取り禁止**。
 - 既に上位車の提供車として確保された要求車は、今Tc は譲る側に回り自分のLCは見送る（譲歩の伝播・§6）。
-- 要求車が停車中（speed=0）は2番目に近い候補を選ぶ（先頭直後に詰まるのを避ける既存例外）。
+- 要求車が止まっている（YIELD_MIN_SPEED 未満）ときは、入る場所の手前で HOLD_DECEL で止まれる最も近い後続を選ぶ
+  （それより近い車はそのまま通り過ぎる。最高速度なら約 155 m 手前）。選ばれた車がそこで止まれる速度まで下がり、
+  間の車が通り過ぎたところで要求車が入る（Layer2._yield_to_stopped）。
 - 本線へ移る速度まで加速している途中の合流車（``LCRequest.accelerating``）には、まだ提供車を割り当てない
   （鍵は他の要求車の提供車選びに使う）。
 """
@@ -16,8 +18,9 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from status.status import CarAction, CarStatus
-from v2.constants import COOP_YIELD, SWAP_WINDOW
+from v2.constants import COOP_YIELD, MAX_DECEL, SWAP_WINDOW, YIELD_MIN_SPEED
 from v2.layer1.priority import Key, KeyedRequest
+from v2.layer2.safety import Safety
 from v2.lc_request import LCRequest
 from v2.snapshot import Snapshot
 
@@ -115,7 +118,10 @@ class RSU:
         request_key: dict[str, Key],
         request_by_id: dict[str, LCRequest],
     ) -> str | None:
-        """次の1段LCの目標車線の後続から、鍵劣位かつ未占有の最近傍（停車中は2番目）を選ぶ。"""
+        """次の1段LCの目標車線の後続から、鍵劣位かつ未占有の最近傍を選ぶ。
+
+        要求車が止まっているときは、入る場所の手前（``Safety.stop_pos_behind``）で HOLD_DECEL で止まれる最も近い後続を選ぶ。
+        """
         step = 1 if req.direction == CarAction.CHANGE_LEFT else -1
         next_lane = req.current_lane + step
         members = snap.lane_members.get(f"{snap.mainlane_edge}_{next_lane}", [])  # 縦位置降順
@@ -142,9 +148,21 @@ class RSU:
         if not viable:
             return None
         # members は縦位置降順なので viable も降順（先頭＝最近傍）
-        if snap.obs[req.veh_id].speed != 0:
+        if snap.obs[req.veh_id].speed >= YIELD_MIN_SPEED:
             return viable[0]
-        return viable[1] if len(viable) > 1 else None
+        stop_pos = Safety.stop_pos_behind(req.current_pos)
+        for vid in viable:
+            o = snap.obs[vid]
+            # 今この要求車に譲っている車は、最大減速で止まれるうちは続ける。上限の速度で近づく車は 1 step 分だけ
+            # HOLD_DECEL の曲線を上回って見えるので、毎回選び直すと役が入れ替わり、外れた車が加速して通り過ぎる
+            if o.yield_for == req.veh_id and o.lane_pos is not None:
+                if o.speed <= Safety.stop_speed(stop_pos - o.lane_pos, abs(MAX_DECEL)):
+                    return vid
+        for vid in viable:
+            o = snap.obs[vid]
+            if o.lane_pos is not None and o.speed <= Safety.stop_speed(stop_pos - o.lane_pos):
+                return vid  # 入る場所の手前で HOLD_DECEL で止まれる最も近い後続
+        return None
 
     @staticmethod
     def apply_roles(active: "list[V2CAV]", assignments: list[Assignment]) -> None:

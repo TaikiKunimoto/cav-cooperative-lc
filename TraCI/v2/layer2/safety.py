@@ -4,8 +4,19 @@ G_req = 空走(v×δ) + 制動距離 + minGap。人間の反応時間(0.75s)は�
 挿入時の前後二方向の安全判定は、フィーダー流入車も見えるよう実測（getNeighbors）で行うため Layer2（pair_executor）に置く。
 """
 
+import math
+
 from status.status import CarAction
-from v2.constants import DELAY, FRICTION_COEFFICIENT, LC_REACTION_LAG, LC_SAFETY_MARGIN, MAX_DECEL, MIN_GAP
+from v2.constants import (
+    DELAY,
+    FRICTION_COEFFICIENT,
+    HOLD_DECEL,
+    LC_REACTION_LAG,
+    LC_SAFETY_MARGIN,
+    MAX_DECEL,
+    MIN_GAP,
+    VEH_LENGTH,
+)
 from v2.lc_request import LCRequest
 
 
@@ -38,6 +49,19 @@ class Safety:
         """
         braking = max(0.0, (v_back**2 - v_front**2) / (2 * abs(MAX_DECEL)))
         return braking + v_back * LC_REACTION_LAG + LC_SAFETY_MARGIN
+
+    @staticmethod
+    def stop_pos_behind(requester_pos: float) -> float:
+        """止まった要求車を入れるために、目標車線の後続が前端を止める位置（要求車の後端の minGap ＋ 2·LC_SAFETY_MARGIN 手前）。
+
+        そこで止まった後続との控除済み距離は 2·LC_SAFETY_MARGIN になり、停止車どうしの挿入判定（必要量 LC_SAFETY_MARGIN）が通る。
+        """
+        return requester_pos - VEH_LENGTH - MIN_GAP - 2 * LC_SAFETY_MARGIN
+
+    @staticmethod
+    def stop_speed(room: float, decel: float = HOLD_DECEL) -> float:
+        """残り room [m] で減速度 decel（既定 HOLD_DECEL）で止まれる速度 √(2·decel·room)（room ≤ 0 なら 0）。"""
+        return math.sqrt(2 * decel * room) if room > 0 else 0.0
 
     @staticmethod
     def next_lane(req: LCRequest) -> int:

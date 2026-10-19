@@ -17,6 +17,7 @@ from status.status import CarStatus
 from utils.traci_wrapper import (
     get_lane_max_speed,
     get_sim_time,
+    get_veh_acceleration,
     get_veh_departure,
     get_veh_lane_id,
     get_veh_lane_index,
@@ -29,11 +30,14 @@ from utils.traci_wrapper import (
     get_veh_type,
 )
 from v2.constants import (
+    ACCEL_JERK,
     ACTIVATION_MARGIN,
     EMERGENCY_DECEL,
     FOLLOW_GAIN,
     FOLLOW_MIN_DECEL,
     FOLLOW_TAU,
+    LC_REACTION_LAG,
+    LEADER_LOOKAHEAD,
     MAX_ACCEL,
     MAX_DECEL,
     MIN_GAP,
@@ -90,6 +94,7 @@ class V2CAV(BaseModel):
     leader: tuple[str, float] | None = None
     leader_distance: float | None = None
     leader_speed: float | None = None
+    leader_accel: float | None = None  # 先行車の直近 step の加速度 [m/s²]（減速中は負）
     length: float = 5.0
     status: CarStatus = CarStatus.NORMAL
     # この step の速度候補（追従 control_speed と Layer2 が積み、apply_speed_command が 1 つに決めて消費する）
@@ -366,9 +371,10 @@ class V2CAV(BaseModel):
         self.road = get_veh_road_id(self.id)
         self.lane = get_veh_lane_index(self.id)
         self.lane_id = get_veh_lane_id(self.id)
-        self.leader = get_veh_leader(self.id, 0)
+        self.leader = get_veh_leader(self.id, LEADER_LOOKAHEAD)
         self.leader_distance = self.leader[1] if self.leader is not None else None
         self.leader_speed = get_veh_speed(self.leader[0]) if self.leader is not None else None
+        self.leader_accel = get_veh_acceleration(self.leader[0]) if self.leader is not None else None
         self.speed_candidates.clear()
 
     # --- 縦方向制御（car-following）: 候補を出すだけ。指令は apply_speed_command が 1 回だけ出す ---
@@ -381,10 +387,12 @@ class V2CAV(BaseModel):
 
         安全車間は ``max(Safety.net_required(自車速, 前車速), 自車速·FOLLOW_TAU) + MIN_GAP``（相対制動の必要量と
         時間車頭 1.0 s の大きい方。``leader_distance`` は minGap 控除済みギャップ）。車間の過不足に比例して前車速度の
-        前後に目標を取る線形則（目標 = 前車速度 + FOLLOW_GAIN·(車間 − 安全車間)）。車間が不足し前車より速いときは
-        相対制動で決まる減速度（``_relative_decel``）で前車速度へ、遅いか同速なら FOLLOW_MIN_DECEL 以下で緩く下げて
-        車間を戻す。余裕があれば余剰に比例して詰める。役割（YIELDING / LANE_CHANGING）による加速禁止は
-        無い: 譲り・整列・保持が要るときは Layer2 が候補を足し、調停で最も遅い候補が勝つ。
+        前後に目標を取る線形則（目標 = 前車速度 + FOLLOW_GAIN·(車間 − 安全車間)）。前車より速いときは、必要な分だけの
+        減速度（``_closing_decel``。前車が今の減速を続けると見込む）で目標へ下げる（車間が安全車間を割っていれば目標は
+        前車速度以下）。遅いか同速で車間が不足していれば FOLLOW_MIN_DECEL 以下で緩く下げて車間を戻す（前車が減速して
+        いれば、安全車間より速く車間が縮まない減速度までは下げる）。余裕があれば余剰に比例して詰める。
+        役割（YIELDING / LANE_CHANGING）による加速禁止は無い: 譲り・整列・保持が要るときは Layer2 が候補を足し、
+        調停で最も遅い候補が勝つ。
         """
         if self.is_obstacle:
             if self.obstacle_stop_pos is None:
@@ -416,17 +424,24 @@ class V2CAV(BaseModel):
                 return
         safety_gap = max(Safety.net_required(v, v_lead), v * FOLLOW_TAU) + MIN_GAP
         target = max(0.0, min(speed_limit, v_lead + FOLLOW_GAIN * (gap - safety_gap)))
-        if gap >= safety_gap:
+        lead_brake = max(0.0, -(self.leader_accel or 0.0))  # 前車の今の減速度（加速中・一定なら 0）
+        below_safety = gap < safety_gap
+        if speed_diff > 0:
+            # 前車より速い: 必要な分だけ減速する（以前は車間に余裕があるときほど最大減速で目標へ向かっていた）
+            decel = self._closing_decel(v, v_lead, gap, below_safety, lead_brake)
+            self.propose("follow", min(target, v_lead) if below_safety else target, decel)
+        elif not below_safety:
             self.propose("follow", target, abs(MAX_DECEL))
-        elif speed_diff > 0:
-            self.propose("follow", min(target, v_lead), self._relative_decel(speed_diff, gap))
         else:
-            self.propose("follow", target, FOLLOW_MIN_DECEL)  # 前車より遅い／同速: 緩く下げて車間を戻す
+            # 前車より遅い／同速で車間が不足: 緩く下げて車間を戻す（前車が減速していれば、それに遅れない減速度まで）
+            decel = max(FOLLOW_MIN_DECEL, self._keep_safety_decel(v, v_lead, lead_brake))
+            self.propose("follow", target, min(decel, abs(MAX_DECEL)))
 
     def apply_speed_command(self) -> str:
         """この step の候補から次 step の速度を 1 つ決めて setSpeed し、採用した規則名を返す（候補は消費する）。
 
-        障害物は control_speed で停止固定済み。候補が無い（走行レーン未確定など）ときは指令を出さない。
+        加速度は、前 step の加速度（減速中なら 0）から ACCEL_JERK·Δt までしか上げない（アクセルの踏み込みの速さの上限。
+        ブレーキ側は制限しない）。障害物は control_speed で停止固定済み。候補が無い（走行レーン未確定など）ときは指令を出さない。
         """
         if self.is_obstacle and self.obstacle_stop_pos is None:
             self.speed_candidates.clear()
@@ -435,16 +450,43 @@ class V2CAV(BaseModel):
             self.speed_rule = None
             return "none"
         next_speed, chosen = SpeedArbiter.choose(self.speed, self.speed_candidates)
+        next_speed = min(next_speed, self.speed + self._accel_cap() * TIME_STEP)
         traci.vehicle.setSpeed(self.id, next_speed)
         self.speed_rule, self.speed_target, self.speed_next = chosen.rule, chosen.target, next_speed
         self.speed_candidates.clear()
         return chosen.rule
 
     # --- 計算ヘルパ ---
+    def _accel_cap(self) -> float:
+        """この step に許す加速度の上限: 前 step の加速度（減速中なら 0）＋ ACCEL_JERK·Δt（MAX_ACCEL まで）。"""
+        a_prev = (self.speed_history[-1] - self.speed_history[-2]) / TIME_STEP if len(self.speed_history) >= 2 else 0.0
+        return min(MAX_ACCEL, max(a_prev, 0.0) + ACCEL_JERK * TIME_STEP)
+
     @staticmethod
-    def _relative_decel(speed_diff: float, net_gap: float) -> float:
-        """前車速度へ揃える減速度: 控除済み車間が MIN_GAP に達する時点で速度差が 0 になる値を
-        FOLLOW_MIN_DECEL〜|MAX_DECEL| にクランプする。余地が無ければ最大減速。"""
-        room = net_gap - MIN_GAP
-        needed = speed_diff**2 / (2 * room) if room > 0 else abs(MAX_DECEL)
+    def _closing_decel(v: float, v_lead: float, net_gap: float, below_safety: bool, lead_brake: float) -> float:
+        """前車より速いときに前車の速度へ揃える減速度（前車が今の減速 lead_brake を続けると見込んで、必要な分だけ）。
+
+        基本は、前車と同じ速度になったときに同速の安全車間 s_eq ＝ max(net_required(v前, v前), v前·FOLLOW_TAU) ＋ minGap が
+        残る相対の減速度 Δv²/(2·(車間 − s_eq)) に前車の減速度を足したもの。車間がそれに足りないときは、minGap までの
+        残りの車間の半分で揃う相対の減速度 Δv²/(車間 − minGap) を使う（両者は車間 2·s_eq − minGap でつながる）。
+        車間が安全車間を割っているときは ``_keep_safety_decel`` も下回らない（臨界の帯へ入らないため）。
+        FOLLOW_MIN_DECEL〜|MAX_DECEL| に収める。
+        """
+        speed_diff = v - v_lead
+        s_eq = max(Safety.net_required(v_lead, v_lead), v_lead * FOLLOW_TAU) + MIN_GAP
+        room = max(net_gap - s_eq, (net_gap - MIN_GAP) / 2)
+        needed = (speed_diff**2 / (2 * room) if room > 0 else abs(MAX_DECEL)) + lead_brake
+        if below_safety:
+            needed = max(needed, V2CAV._keep_safety_decel(v, v_lead, lead_brake))
         return min(max(needed, FOLLOW_MIN_DECEL), abs(MAX_DECEL))
+
+    @staticmethod
+    def _keep_safety_decel(v: float, v_lead: float, lead_brake: float) -> float:
+        """安全車間（相対制動の必要量 net_required(v, v前)）より速く車間が縮まない減速度。
+
+        車間は Δv で縮み、net_required は自車の減速で (v/|MAX_DECEL| ＋ LC_REACTION_LAG)·b、前車の減速で
+        (v前/|MAX_DECEL|)·lead_brake だけ変わるので、b ≥ (Δv ＋ v前·lead_brake/|MAX_DECEL|) / (v/|MAX_DECEL| ＋ LC_REACTION_LAG)。
+        """
+        if v <= 0:
+            return 0.0
+        return (v - v_lead + v_lead * lead_brake / abs(MAX_DECEL)) / (v / abs(MAX_DECEL) + LC_REACTION_LAG)

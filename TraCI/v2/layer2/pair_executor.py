@@ -7,7 +7,8 @@
     1. 対向スワップ … 隣接レーンで互いのレーンを目指し重なった2要求車（織込みの構造的ペア）は、
        どちらも通常挿入が幾何学的に不可能。同一stepの相互 changeLane で原子的に交換する。
     2. 提供車の譲り … 後続側の隙間不足で入れなかった要求にだけ、Phase B の割当提供車が挿入判定と同じ必要量まで
-       減速だけで（有界に）下がる。要求車が停止していれば通過して後方を空けるか、締切直前に限り停止して守る。
+       減速だけで（有界に）下がる。要求車が止まっていれば、入る場所の手前で HOLD_DECEL で止まれる後続が提供車になり
+       （RSU._find_provider）、そこで止まれる速度まで下がる。間の車が通り過ぎたところで要求車が入る。
     3. 要求車のスロット整列 … 前方の隙間が足りなければ前方隣接車より ALIGN_DELTA 遅く走って後ろへずれ、
        後方だけ足りなければ前方余地の範囲で ALIGN_DELTA 速く走って前へずれる（提供車の譲りと対称）。
        「前方と同速に合わせる」は横並びを固定し（lane-drop 終端に並んで到達→相互ブロック）、整列しないと
@@ -131,7 +132,7 @@ class Layer2:
             check = checks[req.veh_id]
             if provider is not None and not check.rear_ok:
                 # 必要なときだけ譲る: 後続側の隙間不足で入れなかった要求にだけ提供車が下がる
-                Layer2._provider_yield(provider, requester, req, snap.sim_time)
+                Layer2._provider_yield(provider, requester, snap.sim_time)
             # 目標レーンのスロットに自分を縦方向で整列させ、挿入成功率を上げる
             Layer2._requester_align_to_slot(requester, req, check)
             if req.deadline_pos - req.current_pos <= HOLD_MARGIN:
@@ -364,7 +365,7 @@ class Layer2:
     # --- 提供車の協調減速 ---
 
     @staticmethod
-    def _provider_yield(provider: V2CAV, requester: V2CAV, req: LCRequest, now: float) -> None:
+    def _provider_yield(provider: V2CAV, requester: V2CAV, now: float) -> None:
         """提供車が要求車の後方に挿入可能な隙間を作る（必要なときだけ・有界に譲る）。
 
         呼ばれるのは、要求車の自力挿入が「後続側の隙間不足」で落ちたときだけ（先行側の不足や整列で解ける場合は
@@ -373,10 +374,8 @@ class Layer2:
 
         - 要求車が走行中: 「要求車速度 − YIELD_DELTA」（ただし要求車速度の YIELD_MIN_RATIO 以上）を目標に、
           減速度 YIELD_DECEL 以下で下がる。車線内で停止はしない。
-        - 要求車が停止気味（< YIELD_MIN_SPEED）: 減速では解けない（相対位置が凍結する）。前方に通過余地があれば
-          要求車を追い越して後方を空ける（通過後は次の後続が提供車になる）。余地が無いときは、要求車が締切の
-          HOLD_MARGIN 以内で止まっている場合に限り、その場で止まってスロットを守る。それ以外は譲らない。
-        - 同じ要求車に YIELD_MAX_DURATION 以上譲り続けても入れなければ譲りをやめ、YIELD_COOLDOWN の間は
+        - 要求車が止まっている（< YIELD_MIN_SPEED）: ``_yield_to_stopped``（入る場所の手前で止まれる速度まで下がる）。
+        - 同じ走行中の要求車に YIELD_MAX_DURATION 以上譲り続けても入れなければ譲りをやめ、YIELD_COOLDOWN の間は
           提供車に選ばれない（RSU が次の後続を選ぶ）。
 
         旧実装（不足率に比例して要求車速度の最大 7 割まで減速、前方が詰まれば常にその場で停止、毎 step 無条件に
@@ -385,6 +384,9 @@ class Layer2:
         p = provider
         r = requester
         if r.lane_pos is None or p.lane_pos is None:
+            return
+        if r.speed < YIELD_MIN_SPEED:
+            Layer2._yield_to_stopped(p, r)
             return
         if p.yield_for != r.id:
             p.yield_for = r.id
@@ -399,17 +401,27 @@ class Layer2:
         if current_net >= Safety.net_required(p.speed, r.speed):
             return  # 自分との隙間は足りている
         p.yield_time += TIME_STEP
-        if r.speed >= YIELD_MIN_SPEED:
-            target = max(r.speed - YIELD_DELTA, YIELD_MIN_RATIO * r.speed, 0.0)
-            p.propose("yield", target, YIELD_DECEL)
+        target = max(r.speed - YIELD_DELTA, YIELD_MIN_RATIO * r.speed, 0.0)
+        p.propose("yield", target, YIELD_DECEL)
+
+    @staticmethod
+    def _yield_to_stopped(provider: V2CAV, requester: V2CAV) -> None:
+        """止まった要求車を入れる: 提供車は、入る場所の手前（``Safety.stop_pos_behind``）で HOLD_DECEL の減速で止まれる速度を
+        上限にして走る（締切前の保持と同じ式）。間の車が通り過ぎて隙間ができたら、要求車が挿入判定どおりに入る。
+
+        提供車は RSU が「そこで HOLD_DECEL で止まれる最も近い後続」として選ぶので、上限に達してからの減速は HOLD_DECEL 以下で
+        済む。新たに割り当てられた車が既に止まれない速さなら譲らず通り過ぎる（優先度なしの割当で最近傍が選ばれた場合など）。
+        譲りは入る場所の手前で止まるところまでなので、走行中の要求車への譲りの時間上限（YIELD_MAX_DURATION）は当てない。
+        """
+        if requester.lane_pos is None or provider.lane_pos is None:
             return
-        # 要求車の前へ完全に抜けて minGap＋余裕を残すのに要する走行余地
-        pass_room = (r.lane_pos - p.lane_pos) + VEH_LENGTH + MIN_GAP + 2.0
-        if p.leader_distance is None or p.leader_distance >= pass_room:
-            p.propose("pass", r.speed + ALIGN_DELTA, abs(MAX_DECEL))  # 通過: 加速側は追従の候補が上限
-            return
-        if req.deadline_pos - r.lane_pos <= HOLD_MARGIN:
-            p.propose("yield", 0.0, abs(MAX_DECEL))  # 締切直前で止まっている要求車のスロットを守る
+        v_cap = Safety.stop_speed(Safety.stop_pos_behind(requester.lane_pos) - provider.lane_pos)
+        if provider.yield_for != requester.id:
+            if provider.speed > v_cap:
+                return  # 止まれない: 通り過ぎる（次の Tc で RSU がその後ろの車を選ぶ）
+            provider.yield_for = requester.id
+            provider.yield_time = 0.0
+        provider.propose("yield", v_cap, abs(MAX_DECEL))
 
     @staticmethod
     def _hold_before_deadline(requester: V2CAV, req: LCRequest) -> None:
