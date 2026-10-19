@@ -217,7 +217,7 @@ class V2Simulation(BaseModel):
             if not self.policy.is_noncooperative and tc_accumulator + 1e-9 >= TC:
                 tc_accumulator = 0.0
                 snap = Snapshot.capture(active, current_time, self.env.mainlane_edge)
-                requests = LCRequest.build_all(snap, self.margin())
+                requests = LCRequest.build_all(snap, self.margin(), self.env.ramp_lanes)
                 if self.policy is Policy.EDF:
                     keyed = EDF.order_requests(requests)  # Phase A: 全要求車の鍵を計算し EDF（dist昇順）にソート
                     assignments = RSU.arbitrate(keyed, snap)  # Phase B: 鍵順に提供車を占有印つきで確保

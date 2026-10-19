@@ -70,6 +70,7 @@ class SpeedLog:
     FIELDS: ClassVar[tuple[str, ...]] = (
         "time",
         "veh",
+        "road",  # edge（車線番号と縦位置は edge ごとに数え直すため、車線変更と後続車を見分けるのに要る）
         "lane",
         "lane_pos",
         "speed",
@@ -95,6 +96,7 @@ class SpeedLog:
             [
                 f"{sim_time:.1f}",
                 veh.id,
+                veh.road,
                 veh.lane,
                 None if veh.lane_pos is None else round(veh.lane_pos, 2),
                 round(veh.speed, 3),

@@ -14,6 +14,9 @@
        進入時に横並びになった車が最後まで入れない。
     4. 締切前の保持 … 締切 D までの実距離が HOLD_MARGIN 以下の要求車に「D で止まれる速度」を上限として与える。
 
+合流ランプから続く車線（加速車線・補助車線）にいて、本線へ移る速度まで加速している途中の要求車
+（``LCRequest.accelerating``）は、挿入もスワップもしない（Layer1 も提供車を割り当てない）。整列と保持は続ける。
+
 速度は ``V2CAV.propose`` の候補として出し、``V2CAV.apply_speed_command`` が追従の候補と合わせて毎 step 1 回だけ指令する
 （最も遅い候補が勝つ。前車が近いときは追従の最大減速が、譲り・整列・保持より優先される）。
 """
@@ -107,7 +110,8 @@ class Layer2:
                 continue
             target_lane = Safety.next_lane(req)
             check = Layer2._insertion_check_live(requester.id, requester.speed, target_lane < req.current_lane)
-            if check.ok and Layer2._slot_free(committed, target_lane, req.current_pos):
+            # 加速の途中の合流車は入らない（整列のために判定の結果だけ残す）
+            if not req.accelerating and check.ok and Layer2._slot_free(committed, target_lane, req.current_pos):
                 traci.vehicle.changeLane(requester.id, target_lane, 0)
                 committed.setdefault(target_lane, []).append(req.current_pos)
                 lc_count += 1
@@ -115,7 +119,7 @@ class Layer2:
                 unresolved.append(req)
                 checks[req.veh_id] = check
 
-        swapped = Layer2._execute_swaps(unresolved, snap, committed)
+        swapped = Layer2._execute_swaps([r for r in unresolved if not r.accelerating], snap, committed)
         lc_count += len(swapped)
 
         for req in unresolved:

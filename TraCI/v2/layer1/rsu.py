@@ -7,6 +7,8 @@
 - 占有印（claimed）で同一提供車の二重割当を防ぐ＝**横取り禁止**。
 - 既に上位車の提供車として確保された要求車は、今Tc は譲る側に回り自分のLCは見送る（譲歩の伝播・§6）。
 - 要求車が停車中（speed=0）は2番目に近い候補を選ぶ（先頭直後に詰まるのを避ける既存例外）。
+- 本線へ移る速度まで加速している途中の合流車（``LCRequest.accelerating``）には、まだ提供車を割り当てない
+  （鍵は他の要求車の提供車選びに使う）。
 """
 
 from typing import TYPE_CHECKING
@@ -48,6 +50,8 @@ class RSU:
             if req.veh_id in claimed:
                 # 既に上位車の提供車として確保済み → 今Tc は譲る側。自分のLCは見送る（譲歩の伝播）
                 continue
+            if req.accelerating:
+                continue  # 加速の途中の合流車は、まだ隙間を要さない（加速しきってから割り当てる）
             provider = RSU._find_provider(req, key, snap, claimed, request_key, request_by_id)
             if provider is not None:
                 claimed.add(provider)  # 占有印（横取り禁止）
@@ -67,12 +71,15 @@ class RSU:
             - 対向スワップ相手の除外なし … 織込みの構造的ペアも最近傍なら提供車に選ぶ
             - 停車中の2番目選択なし … 常に最近傍
 
-        障害物（停止車両）だけは除外する（gap を物理的に作れないため。優先度機構とは無関係）。
+        障害物（停止車両）だけは除外する（gap を物理的に作れないため。優先度機構とは無関係）。加速の途中の合流車にも
+        割り当てない（合流の速度は車の動きの前提で、優先度機構とは無関係）。
         """
         if COOP_YIELD <= 0:
             return []
         assignments: list[Assignment] = []
         for _, req in keyed:
+            if req.accelerating:
+                continue
             step = 1 if req.direction == CarAction.CHANGE_LEFT else -1
             members = snap.lane_members.get(f"{snap.mainlane_edge}_{req.current_lane + step}", [])  # 縦位置降順
             for vid in members:

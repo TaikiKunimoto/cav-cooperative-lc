@@ -53,6 +53,9 @@ class Environment(BaseModel):
     # 区間に入った時点で要求を出すか（合流・織り込み。区間に入った車は自分の行き先と車線が分かっている）。
     # False なら締切の ACTIVATION_MARGIN 手前から要求を出す（分流・封鎖）
     request_at_entry: bool = False
+    # 本線 edge のうち合流ランプから続く車線（merge の加速車線、weave・weave2 の補助車線）。ここから本線へ移る要求車は、
+    # 合流の速度 MERGE_SPEED まで加速してから移る（LCRequest.accelerating_to_merge）
+    ramp_lanes: tuple[int, ...] = ()
 
     def default_activation_margin(self) -> float:
         """要求を出し始める位置（締切の何 m 手前か）の既定値。区間に入った時点なら区間長（＝締切）を返す。"""
@@ -90,8 +93,9 @@ class Environment(BaseModel):
         return rates
 
 
-# 5 環境の道路網は config/v2/build_networks.py が作る。共通: 車線幅 3.5 m、本線 100 km/h、合流ランプ 40 km/h（加速車線で
-# 本線の速度まで加速する）、出口ランプは本線と同じ速度（評価区間の外）、区間の手前の本線 500 m・合流ランプ 300 m、区間の後ろ 200 m。
+# 5 環境の道路網は config/v2/build_networks.py が作る。共通: 車線幅 3.5 m、本線 100 km/h、合流ランプ 40 km/h（合流車は加速車線で
+# 合流の速度 65 km/h まで加速してから本線へ移る）、出口ランプは本線と同じ速度（評価区間の外）、区間の手前の本線 500 m・
+# 合流ランプ 300 m、区間の後ろ 200 m。
 # 区間長（mainlane_length）と締切は道路網の区間の長さとちょうど同じ値にする。
 
 # --- 環境① S-D 単一分流: 本線 3 車線の区間（1,000 m）の終わり DivergeStart で lane0 が出口（ExitRamp）と本線に分かれる。
@@ -119,6 +123,7 @@ MERGE = Environment(
     mainlane_length=240.0,  # 加速車線(MergeZone lane0)が無くなる位置 ＝ 締切
     through_lanes=(1, 2),
     request_at_entry=True,
+    ramp_lanes=(0,),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach lane0/1 → MergeZone lane1/2）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
@@ -150,6 +155,7 @@ WEAVE2 = Environment(
     mainlane_length=610.0,  # 補助車線が出口へ抜ける位置＝締切
     through_lanes=(1, 2),
     request_at_entry=True,
+    ramp_lanes=(0, 3),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
@@ -221,6 +227,7 @@ WEAVE = Environment(
     mainlane_length=457.0,  # 補助車線(WeaveZone lane0)が出口へ抜ける位置 ＝ 締切
     through_lanes=(1, 2),
     request_at_entry=True,
+    ramp_lanes=(0,),
     groups=(
         # 直進（必須LCなし）。本線2車線（MainApproach → WeaveZone lane1/2 → MainLane）
         Group(name="through", route="r_main", weight=1.0, depart_edge="MainApproach"),
