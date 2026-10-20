@@ -118,6 +118,9 @@ def normalize_stdout(text: str) -> str:
                 line = f"{m.group(1)} (<T> {m.group(2)})"
         elif re.match(r"\s*(Duration|Real time factor|UPS|TraCI-Duration|Performance):", line):
             line = re.sub(r":.*", ": <MASKED>", line)
+        elif line.startswith("Arbitration time:"):
+            # v2 の調停の計算時間（壁時計。機械と負荷で変わる）
+            line = "Arbitration time: <MASKED>"
         out.append(line)
     return "\n".join(out) + "\n"
 
@@ -229,6 +232,7 @@ def run_v2(case: V2Case, env: dict[str, str]) -> tuple[str, float, int, dict[str
 
     EVAL_OUTPUT_DIR / EVAL_OUTPUT_NAME で出力先と名前を固定する（並列実行しても互いに上書きしない）。
     ``<key>.csv`` → result.csv、``<key>__requests.csv`` → requests.csv のように接頭辞を外して保存する。
+    調停の計算時間（``<key>__arbitration*.csv``）は壁時計の計測で機械と負荷によって変わるので、比較に含めない。
     """
     start = time.time()
     with tempfile.TemporaryDirectory(prefix="golden-v2-") as tmp:
@@ -237,6 +241,8 @@ def run_v2(case: V2Case, env: dict[str, str]) -> tuple[str, float, int, dict[str
         outputs = {}
         for path in sorted(Path(tmp).glob(f"{case.key}*.csv")):
             suffix = path.stem[len(case.key) :].lstrip("_")
+            if suffix.startswith("arbitration"):
+                continue
             outputs[f"{suffix or 'result'}.csv"] = path.read_bytes()
     dur = time.time() - start
     if proc.returncode != 0:

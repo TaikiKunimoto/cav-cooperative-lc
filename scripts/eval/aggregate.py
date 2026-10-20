@@ -3,7 +3,7 @@
 
 入力: scripts/eval/out/manifest.json（run_sweep.py が生成）
 出力:
-  - out/summary_long.csv      … 1 run = 1 行（メタ情報 + 主要指標）。図はこれから作る。
+  - out/summary_long.csv      … 1 run = 1 行（メタ情報 + 主要指標 + 調停の計算時間 arb_*）。図はこれから作る。
   - out/summary_scenario.csv  … (method, scenario) 別の集計（seed/Q/f を跨いだ平均・SD・件数）
   - out/summary_scenario.md   … 同上の Markdown 表（スライド貼付け用）
   - out/summary_robustness.csv… (method, scenario, Q, f) 別の seed 集計（図2用）
@@ -53,6 +53,14 @@ METRIC_COLS = {
 
 META_KEYS = ["method", "scenario", "env", "q", "f", "seed", "obstacle", "duration_s"]
 
+# 調停の計算時間（TSK-155）の run ごとの要約 `<名前>__arbitration_summary.csv` から拾う列（ヘッダ名 → 出力名）。
+# v2 の協調する方式だけが出す。壁時計の計測なので、測った機械（arb_cpu）と一緒に見る。
+ARBITRATION_COLS = {
+    "arbitration_mean_us": "arb_mean_us",
+    "arbitration_p99_us": "arb_p99_us",
+    "arbitration_max_us": "arb_max_us",
+}
+
 # 作動包絡（operating envelope）: 提案手法が全条件で必須LC 100% を満たす負荷域（2026-07-24 ユーザー決定 (a)）。
 # 織込みは 196m/392m ゾーンの物理容量により超過需要域（weave Q>3000 / weave2 Q>3500）で過飽和となるため、
 # 主結果は包絡内で提示し、超過域は「作動限界の明示」として全グリッド表に残す。
@@ -83,6 +91,22 @@ def _resolve_csv(job: dict) -> Path | None:
         if cand.exists():
             return cand
     return None
+
+
+def _arbitration_summary(csv_path: Path) -> dict:
+    """run の調停の計算時間の要約（`<名前>__arbitration_summary.csv`）。無い run（非協調・計測前の run）は空欄。"""
+    out: dict = dict.fromkeys(ARBITRATION_COLS.values())
+    out["arb_cpu"] = None
+    path = csv_path.with_name(csv_path.stem + "__arbitration_summary.csv")
+    if not path.exists():
+        return out
+    with open(path) as fh:
+        data = list(csv.DictReader(fh))
+    if data:
+        for src, dst in ARBITRATION_COLS.items():
+            out[dst] = _to_float(data[0].get(src))
+        out["arb_cpu"] = data[0].get("cpu") or None
+    return out
 
 
 def _is_stale(job: dict) -> bool:
@@ -134,6 +158,7 @@ def load_long(methods: tuple[str, ...] | None = None) -> tuple[pd.DataFrame, lis
         row: dict = {k: job.get(k) for k in META_KEYS}
         for src, dst in METRIC_COLS.items():
             row[dst] = _to_float(r.get(src))
+        row.update(_arbitration_summary(csv_path))
         rows.append(row)
     if stale:
         print(f"[aggregate] 旧リポジトリ由来の manifest 遺物 {stale} 件を集計対象外にしました（manifest は非破壊）")
