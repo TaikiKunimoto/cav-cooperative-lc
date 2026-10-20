@@ -393,8 +393,9 @@ class V2CAV(BaseModel):
     def control_speed(self) -> None:
         """前方車両との車間に応じた追従の候補（緊急・臨界・追従・制限速度）を出す。SUMO の安全制御は無効化済み。
 
-        安全車間は ``max(Safety.net_required(自車速, 前車速), 自車速·FOLLOW_TAU) + MIN_GAP``（相対制動の必要量と
-        時間車頭 1.0 s の大きい方。``leader_distance`` は minGap 控除済みギャップ）。車間の過不足に比例して前車速度の
+        安全車間は ``max(Safety.net_required(自車速, 前車速), 自車速·FOLLOW_TAU)``（相対制動の必要量と時間車頭 1.0 s の
+        大きい方）で、minGap 控除済みの ``leader_distance`` と比べる（バンパー間ではこれに minGap を足した車間になる。
+        挿入判定・SUMO の Krauss と同じ数え方）。車間の過不足に比例して前車速度の
         前後に目標を取る線形則（目標 = 前車速度 + FOLLOW_GAIN·(車間 − 安全車間)）。前車より速いときは、必要な分だけの
         減速度（``_closing_decel``。前車が今の減速を続けると見込む）で目標へ下げる（車間が安全車間を割っていれば目標は
         前車速度以下）。遅いか同速で車間が不足していれば FOLLOW_MIN_DECEL 以下で緩く下げて車間を戻す（前車が減速して
@@ -430,7 +431,7 @@ class V2CAV(BaseModel):
             if gap < braking_needed:
                 self.propose("critical", v_lead, abs(MAX_DECEL))
                 return
-        safety_gap = max(Safety.net_required(v, v_lead), v * FOLLOW_TAU) + MIN_GAP
+        safety_gap = max(Safety.net_required(v, v_lead), v * FOLLOW_TAU)  # minGap 控除済みの車間に対する安全車間
         target = max(0.0, min(speed_limit, v_lead + FOLLOW_GAIN * (gap - safety_gap)))
         lead_brake = max(0.0, -(self.leader_accel or 0.0))  # 前車の今の減速度（加速中・一定なら 0）
         below_safety = gap < safety_gap
@@ -474,15 +475,16 @@ class V2CAV(BaseModel):
     def _closing_decel(v: float, v_lead: float, net_gap: float, below_safety: bool, lead_brake: float) -> float:
         """前車より速いときに前車の速度へ揃える減速度（前車が今の減速 lead_brake を続けると見込んで、必要な分だけ）。
 
-        基本は、前車と同じ速度になったときに同速の安全車間 s_eq ＝ max(net_required(v前, v前), v前·FOLLOW_TAU) ＋ minGap が
-        残る相対の減速度 Δv²/(2·(車間 − s_eq)) に前車の減速度を足したもの。車間がそれに足りないときは、minGap までの
-        残りの車間の半分で揃う相対の減速度 Δv²/(車間 − minGap) を使う（両者は車間 2·s_eq − minGap でつながる）。
+        基本は、前車と同じ速度になったときに同速の安全車間 s_eq ＝ max(net_required(v前, v前), v前·FOLLOW_TAU) が
+        残る相対の減速度 Δv²/(2·(車間 − s_eq)) に前車の減速度を足したもの。車間がそれに足りないときは、バンパー間が
+        minGap になるまでの残り（minGap 控除済みの車間）の半分で揃う相対の減速度 Δv²/車間 を使う（両者は車間 2·s_eq で
+        つながる）。
         車間が安全車間を割っているときは ``_keep_safety_decel`` も下回らない（臨界の帯へ入らないため）。
         FOLLOW_MIN_DECEL〜|MAX_DECEL| に収める。
         """
         speed_diff = v - v_lead
-        s_eq = max(Safety.net_required(v_lead, v_lead), v_lead * FOLLOW_TAU) + MIN_GAP
-        room = max(net_gap - s_eq, (net_gap - MIN_GAP) / 2)
+        s_eq = max(Safety.net_required(v_lead, v_lead), v_lead * FOLLOW_TAU)
+        room = max(net_gap - s_eq, net_gap / 2)
         needed = (speed_diff**2 / (2 * room) if room > 0 else abs(MAX_DECEL)) + lead_brake
         if below_safety:
             needed = max(needed, V2CAV._keep_safety_decel(v, v_lead, lead_brake))
