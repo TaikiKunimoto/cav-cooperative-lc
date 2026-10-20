@@ -107,11 +107,14 @@ class Layer2:
         同一stepに同じ目標車線へ入る車どうしも、挿入判定と同じ安全車間を取る（``_slot_free``。両側から同じ車線へ入る 2 台が
         挿入判定ではお互いを見ないため）。先に確定するのは鍵の上位の車。``committed`` を渡すと、この step の確定を
         呼び出し側と共有する（あとで任意の車線変更が同じ確定を使う）。
+        上位の要求車の提供車を兼ねる要求車が同じ step に自力で車線を移ったときは、その提供車には譲りを出さない
+        （目標車線から出ていくので、譲っても上位の要求車の隙間は変わらない）。
         """
         provider_of = {a.requester_id: a.provider_id for a in assignments}
         lc_count = 0
         if committed is None:
             committed = {}  # 今stepで確定した target_lane -> (縦位置, 速度) のリスト
+        changed: set[str] = set()  # 今stepで車線を移った要求車
         unresolved: list[LCRequest] = []  # 通常挿入が不可だった要求（EDF 順を保持）
         checks: dict[str, InsertionCheck] = {}  # 通常挿入が不可だった要求の、前後どちらの隙間が足りなかったか
         for req in req_by_id.values():  # EDF 順（鍵昇順）
@@ -132,6 +135,7 @@ class Layer2:
             ):
                 traci.vehicle.changeLane(requester.id, target_lane, 0)
                 committed.setdefault(target_lane, []).append((req.current_pos, requester.speed))
+                changed.add(requester.id)
                 lc_count += 1
             else:
                 unresolved.append(req)
@@ -145,6 +149,9 @@ class Layer2:
             requester = by_id[req.veh_id]
             provider_id = provider_of.get(req.veh_id)
             provider = by_id.get(provider_id) if provider_id is not None else None
+            if provider is not None and provider.id in changed:
+                # 提供車を兼ねる要求車が今stepに自力で車線を移った（もう目標車線にいないので譲らせない）
+                provider = None
             check = checks[req.veh_id]
             yield_on_front = YIELD_ON_FRONT > 0 and not check.front_ok
             if provider is not None and yield_on_front and YIELD_ON_FRONT >= 2:
