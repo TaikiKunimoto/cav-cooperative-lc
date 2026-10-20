@@ -108,6 +108,10 @@ class V2CAV(BaseModel):
     yield_time: float = 0.0  # 同じ要求車に譲り続けている時間 [s]（上限 YIELD_MAX_DURATION）
     yield_cooldown_until: float = 0.0  # この時刻までは提供車に選ばれない
     discretionary_cooldown_until: float = 0.0  # この時刻までは任意の車線変更をしない（Discretionary）
+    # 速度利得の積み上げ（Discretionary。左＝車線番号の大きい側）。車線を移ったら 0 に戻すため、積み上げた車線を覚える
+    speed_gain_left: float = 0.0
+    speed_gain_right: float = 0.0
+    speed_gain_lane: tuple[str, int] | None = None
     # 今いる edge の車線ごとの「ルートを続けるのに要る車線変更の数」（getBestLanes の offset の絶対値。edge ごとに取り直す）
     route_lane_offsets: dict[int, int] = Field(default_factory=dict)
     route_lane_offsets_edge: str | None = None
