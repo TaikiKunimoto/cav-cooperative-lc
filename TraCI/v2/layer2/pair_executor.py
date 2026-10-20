@@ -96,6 +96,7 @@ class Layer2:
         req_by_id: dict[str, LCRequest],
         by_id: dict[str, V2CAV],
         snap: Snapshot,
+        committed: dict[int, list[tuple[float, float]]] | None = None,
     ) -> int:
         """各要求車を EDF 順に処理し、目標車線に十分なギャップがあれば瞬時LC、残る要求は
         対向の 2 台の順番 → 提供車の協調減速 ＋ 要求車のスロット整列で解消を図る。実行したLC数を返す。
@@ -104,11 +105,13 @@ class Layer2:
         確定する。前後二方向の安全（``_insertion_safe_live``＝getNeighbors でジャンクション跨ぎに実測）が満たされていれば
         提供車の有無に依らず changeLane する（空車線・疎な車線へも自力で移れる）。
         同一stepに同じ目標車線へ入る車どうしも、挿入判定と同じ安全車間を取る（``_slot_free``。両側から同じ車線へ入る 2 台が
-        挿入判定ではお互いを見ないため）。先に確定するのは鍵の上位の車。
+        挿入判定ではお互いを見ないため）。先に確定するのは鍵の上位の車。``committed`` を渡すと、この step の確定を
+        呼び出し側と共有する（あとで任意の車線変更が同じ確定を使う）。
         """
         provider_of = {a.requester_id: a.provider_id for a in assignments}
         lc_count = 0
-        committed: dict[int, list[tuple[float, float]]] = {}  # 今stepで確定した target_lane -> (縦位置, 速度) のリスト
+        if committed is None:
+            committed = {}  # 今stepで確定した target_lane -> (縦位置, 速度) のリスト
         unresolved: list[LCRequest] = []  # 通常挿入が不可だった要求（EDF 順を保持）
         checks: dict[str, InsertionCheck] = {}  # 通常挿入が不可だった要求の、前後どちらの隙間が足りなかったか
         for req in req_by_id.values():  # EDF 順（鍵昇順）

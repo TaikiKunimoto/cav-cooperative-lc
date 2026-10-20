@@ -139,6 +139,15 @@ def get_edge_lane_number(edge_id: str) -> int:
     return cast(int, traci.edge.getLaneNumber(edge_id))
 
 
+def get_veh_best_lane_offsets(id: str) -> dict[int, int]:
+    """今いる edge の車線ごとに、ルートを続けるのに要る車線変更の数（getBestLanes の offset の絶対値）を返す。"""
+    offsets: dict[int, int] = {}
+    for best in traci.vehicle.getBestLanes(id):  # (laneID, length, occupation, offset, allowsContinuation, 続く車線)
+        lane_id, offset = str(best[0]), int(best[3])
+        offsets[int(lane_id.rsplit("_", 1)[1])] = abs(offset)
+    return offsets
+
+
 def get_lane_length(lane_id: str) -> float:
     """lane の実長 [m] を返す（net 上の実エッジ長。公称値とはジャンクション形状分ずれる）。"""
     return cast(float, traci.lane.getLength(lane_id))

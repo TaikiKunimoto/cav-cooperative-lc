@@ -76,6 +76,17 @@ OPPOSITE_ORDER: float = 1.0
 # 提供車の協調減速（Layer1 の提供車割当 → Layer2 の _provider_yield）を使うか。0 で Phase B の割当を行わず、
 # 要求車は自力挿入・対向の 2 台の順番・スロット整列・締切前保持だけで車線変更する（要素の除去による比較用。既定 1）。
 COOP_YIELD: float = 1.0
+# --- 任意の車線変更（速度利得）。提供車を付けず（協調しない）、必須の車線変更の邪魔をしない範囲で、速く流れている
+# 隣の車線へ移る（Discretionary）。L・D・T と判定のしきい値は、調整できるパラメータとして残す ---
+DISCRETIONARY_LC: float = 1.0  # 使うか（0 で外す＝比較用）
+DLC_LOOKAHEAD: float = 100.0  # [m] L: 車線ごとの速さ（前方の車の平均速度。いなければ制限速度）を測る範囲
+# 速度利得の判定は SUMO の LC2013（1.27.0 の MSLCM_LC2013.cpp）と同じ形: 左右の車線ごとに、差の割合
+# g = (v_隣 − v_自車線) / max(v_隣, DLC_GAIN_MIN_SPEED) を毎 step 積み上げ（自車線の方が速ければ 0.5^Δt、
+# 同じなら 0.8^Δt を掛けて減らす）、積み上げが DLC_GAIN_THRESHOLD を超えて g > 0 ならその車線へ移りたい
+DLC_GAIN_THRESHOLD: float = 0.2  # LC2013 の 0.2 / lcSpeedGain（lcSpeedGain の既定値 1）
+DLC_GAIN_MIN_SPEED: float = 10.0  # [m/s] LC2013 の RELGAIN_NORMALIZATION_MIN_SPEED
+DLC_REQUESTER_CLEARANCE: float = 50.0  # [m] D: 移る先の車線を次の目標にしている要求車の前後この距離には入らない
+DLC_COOLDOWN: float = 5.0  # [s] T: 任意の車線変更のあと、次の任意の車線変更をしない時間
 # 要求車のスロット整列（Layer2）: 目標車線の前方隣接車にブロックされている時に付ける相対速度差。
 # 同速追従（旧 _requester_match_target_speed）は横並びの重なりを固定してしまい、織込みで対向要求車と
 # 速度同調したまま lane-drop 終端に2台並んで到達→相互ブロックの永久デッドロックを生んだ。
