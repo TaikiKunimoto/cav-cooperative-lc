@@ -9,6 +9,7 @@ from datetime import datetime
 import os
 import random
 import sys
+import time
 from typing import Any, NamedTuple
 
 from pydantic import BaseModel, Field
@@ -23,6 +24,7 @@ from utils.traci_wrapper import (
     get_sim_time,
     get_veh_id_list,
 )
+from v2.arbitration_timing import ArbitrationTiming
 from v2.constants import (
     DRAIN_MAX,
     TC,
@@ -132,6 +134,7 @@ class V2Simulation(BaseModel):
         overlap_lc = 0  # 車体が重なる位置への車線変更の数（0 であるべき）
         crossing_lc = 0  # 横に重なった 2 台が互いの車線へ移ったすり抜けの数（0 であるべき）
         discretionary = DiscretionaryCounts()  # 任意の車線変更の回数と、条件 4・5 で止めた回数
+        arbitration_timing = ArbitrationTiming()  # 調停 1 周期ごとの計算時間（壁時計。調停の結果は変えない）
 
         while self._should_continue():
             traci.simulationStep()
@@ -234,14 +237,28 @@ class V2Simulation(BaseModel):
             tc_accumulator += TIME_STEP
             if not self.policy.is_noncooperative and tc_accumulator + 1e-9 >= TC:
                 tc_accumulator = 0.0
+                t_start = time.perf_counter_ns()  # 調停の計算時間: 状態の取りまとめ → 鍵（Phase A）→ 割当（Phase B）
                 snap = Snapshot.capture(active, current_time, self.env.mainlane_edge)
                 requests = LCRequest.build_all(snap, self.margin(), self.env.ramp_lanes)
+                t_built = time.perf_counter_ns()
                 if self.policy is Policy.EDF:
                     keyed = EDF.order_requests(requests)  # Phase A: 全要求車の鍵を計算し EDF（dist昇順）にソート
+                    t_keyed = time.perf_counter_ns()
                     assignments = RSU.arbitrate(keyed, snap)  # Phase B: 鍵順に提供車を占有印つきで確保
                 else:
                     keyed = FCFS.order_requests(requests)  # Phase A': 発生順（早い者勝ち）にソート
+                    t_keyed = time.perf_counter_ns()
                     assignments = RSU.arbitrate_fcfs(keyed, snap)  # Phase B': 最近傍後続の素朴割当
+                t_assigned = time.perf_counter_ns()
+                arbitration_timing.record(
+                    current_time,
+                    len(active),
+                    len(keyed),
+                    len(assignments),
+                    t_built - t_start,
+                    t_keyed - t_built,
+                    t_assigned - t_keyed,
+                )
                 req_by_id = {r.veh_id: r for _, r in keyed}
                 RSU.apply_roles(active, assignments)  # 毎Tc フル再構築（提供車=YIELDING / 要求車=LANE_CHANGING）
                 if not RSU.keys_unique(keyed):
@@ -307,6 +324,8 @@ class V2Simulation(BaseModel):
         stats.write_mandatory_requests(mandatory_requests, V2CAV.MANDATORY_REQUEST_FIELDS)
         if not self.policy.is_noncooperative:
             stats.write_sidecar("__discretionary.csv", [discretionary.summary_row()])
+            stats.write_sidecar("__arbitration.csv", arbitration_timing.cycle_rows())
+            stats.write_sidecar("__arbitration_summary.csv", [arbitration_timing.summary_row()])
         canceled_without_collision = [v for v in self.canceled_vehicles if v not in self.collided_ids]
 
         self._print_simulation_info(running_list)
@@ -321,6 +340,8 @@ class V2Simulation(BaseModel):
             f"Discretionary: lane changes: {discretionary.lane_changes}; blocked (vehicle-steps) by provider role: "
             f"{discretionary.blocked_provider}; by requester clearance: {discretionary.blocked_clearance}"
         )
+        if not self.policy.is_noncooperative:
+            print(arbitration_timing.summary_line())
         print(f"Speed: emergency brake events (decel above |MAX_DECEL|): {self.emergency_brake_total}")
         rule_summary = ", ".join(f"{k}={v}" for k, v in sorted(self.speed_rule_counts.items()))
         print(f"Speed: rule counts (vehicle-steps): {rule_summary}")

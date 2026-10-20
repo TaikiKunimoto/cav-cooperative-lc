@@ -36,7 +36,7 @@ NAME_RE = re.compile(
 WARN_RE = re.compile(r"performs emergency braking .* with decel=(?P<decel>[0-9.]+)")
 EBRAKE_RE = re.compile(r"Speed: emergency brake events \(decel above \|MAX_DECEL\|\): (?P<n>\d+)")
 BUCKETS = [(5.5, "≤5.5"), (10.0, "5.5–10"), (30.0, "10–30"), (100.0, "30–100"), (float("inf"), ">100")]
-SIDE_SUFFIXES = ("__failures", "__requests", "__obstacle", "__avoid", "__queue", "__discretionary")
+SIDE_SUFFIXES = ("__failures", "__requests", "__obstacle", "__avoid", "__queue", "__discretionary", "__arbitration")
 
 
 @dataclass
