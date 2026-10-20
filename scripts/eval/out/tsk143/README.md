@@ -13,6 +13,8 @@
 | `f12-tc1` | 19876e0 | 同上。調停周期 `--set TC=1.0`（修正前は例外で停止した条件） | weave2 × f0.6 |
 | `f5-9-tau` | 2c0560a | ＋ 追従の時間車頭 FOLLOW_TAU = 1.0 s | merge / weave / weave2 × f0.4 / 0.6 |
 | `full-8197d8e` | 8197d8e | 完全版（F-1〜F-12 マージ後の main）の本番スイート `run_sweep.py --suite proposed`（手元の Mac、6 並列）。raw は `out/raw`（git 管理外）、監査は `audit_runs.py scripts/eval/out` の出力（`audit.md` / `audit.csv` のみ） | 4 環境 × Q1500〜4000 × f0.2/0.4/0.6 × seed1〜5 ＋ 封鎖付き straight × Q1500〜3500 × seed1〜5 ＝ 385 run |
+| `i14-base` | 0c472c3 | I-14 の比較元。任意の車線変更（PR #73）が入った main（6f57518）と同じコード（lab-desktop、12 並列） | merge / weave / weave2 × Q3000 / 4000 × f0.4 / 0.6（seed1）＝ 12 run |
+| `i14-fix` | 655c106 | ＋ 提供車を兼ねる要求車が同じ step に自力で車線を移ったら、その提供車には譲りを出さない（I-14）。`audit.*` は `--baseline out/tsk143/i14-base` の出力。`run_manifest.txt` の dirty=True は i14-base の出力（未追跡）によるもので、コードは 655c106 のまま | 同上 |
 
 `f1` の `logs/` は緊急制動警告が多く大きい（約 5 MB）ので git には入れていない（`raw/` と `audit.*` のみ）。
 再現: 対応するコミットを checkout し、`uv run python scripts/eval/run_tsk143.py --label <label> [--envs ...] [--fs ...] [--obstacle ...] [--set ...]`。
