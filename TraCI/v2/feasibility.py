@@ -3,9 +3,13 @@
 SUMO の車線変更は 1 step で終わり、TraCI の changeLane は lane change mode 0 だと SUMO の安全確認を経ずに実行される。
 そのため、車体が重なる位置への車線変更や、横に重なった 2 台が互いの車線へ移る「すり抜け」も通ってしまう
 （SUMO はこれを衝突と数えないことがある）。毎 step の車線と縦位置を前 step と比べて、その回数を数える。
+車線を移ってから LC_REVERSAL_WINDOW 秒以内に元の車線へ戻った回数も数える（現実の車は 1 回目の車線変更が終わる前に
+戻れない）。
 """
 
-from v2.constants import VEH_LENGTH
+from dataclasses import dataclass, field
+
+from v2.constants import LC_REVERSAL_WINDOW, VEH_LENGTH
 
 # 本線 edge 上の車の (車線インデックス, 縦位置〔前端〕)
 LanePositions = dict[str, tuple[int, float]]
@@ -38,3 +42,21 @@ class Feasibility:
                 if from_a == to_b and to_a == from_b and abs(prev[a][1] - prev[b][1]) < VEH_LENGTH:
                     crossing += 1
         return overlap, crossing
+
+
+@dataclass
+class LaneChangeReversals:
+    """車線を移ってから LC_REVERSAL_WINDOW 秒以内に元の車線へ戻った回数（観測のみ。本線 edge 上の車線変更だけを見る）。"""
+
+    last_change: dict[str, tuple[int, float]] = field(default_factory=dict)  # 車 -> (直前の車線変更で出た車線, 時刻)
+    count: int = 0
+
+    def update(self, prev: LanePositions, cur: LanePositions, now: float) -> None:
+        """前 step と今 step の車線を比べ、車線を移った車ごとに、直前の車線変更で出た車線へすぐ戻ったかを数える。"""
+        for vid, (lane, _) in cur.items():
+            if vid not in prev or prev[vid][0] == lane:
+                continue
+            last = self.last_change.get(vid)
+            if last is not None and last[0] == lane and now - last[1] <= LC_REVERSAL_WINDOW:
+                self.count += 1
+            self.last_change[vid] = (prev[vid][0], now)

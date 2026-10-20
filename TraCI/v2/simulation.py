@@ -27,11 +27,12 @@ from utils.traci_wrapper import (
 from v2.arbitration_timing import ArbitrationTiming
 from v2.constants import (
     DRAIN_MAX,
+    LC_REVERSAL_WINDOW,
     TC,
     TIME_STEP,
 )
 from v2.environment import Environment, Group
-from v2.feasibility import Feasibility, LanePositions
+from v2.feasibility import Feasibility, LanePositions, LaneChangeReversals
 from v2.layer1.priority import EDF, FCFS
 from v2.layer1.rsu import RSU, Assignment
 from v2.layer2.discretionary import Discretionary, DiscretionaryCounts
@@ -133,6 +134,7 @@ class V2Simulation(BaseModel):
         prev_lanes: LanePositions = {}  # 前 step の本線上の (車線, 縦位置)。現実性の検査に使う
         overlap_lc = 0  # 車体が重なる位置への車線変更の数（0 であるべき）
         crossing_lc = 0  # 横に重なった 2 台が互いの車線へ移ったすり抜けの数（0 であるべき）
+        reversals = LaneChangeReversals()  # 車線を移ってすぐ元の車線へ戻った数（0 であるべき）
         discretionary = DiscretionaryCounts()  # 任意の車線変更の回数と、条件 4・5 で止めた回数
         arbitration_timing = ArbitrationTiming()  # 調停 1 周期ごとの計算時間（壁時計。調停の結果は変えない）
 
@@ -209,6 +211,7 @@ class V2Simulation(BaseModel):
             overlap, crossing = Feasibility.count_violations(prev_lanes, cur_lanes)
             overlap_lc += overlap
             crossing_lc += crossing
+            reversals.update(prev_lanes, cur_lanes, current_time)
             prev_lanes = cur_lanes
 
             # --- 突発障害物（位置到達トリガ）。appear_time 以降、指定レーンで pos に到達した最初の車を停止＝障害物化 ---
@@ -334,7 +337,8 @@ class V2Simulation(BaseModel):
         print(f"Layer2: total instant lane changes executed: {total_lc}")
         print(
             f"Feasibility: lane changes into an occupied position: {overlap_lc}; "
-            f"pass-through lane changes: {crossing_lc} (both should be 0)"
+            f"pass-through lane changes: {crossing_lc}; lane changes back within {LC_REVERSAL_WINDOW:g} s: "
+            f"{reversals.count} (all should be 0)"
         )
         print(
             f"Discretionary: lane changes: {discretionary.lane_changes}; blocked (vehicle-steps) by provider role: "

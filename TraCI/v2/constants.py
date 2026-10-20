@@ -21,6 +21,9 @@ EMERGENCY_DECEL: float = 9.0  # [m/s^2]
 OBSTACLE_DECEL: float = 2.5  # [m/s^2]
 MIN_GAP: float = 2.8  # [m] 最小車間距離（vType minGap と統一。提案は model_post_init で setMinGap）
 VEH_LENGTH: float = 5.0  # [m] 車長（vType length と統一）
+# 車線変更の現実性の検査（観測のみ）: 車線を移ってからこの時間以内に元の車線へ戻った回数を数える。SUMO の車線変更は
+# 1 step で終わるが、現実の車は横へ移るのに数秒かかるので、この時間以内に戻るのは 1 回目が終わる前に戻ることになる
+LC_REVERSAL_WINDOW: float = 3.0  # [s]
 # SUMO の laneChangeMode 既定値（strategic/cooperative/speedGain/keepRight 有効・traci と衝突時は安全側）。
 # off-late が活性化窓進入で車線変更を解禁するときに戻す値（TraCI ドキュメントの default 0b011001010101）
 SUMO_DEFAULT_LC_MODE: int = 0b011001010101  # = 1621
