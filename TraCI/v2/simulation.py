@@ -32,6 +32,7 @@ from v2.environment import Environment, Group
 from v2.feasibility import Feasibility, LanePositions
 from v2.layer1.priority import EDF, FCFS
 from v2.layer1.rsu import RSU, Assignment
+from v2.layer2.discretionary import Discretionary, DiscretionaryCounts
 from v2.layer2.pair_executor import Layer2
 from v2.lc_request import LCOperation, LCRequest
 from v2.obstacle import Obstacle
@@ -130,6 +131,7 @@ class V2Simulation(BaseModel):
         prev_lanes: LanePositions = {}  # 前 step の本線上の (車線, 縦位置)。現実性の検査に使う
         overlap_lc = 0  # 車体が重なる位置への車線変更の数（0 であるべき）
         crossing_lc = 0  # 横に重なった 2 台が互いの車線へ移ったすり抜けの数（0 であるべき）
+        discretionary = DiscretionaryCounts()  # 任意の車線変更の回数と、条件 4・5 で止めた回数
 
         while self._should_continue():
             traci.simulationStep()
@@ -257,7 +259,13 @@ class V2Simulation(BaseModel):
 
             # --- Layer2 実行。changeLane と、入れないときの速度候補（譲り・整列・保持）を積む ---
             if snap is not None:
-                total_lc += Layer2.execute_pairs(assignments, req_by_id, {veh.id: veh for veh in active}, snap)
+                by_id = {veh.id: veh for veh in active}
+                committed: dict[
+                    int, list[tuple[float, float]]
+                ] = {}  # この step に確定した車線変更（必須と任意で共有）
+                total_lc += Layer2.execute_pairs(assignments, req_by_id, by_id, snap, committed)
+                # 任意の車線変更（速度利得）。必須の車線変更のあとに、同じ確定を見て行う
+                Discretionary.execute(by_id, req_by_id, snap, committed, discretionary)
 
             # --- 速度指令の確定: 追従と Layer2 の候補から次 step の速度を 1 つ決め、全車 1 回だけ setSpeed する ---
             if not self.policy.is_noncooperative:
@@ -297,6 +305,8 @@ class V2Simulation(BaseModel):
             for suffix, rows in obstacle_metrics.summary_rows(still_running, get_sim_time()).items():
                 stats.write_sidecar(suffix, rows)
         stats.write_mandatory_requests(mandatory_requests, V2CAV.MANDATORY_REQUEST_FIELDS)
+        if not self.policy.is_noncooperative:
+            stats.write_sidecar("__discretionary.csv", [discretionary.summary_row()])
         canceled_without_collision = [v for v in self.canceled_vehicles if v not in self.collided_ids]
 
         self._print_simulation_info(running_list)
@@ -306,6 +316,10 @@ class V2Simulation(BaseModel):
         print(
             f"Feasibility: lane changes into an occupied position: {overlap_lc}; "
             f"pass-through lane changes: {crossing_lc} (both should be 0)"
+        )
+        print(
+            f"Discretionary: lane changes: {discretionary.lane_changes}; blocked (vehicle-steps) by provider role: "
+            f"{discretionary.blocked_provider}; by requester clearance: {discretionary.blocked_clearance}"
         )
         print(f"Speed: emergency brake events (decel above |MAX_DECEL|): {self.emergency_brake_total}")
         rule_summary = ", ".join(f"{k}={v}" for k, v in sorted(self.speed_rule_counts.items()))

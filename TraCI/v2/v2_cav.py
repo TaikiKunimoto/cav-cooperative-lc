@@ -107,6 +107,10 @@ class V2CAV(BaseModel):
     yield_for: str | None = None  # いま譲っている要求車（譲りの継続時間の対象）
     yield_time: float = 0.0  # 同じ要求車に譲り続けている時間 [s]（上限 YIELD_MAX_DURATION）
     yield_cooldown_until: float = 0.0  # この時刻までは提供車に選ばれない
+    discretionary_cooldown_until: float = 0.0  # この時刻までは任意の車線変更をしない（Discretionary）
+    # 今いる edge の車線ごとの「ルートを続けるのに要る車線変更の数」（getBestLanes の offset の絶対値。edge ごとに取り直す）
+    route_lane_offsets: dict[int, int] = Field(default_factory=dict)
+    route_lane_offsets_edge: str | None = None
     receiving_from_id: str | None = None  # 自分に gap を提供してくれる相手（提供車）
     sim_time: float = 0.0
     departure_time: float | None = None
