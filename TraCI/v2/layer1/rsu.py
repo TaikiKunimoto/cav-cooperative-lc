@@ -142,7 +142,13 @@ class RSU:
                     return vid
         for vid in viable:
             o = snap.obs[vid]
-            if o.lane_pos is not None and o.speed <= Safety.stop_speed(stop_pos - o.lane_pos):
+            # 前端がもう停止位置より前の車（要求車の真横で止まっている車など）は、止まっていても選ばない（stop_speed が 0 に
+            # なるので条件を満たしてしまい、上限 0 のまま要求車の横に止め置くことになる）
+            if (
+                o.lane_pos is not None
+                and o.lane_pos <= stop_pos
+                and o.speed <= Safety.stop_speed(stop_pos - o.lane_pos)
+            ):
                 return vid  # 入る場所の手前で HOLD_DECEL で止まれる最も近い後続
         return None
 
