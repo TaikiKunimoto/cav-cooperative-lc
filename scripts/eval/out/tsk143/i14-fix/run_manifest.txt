@@ -1,0 +1,13 @@
+# 2026-10-20T11:26:15 起動: scripts/eval/run_tsk143.py --label i14-fix --qs 3000 4000 --workers 12 git=655c106 dirty=True sumo=Eclipse SUMO sumo 1.27.0
+2026-10-20T11:27:04	ok	v2__weave__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env weave --nogui
+2026-10-20T11:27:08	ok	v2__merge__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env merge --nogui
+2026-10-20T11:27:09	ok	v2__merge__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env merge --nogui
+2026-10-20T11:27:11	ok	v2__weave__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env weave --nogui
+2026-10-20T11:27:17	ok	v2__merge__Q4000__f0.6__s1	uv run python -m v2 1 4000 0.6 --env merge --nogui
+2026-10-20T11:27:22	ok	v2__weave__Q4000__f0.4__s1	uv run python -m v2 1 4000 0.4 --env weave --nogui
+2026-10-20T11:27:24	ok	v2__merge__Q4000__f0.4__s1	uv run python -m v2 1 4000 0.4 --env merge --nogui
+2026-10-20T11:27:24	ok	v2__weave2__Q3000__f0.4__s1	uv run python -m v2 1 3000 0.4 --env weave2 --nogui
+2026-10-20T11:27:25	ok	v2__weave2__Q3000__f0.6__s1	uv run python -m v2 1 3000 0.6 --env weave2 --nogui
+2026-10-20T11:27:26	ok	v2__weave__Q4000__f0.6__s1	uv run python -m v2 1 4000 0.6 --env weave --nogui
+2026-10-20T11:27:39	ok	v2__weave2__Q4000__f0.4__s1	uv run python -m v2 1 4000 0.4 --env weave2 --nogui
+2026-10-20T11:27:41	ok	v2__weave2__Q4000__f0.6__s1	uv run python -m v2 1 4000 0.6 --env weave2 --nogui
