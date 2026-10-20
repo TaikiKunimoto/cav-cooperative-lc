@@ -101,7 +101,7 @@ class V2Simulation(BaseModel):
     emergency_brake_total: int = 0  # 緊急制動（|MAX_DECEL| 超の減速）の発動回数の合計（退出車＋終了時の残車）
     speed_rule_counts: dict[str, int] = Field(default_factory=dict)  # 速度指令で採用した規則名 → 車両・step 数
     # 各車線の待ち行列（流入レーン選択の負荷分散に使う）。レーンは環境により可変なので動的に作る
-    lane_queues: dict[str, list[str]] = Field(default_factory=dict)
+    lane_queues: dict[str, list[str]] = Field(default_factory=dict)  # 投入レーン（"<edge>_<レーン>"）ごとの未発進の車
 
     def run(self, stats: SimulationStatistics) -> None:
         self._set_environment()
@@ -405,7 +405,7 @@ class V2Simulation(BaseModel):
         """グループの投入レーン候補（None=全レーン）の中で待ち行列が最短のレーンを選ぶ（負荷分散）。"""
         lanes_total: int = get_edge_lane_number(edge_id)
         candidates = [str(i) for i in (allowed_lanes if allowed_lanes is not None else range(lanes_total))]
-        queue_length = {lane: len(self.lane_queues.get(lane, [])) for lane in candidates}
+        queue_length = {lane: len(self.lane_queues.get(f"{edge_id}_{lane}", [])) for lane in candidates}
         lanes_without_queue = [lane for lane in candidates if queue_length[lane] == 0]
         if lanes_without_queue:
             return random.choice(lanes_without_queue)
@@ -440,7 +440,7 @@ class V2Simulation(BaseModel):
                     mlc_notice_at_activation=self.policy is Policy.OFF_LATE,
                 )
             )
-            self.lane_queues.setdefault(depart_lane, []).append(str(self.veh_id))
+            self.lane_queues.setdefault(f"{depart_edge}_{depart_lane}", []).append(str(self.veh_id))
             self.veh_id += 1
 
     def _update_lane_queue(self, veh_id: str) -> None:
