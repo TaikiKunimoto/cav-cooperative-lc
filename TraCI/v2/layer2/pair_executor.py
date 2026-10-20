@@ -438,7 +438,8 @@ class Layer2:
             return True
         follower_id, gap = follower
         v_f = get_veh_speed(follower_id)
-        safety_gap = max(Safety.net_required(v_f, provider.speed), v_f * FOLLOW_TAU) + MIN_GAP
+        # control_speed と同じ安全車間（minGap 控除済みの車間に対する値）
+        safety_gap = max(Safety.net_required(v_f, provider.speed), v_f * FOLLOW_TAU)
         return bool(gap - safety_gap >= need)
 
     @staticmethod

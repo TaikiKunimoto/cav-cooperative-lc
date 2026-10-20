@@ -112,10 +112,11 @@ LC_REACTION_LAG: float = 0.25  # [s]
 DRAIN_MAX: float = 900.0  # [s]
 
 # --- 追従則（相対制動。挿入判定と同じ Safety.net_required を安全車間に使う）---
-# 車間が安全車間（net_required + minGap）を上回るときの追従目標 = min(制限速度, 前車速度 + FOLLOW_GAIN·(車間 − 安全車間))。
+# 車間（minGap 控除済み）が安全車間 max(net_required, v·FOLLOW_TAU) を上回るときの追従目標 = min(制限速度, 前車速度 + FOLLOW_GAIN·(車間 − 安全車間))。
 # 余剰車間に比例して前車より速く詰め、安全車間で前車速度に連続接続する（段差のある目標が生む振動を避ける）。
 FOLLOW_GAIN: float = 0.5  # [1/s]
-# 追従の時間車頭（desired time headway）。安全車間 = max(相対制動の必要量, v·FOLLOW_TAU) + minGap。
+# 追従の時間車頭（desired time headway）。安全車間 = max(相対制動の必要量, v·FOLLOW_TAU)（minGap 控除済みの車間に対する値。
+# バンパー間ではこれに minGap が足される。Krauss と同じ数え方）。
 # 相対制動だけだと同速時の車間が 0.25·v + 0.5（27 m/s で約 0.4 s）まで詰まり、非協調ベースライン（Krauss, tau=1.0）と
 # 車両物理が揃わない。全車に setTau(1.0) している値（F4 の統一）と同じ 1.0 s を使う。
 FOLLOW_TAU: float = 1.0  # [s]
