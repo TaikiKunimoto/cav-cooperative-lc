@@ -41,6 +41,13 @@ class LCOperation(BaseModel):
     completed_in_time: bool = False
     completion_time: float | None = None  # 締切内完了の時刻（完了余裕 margin 評価用。未完了なら None）
     completion_pos: float | None = None  # 締切内完了時の縦位置（margin = deadline_pos − completion_pos）
+    # 締切の手前で待った記録（要求個票用。挙動には使わない）。step 数は、この操作が要求を出している間に
+    # 採用された速度の規則で数える（保持＝Layer2 の締切前の保持、対向の順番＝低い方が高い方の後ろへ下がる）
+    hold_time: float | None = None  # 保持の上限が初めて採用された時刻（採用されなければ None）
+    hold_pos: float | None = None  # そのときの縦位置
+    hold_steps: int = 0  # 保持の上限が採用された step 数
+    order_steps: int = 0  # 対向の順番の上限が採用された step 数
+    min_speed: float | None = None  # 活性化から完了までの最低速度 [m/s]（完了した step は含めない）
 
     def is_done(self, lane: int | None, lane_pos: float | None) -> bool:
         """この操作が完了したか。回避は障害物位置を通過したら、本来の目標は target レーン到達で完了。"""

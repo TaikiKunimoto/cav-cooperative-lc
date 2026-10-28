@@ -240,6 +240,11 @@ class V2CAV(BaseModel):
         "collided",
         "final_lane",
         "final_lane_pos",
+        "hold_time",
+        "hold_pos",
+        "hold_steps",
+        "order_steps",
+        "min_speed",
     ]
 
     def mandatory_request_rows(self, env_name: str, collided: bool, phase: str) -> "list[dict[str, Any]]":
@@ -248,6 +253,8 @@ class V2CAV(BaseModel):
         失敗個票（mandatory_failure_rows）と異なり完了した要求も1行ずつ出す。集計側が
         margin = deadline_pos − completion_pos [m]、所要時間 = completion_time − activation_time [s]
         を計算できるよう生値のまま出力する。未完了要求は completion_* が空欄になる。
+        締切の手前で待った記録（hold_* / order_steps / min_speed）は ``record_wait_rule`` と
+        ``update_request_speed`` が数えた値。非協調（Layer2 が動かない）では hold_steps・order_steps は 0。
         """
         rows: list[dict[str, Any]] = []
         for op in self.operations:
@@ -274,9 +281,39 @@ class V2CAV(BaseModel):
                     "collided": collided,
                     "final_lane": self.lane,
                     "final_lane_pos": self.lane_pos,
+                    "hold_time": op.hold_time,
+                    "hold_pos": op.hold_pos,
+                    "hold_steps": op.hold_steps,
+                    "order_steps": op.order_steps,
+                    "min_speed": op.min_speed,
                 }
             )
         return rows
+
+    def update_request_speed(self) -> None:
+        """活性化済みで未完了の操作に、この step の速度で最低速度を更新する（要求個票の min_speed。全ポリシー共通）。"""
+        for op in self.operations:
+            if not op.activated or op.completed_in_time or op.is_return:
+                continue
+            if op.min_speed is None or self.speed < op.min_speed:
+                op.min_speed = self.speed
+
+    def record_wait_rule(self, rule: str) -> None:
+        """この step に採用した速度の規則が保持・対向の順番なら、要求を出している操作に数える（要求個票の hold_* / order_steps）。
+
+        要求を出している操作は ``active_operation``（Snapshot が要求を作るときと同じ選び方）。
+        """
+        if rule not in ("hold", "order"):
+            return
+        op = self.active_operation()
+        if op is None:
+            return
+        if rule == "order":
+            op.order_steps += 1
+            return
+        if op.hold_time is None:
+            op.hold_time, op.hold_pos = self.sim_time, self.lane_pos
+        op.hold_steps += 1
 
     def active_operation(self) -> LCOperation | None:
         """未完了（is_done が False）の操作のうち、最も deadline が近いものを返す（なければ None）。"""
