@@ -48,6 +48,8 @@ FIGSIZE = (4.5, 3.2)
 FONT_SIZE = 12
 
 ENVS = ["diverge", "merge", "weave", "weave2"]
+STOP_SPEED = 1.0  # [m/s] これ未満を停止とみなす（v2/constants.py の YIELD_MIN_SPEED と同じ値）
+STEP_S = 0.1  # [s] シミュレーションの 1 step（v2/constants.py の TIME_STEP）
 Q_LEVELS = [1500, 2000, 2500, 3000, 3500, 4000]
 F_LEVELS = [0.2, 0.4, 0.6]
 
@@ -162,6 +164,52 @@ class MarginReport:
         inc_g.to_csv(MARGIN_DIR / "incomplete_stats.csv", index=False)
 
     @staticmethod
+    def write_hold_stats(ds: MarginDataset) -> pd.DataFrame | None:
+        """締切の手前で待った要求の件数を、シナリオ×Q（f・シードは通算）と全 Q 通算で hold_stats.csv に出す。
+
+        held＝保持の上限が 1 step 以上採用された要求、ordered＝対向の順番の上限が 1 step 以上採用された要求、
+        waited＝そのどちらか、stopped＝最低速度が STOP_SPEED 未満の要求、held_stopped＝held かつ stopped。
+        hold_s_median は held の要求の、保持の上限が採用された時間 [s] の中央値。
+        個票に hold_steps 列が無い（記録を足す前の run）ときは出さずに None を返す。
+        """
+        if "hold_steps" not in ds.df.columns:
+            print("[margin] 個票に hold_steps 列が無いので hold_stats.csv は出しません（記録を足す前の run）")
+            return None
+        d = ds.df.assign(
+            held=ds.df["hold_steps"] > 0,
+            ordered=ds.df["order_steps"] > 0,
+            stopped=ds.df["min_speed"] < STOP_SPEED,
+            hold_s=ds.df["hold_steps"] * STEP_S,
+        )
+        d["waited"] = d["held"] | d["ordered"]
+        d["held_stopped"] = d["held"] & d["stopped"]
+
+        def agg(g: "pd.core.groupby.DataFrameGroupBy") -> pd.DataFrame:
+            out = g.agg(
+                n=("veh_id", "size"),
+                held=("held", "sum"),
+                ordered=("ordered", "sum"),
+                waited=("waited", "sum"),
+                stopped=("stopped", "sum"),
+                held_stopped=("held_stopped", "sum"),
+            )
+            out["hold_s_median"] = g.apply(lambda x: x.loc[x["held"], "hold_s"].median(), include_groups=False)
+            for col in ("held", "ordered", "waited", "stopped", "held_stopped"):
+                out[f"{col}_pct"] = 100 * out[col] / out["n"]
+            return out
+
+        by_q = agg(d.groupby(["scenario", "q"])).reset_index()
+        total = agg(d.groupby("scenario")).reset_index().assign(q="all")
+        stats = pd.concat([by_q, total], ignore_index=True)
+        stats["scenario"] = pd.Categorical(stats["scenario"], categories=ENVS, ordered=True)
+        stats["q"] = pd.Categorical(stats["q"].astype(str), categories=[*map(str, Q_LEVELS), "all"], ordered=True)
+        stats = stats.sort_values(["scenario", "q"])
+        stats = stats.round({c: 1 for c in stats.columns if c.endswith("_pct") or c == "hold_s_median"})
+        MARGIN_DIR.mkdir(parents=True, exist_ok=True)
+        stats.to_csv(MARGIN_DIR / "hold_stats.csv", index=False)
+        return stats
+
+    @staticmethod
     def write_scenario_summary(ds: MarginDataset) -> pd.DataFrame:
         """作動包絡内のシナリオ別 margin サマリを CSV と論文スタイル tex 断片で出力する。"""
         comp = ds.completed(envelope_only=True)
@@ -229,6 +277,7 @@ def main() -> None:
 
     ds = MarginDataset.load(RAW_DIR, parse_seeds(args.seeds))
     MarginReport.write_stats(ds)
+    hold = MarginReport.write_hold_stats(ds)
     summary = MarginReport.write_scenario_summary(ds)
     MarginReport.plot_cdf(ds, envelope_only=True, stem="fig_margin_cdf")
     MarginReport.plot_cdf(ds, envelope_only=False, stem="fig_margin_cdf_fullgrid")
@@ -237,6 +286,9 @@ def main() -> None:
     n_done = int(ds.df["completed_in_time"].astype(bool).sum())
     print(f"[margin] 要求 {n_all} 件（完了 {n_done} / 未完了 {n_all - n_done}）")
     print(summary.to_string(index=False))
+    if hold is not None:
+        cols = ["scenario", "q", "n", "held_pct", "ordered_pct", "waited_pct", "held_stopped_pct", "hold_s_median"]
+        print(hold.loc[hold["q"] == "all", cols].to_string(index=False))
     print(f"[margin] 出力: {MARGIN_DIR}/ と {FIG_DIR}/fig_margin_cdf.(png|pdf)")
 
 

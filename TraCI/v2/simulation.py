@@ -195,6 +195,7 @@ class V2Simulation(BaseModel):
                 # TODO: ここ本当に必要か，一回で良いのか？
                 veh.update_activation(self.env.mainlane_edge, self.margin())  # 活性化を一度だけ記録
                 veh.update_deadline_achievement(self.env.mainlane_edge)  # 締切までに目標到達したら一度だけ記録（F3）
+                veh.update_request_speed()  # 未完了の要求の最低速度（要求個票）
                 active.append(veh)
                 self._update_lane_queue(vid)
 
@@ -292,6 +293,7 @@ class V2Simulation(BaseModel):
                 for veh in active:
                     rule = veh.apply_speed_command()
                     self.speed_rule_counts[rule] = self.speed_rule_counts.get(rule, 0) + 1
+                    veh.record_wait_rule(rule)  # 保持・対向の順番で速度が決まった step を要求ごとに数える（要求個票）
                     if speed_log is not None:
                         speed_log.write(current_time, veh)
 
