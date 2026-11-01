@@ -49,6 +49,7 @@ from v2.constants import (
     MAX_DECEL,
     MIN_GAP,
     OPPOSITE_ORDER,
+    POSITION_ORDER,
     STAGE_HOLD,
     TIME_STEP,
     VEH_LENGTH,
@@ -109,15 +110,16 @@ class Layer2:
         呼び出し側と共有する（あとで任意の車線変更が同じ確定を使う）。
         上位の要求車の提供車を兼ねる要求車が同じ step に自力で車線を移ったときは、その提供車には譲りを出さない
         （目標車線から出ていくので、譲っても上位の要求車の隙間は変わらない）。
+        POSITION_ORDER のときは、EDF 順の代わりに縦位置の前から処理する（``_processing_order``）。
         """
         provider_of = {a.requester_id: a.provider_id for a in assignments}
         lc_count = 0
         if committed is None:
             committed = {}  # 今stepで確定した target_lane -> (縦位置, 速度) のリスト
         changed: set[str] = set()  # 今stepで車線を移った要求車
-        unresolved: list[LCRequest] = []  # 通常挿入が不可だった要求（EDF 順を保持）
+        unresolved: list[LCRequest] = []  # 通常挿入が不可だった要求（処理順を保持）
         checks: dict[str, InsertionCheck] = {}  # 通常挿入が不可だった要求の、前後どちらの隙間が足りなかったか
-        for req in req_by_id.values():  # EDF 順（鍵昇順）
+        for req in Layer2._processing_order(req_by_id):  # 既定は EDF 順（鍵昇順）
             requester = by_id.get(req.veh_id)
             if requester is None:
                 continue
@@ -167,6 +169,18 @@ class Layer2:
                 # 締切間近でなお挿入不可: 保持の位置で止まれる速度を上限にして lane-drop 端の急停止を防ぐ（整列は続ける）
                 Layer2._hold_before_deadline(requester, req)
         return lc_count
+
+    @staticmethod
+    def _processing_order(req_by_id: dict[str, LCRequest]) -> list[LCRequest]:
+        """Layer2 で要求を処理する順。既定は EDF 順（``req_by_id`` は鍵昇順の keyed から構築済み）。
+
+        POSITION_ORDER のときは縦位置の前から（同じ位置なら車両 ID の小さい方から）。同じ step に同じ車線へ入る車の
+        どちらを先に確定するか（``_slot_free``）と、対向の 2 台のどちらが下がるか（``_order_opposite_pairs``）に効く。
+        """
+        requests = list(req_by_id.values())
+        if POSITION_ORDER > 0:
+            requests.sort(key=lambda r: (-r.current_pos, int(r.veh_id)))
+        return requests
 
     @staticmethod
     def _slot_free(
@@ -285,8 +299,9 @@ class Layer2:
     def _order_opposite_pairs(unresolved: list[LCRequest], by_id: dict[str, V2CAV]) -> dict[str, frozenset[str]]:
         """隣の車線どうしで互いに相手の車線を目指す 2 台（対向の 2 台）の順番を、優先度（EDF の鍵）で決める（OPPOSITE_ORDER）。
 
-        ``unresolved`` は鍵の昇順（優先度の高い順）。各組で優先度の低い方が ``_stay_behind`` で高い方の後ろへ下がり、
-        高い方が入る場所を自分の前に残す。使う操作は加減速だけで車線は変えない（入れ替えのように車体がすり抜けない）。
+        ``unresolved`` は処理順（既定は鍵の昇順＝優先度の高い順）。各組で優先度の低い方が ``_stay_behind`` で高い方の
+        後ろへ下がり、高い方が入る場所を自分の前に残す。POSITION_ORDER のときは前の車を高い方として扱う（後ろの車が下がる）。
+        使う操作は加減速だけで車線は変えない（入れ替えのように車体がすり抜けない）。
         戻り値は「優先度の高い要求車 -> そのために下がる低い要求車の集合」（高い方の整列で使う）。
         """
         yielding_to: dict[str, set[str]] = {}
