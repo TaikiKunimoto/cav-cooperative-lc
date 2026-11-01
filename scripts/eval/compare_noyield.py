@@ -47,6 +47,7 @@ RUN_COLS = {  # 本体の CSV（末尾 1 行）から拾う列 → 出力名
     "traffic volume": "throughput",
 }
 KEYS = ["scenario", "q", "f", "seed"]
+REQ_NUMERIC = ["activation_time", "completion_time", "deadline_pos", "completion_pos", "hold_steps", "min_speed"]
 
 
 def _float(v: str | None) -> float:
@@ -81,6 +82,8 @@ def load(raw_dir: Path, method: str) -> tuple[pd.DataFrame, pd.DataFrame]:
         req_path = path.with_name(path.stem + "__requests.csv")
         if req_path.exists():
             df = pd.read_csv(req_path)
+            for col in REQ_NUMERIC:  # 空欄や未完了の値を NaN にそろえる（列が文字列で読まれる run がある）
+                df[col] = pd.to_numeric(df[col], errors="coerce")
             df = df[df["activation_time"].notna()]
             reqs.append(df.assign(**meta))
     if not runs:
