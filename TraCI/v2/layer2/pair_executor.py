@@ -329,6 +329,8 @@ class Layer2:
         締切の位置は高い車に残す: 2 台とも締切まで来ると同じ位置で止まり、前にいた低い車も追いつかれて横に並ぶ。
         そこで締切前の保持の区間では、低い車は締切の 1 台分手前（車長 ＋ minGap ＋ 余裕 2·LC_SAFETY_MARGIN）で
         HOLD_DECEL で止まれる速度を上限にする（締切前の保持と同じ形）。高い車が車線変更を終えれば外れる。
+        ただし上限を与えるのは、低い車が最大減速でその位置の手前に止まれるときだけ。止まれない車は通り過ぎる
+        （止まった要求車の入る場所の手前で止まれない後続を提供車に選ばない ``RSU._find_provider`` と同じ考え方）。
 
         高い車が低い車の車線へ入るには、低い車がその後ろに ``Safety.net_required(v_低, v_高)``（挿入判定の後続側と
         同じ式）だけ離れているか、前に ``Safety.net_required(v_高, v_低)`` だけ離れている必要がある。後ろ側には
@@ -340,12 +342,17 @@ class Layer2:
         - 横に重なっている（または前寄り）で高い車が走行中: 高い車の速度 − YIELD_DELTA を目標に YIELD_DECEL 以下で
           下がって後ろへ回る（提供車の譲りと同じ則）。
         - 高い車が止まっていて低い車が前寄り: 前へ出て空ける（前が詰まっていれば追従の候補が勝つ）。
-        - 高い車が止まっていて低い車が後ろ寄りで重なっている: その場で止まり、それ以上前へ出ない。
+        - 高い車が止まっていて低い車が後ろ寄りで重なっている: 高い車の入る場所の手前で止まれず、自分の保持の位置が
+          その 1 台分より先にあれば、止まらずに通り過ぎる（高い車はそのあと後ろへ入れる）。そうでなければ
+          その場で止まり、それ以上前へ出ない（2 台の保持の位置が同じときは、前へ抜けても高い車の位置を塞ぐため）。
         """
         low_pos, high_pos = low_req.current_pos, high_req.current_pos
         high_hold = Layer2._hold_pos(high_req)  # 高い車が保持で止まる位置
-        slot = high_hold - (VEH_LENGTH + MIN_GAP + 2 * LC_SAFETY_MARGIN)  # 低い車が止まってよい一番前
-        reserved = high_hold - low_pos <= HOLD_MARGIN
+        clearance = VEH_LENGTH + MIN_GAP + 2 * LC_SAFETY_MARGIN  # 1 台分（車長 ＋ minGap ＋ 余裕）
+        slot = high_hold - clearance  # 低い車が止まってよい一番前
+        # 低い車が最大減速で slot の手前に止まれるか（止まれない車には位置を残させず、通り過ぎさせる）
+        can_stop = low_pos <= slot and low.speed**2 <= 2 * abs(MAX_DECEL) * (slot - low_pos)
+        reserved = can_stop and high_hold - low_pos <= HOLD_MARGIN
         if reserved:
             low.propose("order", math.sqrt(2 * HOLD_DECEL * max(slot - low_pos, 0.0)), abs(MAX_DECEL))
         front_gap = (low_pos - VEH_LENGTH) - high_pos - MIN_GAP  # 高い車の前端から低い車の後端まで（minGap 控除済み）
@@ -368,6 +375,8 @@ class Layer2:
             low.propose("order", max(high.speed - YIELD_DELTA, 0.0), YIELD_DECEL)
         elif low_pos > high_pos:
             low.propose("order", low.speed + ALIGN_DELTA, ALIGN_DECEL)
+        elif not can_stop and Layer2._hold_pos(low_req) - high_pos >= clearance:
+            return False  # 止まった高い車の入る場所の手前で止まれず、自分はその先で止まる: 通り過ぎる
         else:
             low.propose("order", 0.0, abs(MAX_DECEL))
         return True
