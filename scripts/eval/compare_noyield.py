@@ -10,6 +10,9 @@
     t_p50/t_p90   活性化から完了までの時間の中央値・90%点 [s]（締切内に完了した要求）
     margin_p10/margin_p50   完了時の残距離（締切位置 − 完了位置）の 10%点・中央値 [m]
 
+封鎖付き straight は、make_b2_outputs.py の実験 1 と同じ表・図（封鎖後のスループット・最大待ち行列・急減速・回避完了位置の
+累積分布）を両方式で ``obstacle/`` に書く。
+
 使い方（リポジトリ直下から）::
 
     uv run python scripts/eval/compare_noyield.py --proposed-raw <提案の raw/> --variant-raw <変種の raw/>
@@ -21,12 +24,20 @@ import argparse
 import csv
 from pathlib import Path
 import re
+import sys
+import tempfile
 
 import pandas as pd
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR))
+
+import make_b2_outputs as b2  # noqa: E402
+
 OUT_DIR = SCRIPT_DIR / "out" / "tsk128_noyield"
 METHODS = ("v2", "v2-noyield-pos")
+VARIANT_LABEL = "協調減速なし"  # 図の凡例（提案は make_b2_outputs.py の METHOD_LABEL のまま）
+VARIANT_STYLE = {"color": "#D55E00", "marker": "D", "linestyle": ":"}
 STOP_SPEED = 1.0  # [m/s] v2/constants.py の YIELD_MIN_SPEED と同じ
 SCENARIO_ORDER = ["diverge", "merge", "straight_obs", "weave", "weave2"]
 
@@ -138,6 +149,26 @@ def summarize(runs: pd.DataFrame, reqs: pd.DataFrame, by: list[str]) -> pd.DataF
     return out.sort_values([c for c in by if c != "method"] + ["method"]).round(3)
 
 
+def obstacle_outputs(proposed_raw: Path, variant_raw: Path, out: Path) -> None:
+    """封鎖付き straight の両方式の run で、make_b2_outputs.py の実験 1 の表・図を ``out`` に書く。
+
+    実験 1 は 1 つの raw/ を読むので、両方式の run へのリンクを一時ディレクトリに集めて渡す。
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        links = Path(tmp)
+        for raw, method in ((proposed_raw, METHODS[0]), (variant_raw, METHODS[1])):
+            for path in raw.glob(f"{method}__straight_obs__*"):
+                (links / path.name).symlink_to(path.resolve())
+        b2.RAW_DIR = links
+        b2.B2_DIR = out
+        b2.METHODS_EXP1 = list(METHODS)
+        b2.METHOD_LABEL[METHODS[1]] = VARIANT_LABEL
+        b2.METHOD_STYLE[METHODS[1]] = VARIANT_STYLE
+        out.mkdir(parents=True, exist_ok=True)
+        b2._setup_japanese_font()
+        b2.exp1_tables_and_figs(b2.load_exp1())
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--proposed-raw", type=Path, required=True, help="提案（v2）の raw/")
@@ -168,6 +199,7 @@ def main() -> None:
     for name, by in tables.items():
         summarize(runs, reqs, by).to_csv(args.out / name, index=False)
         print(f"[compare] {args.out / name}")
+    obstacle_outputs(args.proposed_raw, args.variant_raw, args.out / "obstacle")
 
 
 if __name__ == "__main__":
